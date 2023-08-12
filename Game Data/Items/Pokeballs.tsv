@@ -1,0 +1,5 @@
+Name	Rate_Modifier	Conditions	Buy_Price	Sell_Price	Description
+Poke Ball	1		200	100	A device for catching wild Pokémon. It is thrown like a ball at the target. It is designed as a capsule system.
+Great Ball	1.5		600	300	A good, high-performance Ball that provides a higher Pokémon catch rate than a standard Poké Ball.
+Ultra Ball	2		1200	600	An ultra-performance Ball that provides a higher Pokémon catch rate than a Great Ball.
+Master Ball	255				The best Ball with the ultimate level of performance. It will catch any wild Pokémon without fail.

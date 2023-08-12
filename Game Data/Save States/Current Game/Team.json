@@ -1,0 +1,100 @@
+[
+    {
+        "Name": "Chimchar",
+        "Level": 6,
+        "XP": 209,
+        "Move_Names": [
+            "Scratch",
+            "Leer"
+        ],
+        "Move_PPs": [
+            29,
+            30
+        ],
+        "Health": 14,
+        "Status": null,
+        "EVs": [
+            5,
+            0,
+            0,
+            0,
+            0,
+            1
+        ],
+        "IVs": [
+            31,
+            31,
+            31,
+            31,
+            31,
+            31
+        ],
+        "Gender": "Male",
+        "Nature": "Bashful",
+        "Ability": "Blaze",
+        "KO": false,
+        "Stat_Stages": {
+            "attack": 0,
+            "defence": 0,
+            "spAttack": 0,
+            "spDefence": 0,
+            "speed": 0,
+            "accuracy": 0,
+            "evasion": 0
+        },
+        "Friendly": true,
+        "Shiny": true,
+        "Visible": true,
+        "Catch_Date": "2022-09-23",
+        "Catch_Location": null,
+        "Catch_Level": 5
+    },
+    {
+        "Name": "Shinx",
+        "Level": 3,
+        "XP": 57,
+        "Move_Names": [
+            "Tackle"
+        ],
+        "Move_PPs": [
+            35
+        ],
+        "Health": 7,
+        "Status": null,
+        "EVs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "IVs": [
+            0,
+            13,
+            1,
+            30,
+            5,
+            25
+        ],
+        "Gender": "Female",
+        "Nature": "Quiet",
+        "Ability": "Rivalry",
+        "KO": false,
+        "Stat_Stages": {
+            "attack": 0,
+            "defence": 0,
+            "spAttack": 0,
+            "spDefence": 0,
+            "speed": 0,
+            "accuracy": 0,
+            "evasion": 0
+        },
+        "Friendly": true,
+        "Shiny": false,
+        "Visible": true,
+        "Catch_Date": "2022-09-23",
+        "Catch_Location": "Route 201",
+        "Catch_Level": 3
+    }
+]
