@@ -1,20 +1,22 @@
 [
     {
         "Name": "Chimchar",
-        "Level": 6,
-        "XP": 232,
+        "Level": 7,
+        "XP": 246,
         "Move_Names": [
             "Scratch",
-            "Leer"
+            "Leer",
+            "Ember"
         ],
         "Move_PPs": [
-            24,
-            30
+            35,
+            30,
+            25
         ],
-        "Health": 7,
+        "Health": 23,
         "Status": null,
         "EVs": [
-            5,
+            6,
             1,
             0,
             0,
@@ -59,7 +61,7 @@
         "Move_PPs": [
             35
         ],
-        "Health": 7,
+        "Health": 15,
         "Status": null,
         "EVs": [
             0,
@@ -106,10 +108,10 @@
             "Growl"
         ],
         "Move_PPs": [
-            9,
-            39
+            10,
+            40
         ],
-        "Health": 0,
+        "Health": 16,
         "Status": null,
         "EVs": [
             0,
