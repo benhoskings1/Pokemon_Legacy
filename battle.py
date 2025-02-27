@@ -23,7 +23,7 @@ from General.Item import Pokeball, MedicineItem
 from General.Route import Route
 from General.Status_Conditions.Burn import Burn
 from General.Status_Conditions.Poison import Poison
-from Pokemon import Pokemon
+from pokemon import Pokemon
 
 
 class State(Enum):

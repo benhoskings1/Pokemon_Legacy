@@ -3,10 +3,10 @@ from math import ceil, floor
 
 import pygame as pg
 
-import Bag
+from bag import Bag
 from General.Colours import Colours
 from General.Selector import Selector3
-from Screen import Screen, BlitLocation
+from screen import Screen, BlitLocation
 
 
 class BagState(Enum):

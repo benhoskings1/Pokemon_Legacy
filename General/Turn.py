@@ -1,6 +1,6 @@
 from enum import Enum
 
-from Pokemon import Pokemon
+from pokemon import Pokemon
 
 
 class Action(Enum):

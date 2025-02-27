@@ -2,7 +2,7 @@ import pygame as pg
 import pytmx
 
 from Map_Files.Map_Objects.Tall_Grass import TallGrass, Obstacle
-from Screen import Screen
+from screen import Screen
 
 clear = pg.SRCALPHA
 

@@ -1,4 +1,4 @@
-from Pokemon import Pokemon
+from pokemon import Pokemon
 
 
 class Team:

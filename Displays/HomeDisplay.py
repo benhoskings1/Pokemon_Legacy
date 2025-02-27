@@ -5,7 +5,7 @@ import pygame as pg
 
 from General.Controller import Controller
 from General.Selector import Selector3
-from Screen import Screen
+from screen import Screen
 
 
 class HomeAction(Enum):

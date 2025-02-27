@@ -2,26 +2,26 @@
     {
         "Name": "Chimchar",
         "Level": 7,
-        "XP": 246,
+        "XP": 297,
         "Move_Names": [
             "Scratch",
             "Leer",
             "Ember"
         ],
         "Move_PPs": [
-            35,
+            33,
             30,
-            25
+            22
         ],
-        "Health": 23,
+        "Health": 11,
         "Status": null,
         "EVs": [
             6,
-            1,
+            2,
             0,
             0,
             0,
-            1
+            2
         ],
         "IVs": [
             31,

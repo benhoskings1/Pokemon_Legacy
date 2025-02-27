@@ -5,10 +5,10 @@ import pandas as pd
 import pygame as pg
 
 import General.Move
-import Pokemon
+import pokemon
 from General.Colours import Colours
 from General.Selector import Selector3
-from Screen import Screen, BlitLocation, FontOption
+from screen import Screen, BlitLocation, FontOption
 
 levelUpValues = pd.read_csv("Game Data/Level Up.tsv", delimiter='\t')
 

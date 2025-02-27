@@ -7,8 +7,8 @@ from datetime import datetime
 import pandas as pd
 import pygame as pg
 
-from Bag import Bag
-from Battle import Battle, State
+from bag import Bag
+from battle import Battle, State
 from Displays.LoadDisplay import LoadDisplay
 from General.Animations import createAnimation
 from General.Colours import Colours
@@ -16,10 +16,10 @@ from General.Controller import Controller
 from General.Direction import Direction
 from General.Time import Time
 from Map_Files.TiledMap import TiledMap
-from Player import Player, Movement
-from Pokemon import Pokemon
+from player import Player, Movement
+from pokemon import Pokemon
 from Poketech.Poketech import Poketech
-from Team import Team
+from team import Team
 
 pokedex = pd.read_csv("Game Data/Pokedex/Local Dex.tsv", delimiter='\t', index_col=1)
 

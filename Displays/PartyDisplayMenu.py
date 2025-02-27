@@ -3,7 +3,7 @@ from enum import Enum
 import pygame as pg
 
 from General.Colours import Colours
-from Screen import Screen, BlitLocation, FontOption
+from screen import Screen, BlitLocation, FontOption
 
 
 class PartyAction(Enum):

@@ -5,8 +5,8 @@ import os
 import numpy as np
 import pygame as pg
 
-from Pokemon import Pokemon
-from Team import Team
+from pokemon import Pokemon
+from team import Team
 
 root = "."
 

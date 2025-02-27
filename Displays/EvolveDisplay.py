@@ -2,7 +2,7 @@ from math import ceil
 
 import pygame as pg
 
-from Screen import Screen, BlitLocation
+from screen import Screen, BlitLocation
 
 
 class EvolveDisplay:

@@ -1,7 +1,7 @@
 import pygame as pg
 
-from Pokemon import Stats
-from Screen import Screen
+from pokemon import Stats
+from screen import Screen
 
 
 class LevelUpDisplay:

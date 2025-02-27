@@ -6,8 +6,8 @@ import pygame as pg
 from General.Colours import Colours
 from General.Move import Move, getMove
 from General.Selector import Selector3
-from Pokemon import Pokemon
-from Screen import Screen, BlitLocation
+from pokemon import Pokemon
+from screen import Screen, BlitLocation
 
 
 class LearnState(Enum):

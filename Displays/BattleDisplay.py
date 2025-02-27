@@ -4,8 +4,8 @@ import pygame as pg
 
 from General.Colours import Colours
 from General.Environment import Environment
-from Pokemon import Pokemon
-from Screen import Screen, BlitLocation, FontOption
+from pokemon import Pokemon
+from screen import Screen, BlitLocation, FontOption
 
 
 class BattleDisplay:
