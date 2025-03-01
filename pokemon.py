@@ -12,15 +12,15 @@ from General.Animations import Animations, createAnimation
 from General.Move import getMove
 from Image_Processing.ImageEditor import ImageEditor
 
-with open("Game Data/Pokedex/LocalDex/LocalDex.pickle", 'rb') as file:
+with open("game_data/Pokedex/LocalDex/LocalDex.pickle", 'rb') as file:
     pokedex: pd.DataFrame = pickle.load(file)
     print("Successfully loaded from pickle")
 
-oldPokedex = pd.read_csv("Game Data/Pokedex/Local Dex.tsv", delimiter='\t', index_col=1)
-attributes = pd.read_csv("Game Data/Pokedex/AttributeDex.tsv", delimiter='\t', index_col=1)
-effectiveness = pd.read_csv("Game Data/Effectiveness.csv", index_col=0)
-levelUpValues = pd.read_csv("Game Data/Level Up.tsv", delimiter='\t')
-natures = pd.read_csv("Game Data/Natures.tsv", delimiter='\t', index_col=0)
+oldPokedex = pd.read_csv("game_data/Pokedex/Local Dex.tsv", delimiter='\t', index_col=1)
+attributes = pd.read_csv("game_data/Pokedex/AttributeDex.tsv", delimiter='\t', index_col=1)
+effectiveness = pd.read_csv("game_data/Effectiveness.csv", index_col=0)
+levelUpValues = pd.read_csv("game_data/Level Up.tsv", delimiter='\t')
+natures = pd.read_csv("game_data/Natures.tsv", delimiter='\t', index_col=0)
 
 capWildMoves = True
 

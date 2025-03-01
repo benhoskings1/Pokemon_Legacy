@@ -21,7 +21,7 @@ from pokemon import Pokemon
 from Poketech.Poketech import Poketech
 from team import Team
 
-pokedex = pd.read_csv("Game Data/Pokedex/Local Dex.tsv", delimiter='\t', index_col=1)
+pokedex = pd.read_csv("game_data/Pokedex/Local Dex.tsv", delimiter='\t', index_col=1)
 
 
 class Game:
@@ -30,9 +30,9 @@ class Game:
         self.overwrite: str = overwrite
 
         if new:
-            self.dataPath = "Game Data/Save States/Start"
+            self.dataPath = "game_data/Save States/Start"
         else:
-            self.dataPath = "Game Data/Save States/Current Game"
+            self.dataPath = "game_data/Save States/Current Game"
 
         self.running = True
 
@@ -370,6 +370,10 @@ class Game:
 
                 pg.time.delay(100)
 
+            elif keys[self.controller.a]:
+                print("activating bag")
+                self.bag.loop(self.bottomSurf, self.controller)
+
             if keys[self.controller.b]:
                 self.player.movement = Movement.running
 
@@ -432,19 +436,19 @@ class Game:
             pg.event.pump()
 
     def save(self):
-        if not os.path.exists("Game Data/Save States/Save Test"):
-            os.mkdir("Game Data/Save States/Save Test")
+        if not os.path.exists("game_data/Save States/Save Test"):
+            os.mkdir("game_data/Save States/Save Test")
         try:
             teamData = []
             for pokemon in self.team.pokemon:
                 teamData.append(pokemon.getJSONData())
 
-            with open("Game Data/Save States/Save Test/Team.json", "w") as write_file:
+            with open("game_data/Save States/Save Test/Team.json", "w") as write_file:
                 json.dump(teamData, write_file, indent=4)
 
             bagData = self.bag.getJSONData()
 
-            with open("Game Data/Save States/Save Test/Bag.json", "w") as write_file:
+            with open("game_data/Save States/Save Test/Bag.json", "w") as write_file:
                 json.dump(bagData, write_file, indent=4)
 
             # need to set all pygame surfaces to none
@@ -468,23 +472,23 @@ class Game:
             if self.battle:
                 self.battle.clearSurfaces()
 
-            with open("Game Data/Save States/Save Test/Game.pickle", 'wb') as f:
+            with open("game_data/Save States/Save Test/Game.pickle", 'wb') as f:
                 pickle.dump(self, f)
                 print("Successfully pickled")
 
             # can
-            for root, dirs, files in os.walk("Game Data/Save States/Current Game", topdown=False):
+            for root, dirs, files in os.walk("game_data/Save States/Current Game", topdown=False):
                 for name in files:
                     os.remove(os.path.join(root, name))
                 for name in dirs:
                     os.rmdir(os.path.join(root, name))
 
-            os.rename("Game Data/Save States/Save Test", "Game Data/Save States/Current Game")
+            os.rename("game_data/Save States/Save Test", "game_data/Save States/Current Game")
 
         except TypeError:
             print("Pickle Failed")
             print("The data was not overwritten")
-            for root, dirs, files in os.walk("Game Data/Save States/Save Test", topdown=False):
+            for root, dirs, files in os.walk("game_data/Save States/Save Test", topdown=False):
                 for name in files:
                     os.remove(os.path.join(root, name))
                 for name in dirs:

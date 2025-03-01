@@ -6,20 +6,20 @@ from random import randint
 
 import pygame as pg
 
-from Displays.BagDisplay import BagDisplay, BagAction, BagState
+from Displays.bag_display import BagDisplay, BagAction, BagState
 from Displays.BattleDisplay import BattleDisplay
 from Displays.EvolveDisplay import EvolveDisplay
 from Displays.HomeDisplay import HomeDisplay, HomeAction
 from Displays.LearnMove import LearnMoveDisplay, LearnAction
 from Displays.LevelUpDisplay import LevelUpDisplay
 from Displays.MoveDisplay import MoveDisplay, FightAction
-from Displays.PartyDisplayBattle import PartyDisplay, PartyAction
+from Displays.team_display_battle import TeamDisplay, PartyAction
 from General.Animations import createAnimation
 from General.Colours import Colours
 from General.Condition import StatusCondition
 from General.Environment import Environment
 from General.Image import Image
-from General.Item import Pokeball, MedicineItem
+from General.Item import Item, Pokeball, MedicineItem
 from General.Route import Route
 from General.Status_Conditions.Burn import Burn
 from General.Status_Conditions.Poison import Poison
@@ -107,7 +107,7 @@ class Battle:
         self.homeDisplay = HomeDisplay(self.screenSize)  # Home screen
         self.bagDisplay = BagDisplay(self.game.bag)  # Bag Screens
         self.moveDisplay = MoveDisplay(self.screenSize, friendlyMoves)  # Move screen
-        self.teamDisplay = PartyDisplay(self.screenSize, game.team.pokemon)  # Party Screen
+        self.teamDisplay = TeamDisplay(self.screenSize, game.team)  # Party Screen
 
         self.learnMoveDisplay = LearnMoveDisplay(self.screenSize)  # Learn Move Screens
         self.levelUpDisplay = LevelUpDisplay((254, 196))
@@ -171,91 +171,6 @@ class Battle:
 
             pg.time.delay(duration)
 
-    def bagLogic(self, keys):
-        action = self.bagDisplay.update(keys, self.game.controller)
-        self.updateScreen()
-        if action == BagAction.home:
-            self.state = State.home
-        elif action == BagAction.item:
-            screen = self.bagDisplay.screenIndices[self.bagDisplay.state.value - 1]
-            [_, _, pos] = self.bagDisplay.selectors[self.bagDisplay.state.value].getValues()
-
-            idx = pos + screen * 6
-
-            HPRestoreItems = {}
-            StatusItems = {}
-            for item in self.game.bag.medicine:
-                if item.battleType == "HP/PP":
-                    HPRestoreItems[item] = self.game.bag.medicine[item]
-                elif item.battleType == "Status":
-                    StatusItems[item] = self.game.bag.medicine[item]
-
-            if self.bagDisplay.state == BagState.restore or self.bagDisplay.state == BagState.status:
-
-                if self.bagDisplay.state == BagState.restore:
-                    items = HPRestoreItems
-                else:
-                    items = StatusItems
-
-                if idx < len(items):
-                    item, count = list(items.items())[idx]
-                    if item.heal and self.friendly.health != self.friendly.stats.health:
-                        self.useItem(item)
-                        self.game.bag.medicine[item] -= 1
-                        if self.game.bag.medicine[item] == 0:
-                            self.game.bag.medicine.pop(item)
-
-                        return BagAction.item
-
-                    elif item.heal:
-                        self.displayMessage("It won't have any effect", 1500)
-                        self.battleDisplay.text = str.format("What will {} do?", self.friendly.name)
-                        return None
-
-                    if item.status and self.friendly.status:
-                        if item.status == self.friendly.status.value:
-                            self.useItem(item)
-                            self.game.bag.medicine[item] -= 1
-                            if self.game.bag.medicine[item] == 0:
-                                self.game.bag.medicine.pop(item)
-                        else:
-                            self.displayMessage("It won't have any effect", 1500)
-                            self.battleDisplay.text = str.format("What will {} do?", self.friendly.name)
-                            return None
-
-                    elif item.status:
-                        self.displayMessage("It won't have any effect", 1500)
-                        self.battleDisplay.text = str.format("What will {} do?", self.friendly.name)
-                        return None
-
-                    self.displayMessage("Not yet implemented...", 1500)
-                    self.battleDisplay.text = str.format("What will {} do?", self.friendly.name)
-                    return None
-
-                else:
-                    return None
-
-            elif self.bagDisplay.state == BagState.pokeball:
-                if idx < len(self.game.bag.pokeballs):
-                    item, count = list(self.game.bag.pokeballs.items())[idx]
-                    self.game.bag.pokeballs[item] -= 1
-                    if self.game.bag.pokeballs[item] == 0:
-                        self.game.bag.pokeballs.pop(item)
-
-                    end = self.useItem(item, targetFriendly=False)
-
-                    if end:
-                        return True
-
-                else:
-                    return None
-
-            self.bagDisplay.updateScreens(self.game.bag)
-
-            return BagAction.item
-
-        return None
-
     def fightLogic(self, keys):
         action = self.moveDisplay.update(self.game.controller, keys=keys)
         self.updateScreen()
@@ -271,23 +186,6 @@ class Battle:
         if action != HomeAction.nothing:
             self.state = State(action.value + 1)
         self.updateScreen()
-
-    def pokemonLogic(self, keys):
-        action = self.teamDisplay.update(keys, self.game.controller, self.pokemonTeam)
-        self.updateScreen()
-        if action == PartyAction.home:
-            self.state = State.home
-        elif action != PartyAction.nothing:
-            if action.value >= len(self.pokemonTeam):
-                return None
-            elif self.pokemonTeam[action.value] == self.friendly:
-                self.state = State.home
-                return None
-
-            self.state = State.home
-            return action
-
-        return None
 
     def learnLogic(self, move):
         if len(self.friendly.moves) == 4:
@@ -756,6 +654,9 @@ class Battle:
                 pg.time.delay(int(timePerFrame))
 
     def useItem(self, item, targetFriendly=True):
+        # Ensure that the pokeball targets the friendly pokemon
+        if item.type == "Pokeball":
+            targetFriendly = False
 
         self.displayMessage(str.format("Used the {}", item.name), 1000)
 
@@ -867,7 +768,7 @@ class Battle:
 
         target.health = round(target.health)
 
-    def getAction(self):
+    def select_action(self):
         action = None
         while not action:
             pg.time.delay(100)  # set the debounce-time for keys
@@ -879,10 +780,20 @@ class Battle:
                 action = self.fightLogic(keys)
 
             elif self.state == State.bag:
-                action = self.bagLogic(keys)
+                res = self.game.bag.loop(self.game.bottomSurf, self.game.controller, battle=self)
+                if res != BagAction.home:
+                    self.useItem(res, targetFriendly=True)
+
+                self.game.bag.display.set_default_view()
+                self.state = State.home
 
             elif self.state == State.pokemon:
-                action = self.pokemonLogic(keys)
+                action = self.game.team.display_loop(self.game.bottomSurf, self.game.controller)
+                if action != PartyAction.home:
+                    self.tag_in_teammate(action)
+
+                self.game.team.battle_display.set_default_view()
+                self.state = State.home
 
             elif self.state == State.run:
                 if self.friendly.stats.speed > self.foe.stats.speed:
@@ -923,21 +834,20 @@ class Battle:
             else:
                 self.attack(attacker=pokemon, target=self.friendly, move=move)
 
-    def loop2(self):
+    def tag_in_teammate(self, teammate: PartyAction):
+        pkIndex = self.activePokemon.index(self.friendly)
+        self.activePokemon[pkIndex] = self.pokemonTeam[teammate.value]
+        self.friendly = self.activePokemon[pkIndex]
+        self.moveDisplay = MoveDisplay(self.screenSize, self.friendly.moves)
 
+    def loop2(self):
         while self.running:
             # get speed of wild Pokémon
             self.battleDisplay.text = str.format("What will {} do?", self.friendly.name)
-            friendlyAction = self.getAction()
+            friendlyAction = self.select_action()
 
             moveIdx = randint(0, len(self.foe.moves) - 1)
             foeAction = FightAction(moveIdx)
-
-            if type(friendlyAction) == PartyAction:
-                pkIndex = self.activePokemon.index(self.friendly)
-                self.activePokemon[pkIndex] = self.pokemonTeam[friendlyAction.value]
-                self.friendly = self.activePokemon[pkIndex]
-                self.moveDisplay = MoveDisplay(self.screenSize, self.friendly.moves)
 
             speeds = []
             for pokemon in self.activePokemon:
@@ -1015,3 +925,24 @@ class Battle:
         self.levelUpDisplay = None
         self.evolveDisplay = None
         self.lowerScreenBase = None
+
+
+if __name__ == '__main__':
+    from game import Game
+    from bag import Bag
+    import json
+
+    pg.init()
+
+    with open("test_data/bag/test_bag.json", "r") as read_file:
+        bag_data = json.load(read_file)
+
+    demo_bag = Bag(**bag_data)
+
+    game = Game(scale=1, fromPickle=True, overwrite=False)
+
+    game.bag = Bag(**bag_data)
+
+    battle = Battle(game, routeName="Route 201", wildName="Abra", wildLevel=100)
+
+    battle.loop2()

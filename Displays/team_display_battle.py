@@ -1,3 +1,4 @@
+import time
 from enum import Enum
 from math import ceil
 
@@ -5,12 +6,12 @@ import pandas as pd
 import pygame as pg
 
 import General.Move
-import pokemon
+from pokemon import Pokemon
 from General.Colours import Colours
 from General.Selector import Selector3
 from screen import Screen, BlitLocation, FontOption
 
-levelUpValues = pd.read_csv("Game Data/Level Up.tsv", delimiter='\t')
+levelUpValues = pd.read_csv("game_data/Level Up.tsv", delimiter='\t')
 
 
 class PartyAction(Enum):
@@ -29,9 +30,8 @@ class PartyState(Enum):
     screen2 = 1
 
 
-class PartyDisplay:
+class TeamDisplay:
     def __init__(self, size, team):
-
         self.screen = Screen(pg.Vector2(256, 192))
         self.screen.loadImage("Images/Battle/Party Displays/Screen 1/Base.png", base=True)
 
@@ -121,11 +121,11 @@ class PartyDisplay:
         self.selectors = [self.selector, selector2, summarySelector, checkSelector, moveSelector]
 
         self.screenIdx = 0
-        self.teamSize = len(team)
+        self.teamSize = len(team.pokemon)
         self.pokemonIdx = 0
         self.moveIdx = 0
 
-        self.updateScreen(team)
+        self.updateScreen(team.pokemon)
 
     def getSurface(self):
         selector = self.selectors[self.screenIdx]
@@ -163,7 +163,7 @@ class PartyDisplay:
         hpOffset = pg.Vector2(int(64 * 15 / 8), int(26 * 15 / 8))
 
         for idx, pk in enumerate(team):
-            pk: Pokemon.Pokemon
+            pk: Pokemon
             position = positions[idx] * 15 / 8
             screen1.addImage(pk.smallImage, position + pkOffset,
                              location=BlitLocation.centre)
@@ -193,7 +193,7 @@ class PartyDisplay:
             screen1.loadImage(imPath, pos=hpRect.topleft, size=hpRect.size)
 
         screen2 = self.screens[1]
-        pk: Pokemon.Pokemon = team[self.pokemonIdx]
+        pk: Pokemon = team[self.pokemonIdx]
         screen2.refresh()
         # screen2.scaleSurface(15 / 8)
         screen2.addImage(pk.smallImage, (int(128 * 15 / 8), int(70 * 15 / 8)),
@@ -410,3 +410,10 @@ class PartyDisplay:
                 self.screenIdx -= 1
 
         return action
+
+    def set_default_view(self):
+        self.screenIdx, self.pokemonIdx, self.moveIdx = 0, 0, 0
+
+        for selector in self.selectors:
+            selector.level = 0
+            selector.position = pg.Vector2(0, 0)

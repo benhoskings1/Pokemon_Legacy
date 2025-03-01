@@ -1,27 +1,28 @@
 import pandas as pd
 import pygame as pg
 
-prices = pd.read_csv("Game Data/Item Prices.tsv", delimiter="\t", index_col=0)
-pokeballs = pd.read_csv("Game Data/Items/Pokeballs.tsv", delimiter="\t", index_col=0)
-medicine = pd.read_csv("Game Data/Items/Medicine.tsv", delimiter="\t", index_col=0)
+item_data = pd.read_csv("game_data/items.tsv", delimiter="\t", index_col=0)
+pokeballs = pd.read_csv("game_data/Items/pokeballs.tsv", delimiter="\t", index_col=0)
+medicine = pd.read_csv("game_data/Items/medicine.tsv", delimiter="\t", index_col=0)
+
+item_data = item_data.merge(medicine, on="item_id", how="left").merge(pokeballs, on="item_id", how="left")
 
 
 class Item:
-    def __init__(self, name, type, description=""):
-        data = prices.loc[name]
-        self.name = name
+    def __init__(self, data, type, description=""):
+        self.name = data["name"]
         self.type = type
-        self.image = pg.image.load(str.format("Sprites/Items/{}/{}.png", self.type, name))
+        self.image = pg.image.load(str.format("Sprites/Items/{}/{}.png", self.type, data["name"]))
 
-        if pd.isna(data.Buy_Price):
+        if pd.isna(data.buy_price):
             self.buyPrice = None
         else:
-            self.buyPrice = data.Buy_Price
+            self.buyPrice = data.buy_price
 
-        if pd.isna(data.Sell_Price):
+        if pd.isna(data.sell_price):
             self.sellPrice = None
         else:
-            self.sellPrice = data.Sell_Price
+            self.sellPrice = data.sell_price
 
         self.description = description
 
@@ -31,11 +32,11 @@ class Item:
 
 class Pokeball(Item):
     def __init__(self, name):
-        data = pokeballs.loc[name]
-        if pd.isna(data.Description):
-            super().__init__(name, type="Pokeball")
+        data = item_data.loc[item_data["name"] == name].iloc[0]
+        if pd.isna(data.description):
+            super().__init__(data, type="Pokeball")
         else:
-            super().__init__(name, type="Pokeball", description=data.Description)
+            super().__init__(data, type="Pokeball", description=data.description)
 
         self.modifier = data.Rate_Modifier
 
@@ -47,23 +48,23 @@ class Pokeball(Item):
 
 class MedicineItem(Item):
     def __init__(self, name):
-        data = medicine.loc[name]
-        if pd.isna(data.Description):
-            super().__init__(name, type="Medicine")
+        data = item_data.loc[item_data["name"] == name].iloc[0]
+        if pd.isna(data.description):
+            super().__init__(data, type="Medicine")
         else:
-            super().__init__(name, type="Medicine", description=data.Description)
+            super().__init__(data, type="Medicine", description=data.description)
 
-        if pd.isna(data.Heal_Amount):
+        if pd.isna(data.heal_amount):
             self.heal = False
         else:
-            self.heal = data.Heal_Amount
+            self.heal = data.heal_amount
 
-        if pd.isna(data.Status):
+        if pd.isna(data.status):
             self.status = None
         else:
-            self.status = data.Status
+            self.status = data.status
 
-        if pd.isna(data.Battle_Type):
-            self.battleType = None
+        if pd.isna(data.battle_type):
+            self.battle_type = None
         else:
-            self.battleType = data.Battle_Type
+            self.battle_type = data.battle_type

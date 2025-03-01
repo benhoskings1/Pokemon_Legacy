@@ -48,7 +48,6 @@ class Screen:
                 textSurf = self.font.renderText(text, lineCount=lines, colour=colour)
         else:
             textSurf = self.font.renderText(text, lineCount=lines)
-
         blitPos = pos
         size = pg.Vector2(textSurf.get_size())
         if location == BlitLocation.centre:

@@ -6,7 +6,7 @@ import pandas as pd
 
 class Route:
     def __init__(self, name):
-        data = pd.read_csv(str.format("Game Data/Locations/{}.tsv", name), delimiter='\t', index_col=0)
+        data = pd.read_csv(str.format("game_data/Locations/{}.tsv", name), delimiter='\t', index_col=0)
         self.data = {}
         for time in data.index:
             timeData = data.loc[time]

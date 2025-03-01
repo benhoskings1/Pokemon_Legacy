@@ -3,7 +3,6 @@ from math import ceil, floor
 
 import pygame as pg
 
-from bag import Bag
 from General.Colours import Colours
 from General.Selector import Selector3
 from screen import Screen, BlitLocation
@@ -24,7 +23,7 @@ class BagAction(Enum):
 
 
 class BagDisplay:
-    def __init__(self, bag: Bag, size=pg.Vector2(256, 192)):
+    def __init__(self, bag, size=pg.Vector2(256, 192)):
 
         self.state = BagState.home
 
@@ -33,9 +32,9 @@ class BagDisplay:
         HPRestoreItems = {}
         StatusItems = {}
         for item in bag.medicine:
-            if item.battleType == "HP/PP":
+            if item.battle_type == "HP/PP":
                 HPRestoreItems[item] = bag.medicine[item]
-            elif item.battleType == "Status":
+            elif item.battle_type == "Status":
                 StatusItems[item] = bag.medicine[item]
 
         if len(HPRestoreItems) > 0:
@@ -191,9 +190,9 @@ class BagDisplay:
         HPRestoreItems = {}
         StatusItems = {}
         for item in bag.medicine:
-            if item.battleType == "HP/PP":
+            if item.battle_type == "HP/PP":
                 HPRestoreItems[item] = bag.medicine[item]
-            elif item.battleType == "Status":
+            elif item.battle_type == "Status":
                 StatusItems[item] = bag.medicine[item]
 
         for idx in range(len(self.restoreScreens) * 6):
@@ -330,3 +329,12 @@ class BagDisplay:
                 self.state = BagState.home
 
         return action
+
+    def set_default_view(self):
+        self.state = BagState.home
+
+        self.restoreIdx, self.pokeballIdx, self.statusIdx, itemIdx = 0, 0, 0, 0
+
+        for selector in self.selectors:
+            selector.level = 0
+            selector.position = pg.Vector2(0, 0)

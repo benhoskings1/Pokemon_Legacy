@@ -1,22 +1,22 @@
 [
     {
         "Name": "Chimchar",
-        "Level": 7,
-        "XP": 297,
+        "Level": 8,
+        "XP": 318,
         "Move_Names": [
             "Scratch",
             "Leer",
             "Ember"
         ],
         "Move_PPs": [
-            33,
+            35,
             30,
-            22
+            25
         ],
-        "Health": 11,
+        "Health": 25,
         "Status": null,
         "EVs": [
-            6,
+            7,
             2,
             0,
             0,
@@ -36,7 +36,7 @@
         "Ability": "Blaze",
         "KO": false,
         "Stat_Stages": {
-            "attack": 0,
+            "attack": -1,
             "defence": 0,
             "spAttack": 0,
             "spDefence": 0,

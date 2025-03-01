@@ -1,10 +1,13 @@
 {
     "Items": {},
     "Pokeballs": {
-        "Great Ball": 25
+      "Ultra Ball": 10,
+      "Poke Ball": 5
     },
     "Medicine": {
-        "Super Potion": 19
+      "Hyper Potion": 20,
+      "Super Potion": 10,
+      "Burn Heal": 2
     },
     "TMs": {},
     "Berries": {},

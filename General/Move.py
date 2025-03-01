@@ -3,7 +3,7 @@ from enum import Enum
 
 import pandas as pd
 
-movesData = pd.read_csv("Game Data/Moves.tsv", delimiter='\t', index_col=0)
+movesData = pd.read_csv("game_data/Moves.tsv", delimiter='\t', index_col=0)
 
 
 class EffectType(Enum):
