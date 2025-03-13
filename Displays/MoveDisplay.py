@@ -2,7 +2,7 @@ from enum import Enum
 
 import pygame as pg
 
-from General.Selector import Selector3
+from general.Selector import Selector3
 from screen import Screen, BlitLocation, FontOption
 
 

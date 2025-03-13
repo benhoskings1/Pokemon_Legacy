@@ -2,8 +2,8 @@ from enum import Enum
 
 import pygame as pg
 
-from Font.Font import Font, LevelFont
-from General.Colours import Colours
+from font.Font import Font, LevelFont
+from general.Colours import Colours
 
 
 class BlitLocation(Enum):

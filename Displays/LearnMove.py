@@ -3,9 +3,9 @@ from math import ceil
 
 import pygame as pg
 
-from General.Colours import Colours
-from General.Move import Move, getMove
-from General.Selector import Selector3
+from general.Colours import Colours
+from general.Move import Move, getMove
+from general.Selector import Selector3
 from pokemon import Pokemon
 from screen import Screen, BlitLocation
 

@@ -3,7 +3,7 @@ from enum import Enum
 
 import pygame as pg
 
-from Font.Font import ClockFont
+from font.Font import ClockFont
 from screen import Screen, BlitLocation
 
 largeClockFont = ClockFont(1.85)

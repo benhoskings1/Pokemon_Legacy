@@ -2,7 +2,7 @@ from enum import Enum
 
 import pygame as pg
 
-from General.Colours import Colours
+from general.Colours import Colours
 from screen import Screen, BlitLocation, FontOption
 
 

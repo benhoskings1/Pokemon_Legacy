@@ -43,7 +43,7 @@ class Font:
         self.letters = {}
         self.sizes = {}
 
-        names = sorted(os.listdir("Font/Letter Images"))
+        names = sorted(os.listdir("font/Letter Images"))
 
         for name in names:
             letter = name[0]
@@ -53,7 +53,7 @@ class Font:
                 letter = "/"
 
             if name.endswith(".png"):
-                image = pg.image.load(str.format("Font/Letter Images/{}", name))
+                image = pg.image.load(str.format("font/Letter Images/{}", name))
                 newImage = pg.transform.scale(image, pg.Vector2(image.get_size()) * scale)
                 self.sizes[letter] = newImage.get_size()
                 self.letters[letter] = newImage
@@ -94,6 +94,8 @@ class Font:
                           ".": Baseline.centre, "'": Baseline.centre,
                           "(": Baseline.centre, ")": Baseline.centre,
                           "+": Baseline.centre}
+
+        self.size = 10
 
     def renderText(self, text: str, lineCount=1, colour=None, shadowColour=None):
         words = text.split(" ")
@@ -190,7 +192,7 @@ class LevelFont:
         self.letters = {}
         self.sizes = {}
 
-        names = sorted(os.listdir("Font/Level"))
+        names = sorted(os.listdir("font/Level"))
 
         for name in names:
 
@@ -198,7 +200,7 @@ class LevelFont:
             if "slash" in name:
                 letter = "/"
 
-            image = pg.image.load(str.format("Font/Level/{}", name))
+            image = pg.image.load(str.format("font/Level/{}", name))
             newImage = pg.transform.scale(image, pg.Vector2(image.get_size()) * scale)
             self.sizes[letter] = newImage.get_size()
             self.letters[letter] = newImage
@@ -251,7 +253,7 @@ class ClockFont:
         self.letters = {}
         self.sizes = {}
 
-        names = sorted(os.listdir("Font/Clock"))
+        names = sorted(os.listdir("font/Clock"))
 
         for name in names:
             letter = name[0]
@@ -260,7 +262,7 @@ class ClockFont:
                 letter = ":"
 
             if name.endswith(".png"):
-                image = pg.image.load(str.format("Font/Clock/{}", name))
+                image = pg.image.load(str.format("font/Clock/{}", name))
                 newImage = pg.transform.scale(image, pg.Vector2(image.get_size()) * scale)
                 self.sizes[letter] = newImage.get_size()
                 self.letters[letter] = newImage

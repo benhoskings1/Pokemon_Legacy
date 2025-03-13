@@ -3,8 +3,8 @@ from math import ceil, floor
 
 import pygame as pg
 
-from General.Colours import Colours
-from General.Selector import Selector3
+from general.Colours import Colours
+from general.Selector import Selector3
 from screen import Screen, BlitLocation
 
 

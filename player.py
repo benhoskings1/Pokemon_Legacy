@@ -3,7 +3,7 @@ from enum import Enum
 
 import pygame as pg
 
-from General.Direction import Direction
+from general.Direction import Direction
 from Sprites.SpriteSet import SpriteSet2
 
 

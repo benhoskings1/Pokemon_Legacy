@@ -1,11 +1,32 @@
-from math import ceil
+from math import ceil, floor
 
 import pygame as pg
 
-from General.Colours import Colours
-from General.Environment import Environment
+from general.Colours import Colours
+from general.Environment import Environment
 from pokemon import Pokemon
 from screen import Screen, BlitLocation, FontOption
+
+from sprite_screen import SpriteScreen
+
+
+class PokeballSprite(pg.sprite.Sprite):
+    def __init__(self, pokeball_type):
+        super().__init__(self)
+
+        self.pokeball_type = pokeball_type
+        self.image_base_path = "Sprites/Pokeball Sprites/Poke ball/Catch Animation"
+
+        self.images = [pg.image.load(f"{self.image_base_path} {idx}.png") for idx in range(22)]
+        self.image_idx = 0
+
+        self.image = self.images[0]
+
+        self.rect = self.image.get_rect()
+
+    def get_image(self):
+        self.image = self.images[self.image_idx]
+        return self.image
 
 
 class BattleDisplay:

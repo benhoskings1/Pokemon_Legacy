@@ -8,8 +8,8 @@ import cv2
 import pandas as pd
 import pygame as pg
 
-from General.Animations import Animations, createAnimation
-from General.Move import getMove
+from general.Animations import Animations, createAnimation
+from general.Move import getMove
 from Image_Processing.ImageEditor import ImageEditor
 
 with open("game_data/Pokedex/LocalDex/LocalDex.pickle", 'rb') as file:
@@ -122,11 +122,13 @@ class StatStages:
         print(self.attack, self.defence, self.spAttack, self.spDefence, self.speed)
 
 
-class Pokemon:
+class Pokemon(pg.sprite.Sprite):
     def __init__(self, Name, Level=None, XP=None, Move_Names=None, Move_PPs=None, Health=None, Status=None,
                  EVs=None, IVs=None, Gender=None, Nature=None, Ability=None, KO=False, Stat_Stages=None,
                  Friendly=False, Shiny=None, Visible=True, Catch_Location=None, Catch_Level=None,
                  Catch_Date=None):
+
+        super().__init__()
 
         data = pokedex.loc[Name]
         oldData = oldPokedex.loc[Name]
@@ -251,9 +253,6 @@ class Pokemon:
                 else:
                     move.PP = move.maxPP
 
-        # in battle stats
-        self.visible = Visible
-
         if Stat_Stages:
             self.statStages = StatStages(**Stat_Stages)
         else:
@@ -282,6 +281,17 @@ class Pokemon:
             self.catchLevel = self.level
             self.catchDate = datetime.datetime.now()
 
+        # display options
+        self.sprite_type = "pokemon"
+        self.rect = self.image.get_rect()
+
+        if self.friendly:
+            self.rect.midbottom = pg.Vector2(int(66 * 15 / 8), int(144 * 15 / 8))
+        else:
+            self.rect.midbottom = pg.Vector2(int(192 * 15 / 8), int(90 * 15 / 8))
+
+        self.visible = Visible
+
     def loadAnimation(self):
         animations = createAnimation(self.name)
 
@@ -291,7 +301,6 @@ class Pokemon:
             self.animation = animations.front
 
     def getMoveDamage(self, move, target, ignoreModifiers=False):
-
         if move.category == "Physical":
             if move.power:
                 if ignoreModifiers:
@@ -518,6 +527,10 @@ class Pokemon:
 
         for move in self.moves:
             move.PP = move.maxPP
+
+    ######### DISPLAY FUNCTIONS BELOW
+    # def get_shimmer_frame(self):
+    #     return
 
     def getJSONData(self):
         movePPs = [move.PP for move in self.moves]

@@ -5,10 +5,10 @@ import time
 import pandas as pd
 import pygame as pg
 
-from General.Item import Item, Pokeball, MedicineItem
+from general.Item import Item, Pokeball, MedicineItem
 
 # Used for visualisation
-from General.Controller import Controller
+from general.Controller import Controller
 from Displays.bag_display import BagDisplay, BagAction, BagState
 from battle import Battle
 

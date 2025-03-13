@@ -3,8 +3,8 @@ from math import ceil
 
 import pygame as pg
 
-from General.Controller import Controller
-from General.Selector import Selector3
+from general.Controller import Controller
+from general.Selector import Selector3
 from screen import Screen
 
 

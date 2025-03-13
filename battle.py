@@ -6,24 +6,26 @@ from random import randint
 
 import pygame as pg
 
-from Displays.bag_display import BagDisplay, BagAction, BagState
+from Displays.bag_display import BagAction
+from Displays.battle_display_V2 import BattleDisplayV2
 from Displays.BattleDisplay import BattleDisplay
 from Displays.EvolveDisplay import EvolveDisplay
 from Displays.HomeDisplay import HomeDisplay, HomeAction
 from Displays.LearnMove import LearnMoveDisplay, LearnAction
 from Displays.LevelUpDisplay import LevelUpDisplay
 from Displays.MoveDisplay import MoveDisplay, FightAction
-from Displays.team_display_battle import TeamDisplay, PartyAction
-from General.Animations import createAnimation
-from General.Colours import Colours
-from General.Condition import StatusCondition
-from General.Environment import Environment
-from General.Image import Image
-from General.Item import Item, Pokeball, MedicineItem
-from General.Route import Route
-from General.Status_Conditions.Burn import Burn
-from General.Status_Conditions.Poison import Poison
+from Displays.team_display_battle import PartyAction
+from general.Animations import createAnimation
+from general.Colours import Colours
+from general.Condition import StatusCondition
+from general.Environment import Environment
+from general.Image import Image
+from general.Item import Item, Pokeball, MedicineItem
+from general.Route import Route
+from general.Status_Conditions.Burn import Burn
+from general.Status_Conditions.Poison import Poison
 from pokemon import Pokemon
+from team import Team
 
 
 class State(Enum):
@@ -42,11 +44,11 @@ class Battle:
         self.game = game
         self.running = True
         self.catchLocation = routeName
-        self.pokemonTeam = game.team.pokemon
+        self.pokemon_team: Team = game.team
 
         # set up the displays
 
-        self.friendly: Pokemon = self.pokemonTeam[0]
+        self.friendly: Pokemon = self.pokemon_team.get_active_pokemon()
         friendlyMoves = self.friendly.moves
 
         self.screenSize = pg.Vector2(game.topSurf.get_size())
@@ -102,12 +104,13 @@ class Battle:
 
         self.activePokemon = [self.friendly, self.foe]
 
-        # Top screen
+        print(self.screenSize, self.battleDisplay.screen2.size)
+        self.battle_display = BattleDisplayV2(self.screenSize, self.timeOfDay, self.environment)
+        self.battle_display.add_pokemon_sprites(self.activePokemon)
 
+        # Top screen
         self.homeDisplay = HomeDisplay(self.screenSize)  # Home screen
-        self.bagDisplay = BagDisplay(self.game.bag)  # Bag Screens
         self.moveDisplay = MoveDisplay(self.screenSize, friendlyMoves)  # Move screen
-        self.teamDisplay = TeamDisplay(self.screenSize, game.team)  # Party Screen
 
         self.learnMoveDisplay = LearnMoveDisplay(self.screenSize)  # Learn Move Screens
         self.levelUpDisplay = LevelUpDisplay((254, 196))
@@ -126,12 +129,13 @@ class Battle:
 
         if not pickleData:
             pg.event.pump()
-            self.introAnimations(2000)
+            print("starting animation")
+            self.battle_display.intro_animations(self.game.topSurf, 2000)
 
     def updateUpperScreen(self, opacity=None, friendly=False):
         if self.state != State.evolve:
-            self.battleDisplay.updateScreen(self.friendly, self.foe, opacity=opacity, friendly=friendly)
-            self.game.topSurf.blit(self.battleDisplay.getSurface(), (0, 0))
+            self.battle_display.render_pokemon_details()
+            self.game.topSurf.blit(self.battle_display.get_surface(show_sprites=True), (0, 0))
         else:
             self.game.topSurf.blit(self.evolveDisplay.getUpperSurface(), (0, 0))
 
@@ -143,10 +147,6 @@ class Battle:
             self.game.bottomSurf.blit(self.homeDisplay.getSurface(), (0, 0))
         elif self.state == State.fight:
             self.game.bottomSurf.blit(self.moveDisplay.getSurface(), (0, 0))
-        elif self.state == State.pokemon:
-            self.game.bottomSurf.blit(self.teamDisplay.getSurface(), (0, 0))
-        elif self.state == State.bag:
-            self.game.bottomSurf.blit(self.bagDisplay.getSurface(), (0, 0))
         elif self.state == State.learnMove:
             self.game.bottomSurf.blit(self.learnMoveDisplay.getSurface(), (0, 0))
         elif self.state == State.evolve:
@@ -157,19 +157,6 @@ class Battle:
         self.updateLowerScreen(cover)
         if flip:
             pg.display.flip()
-
-    def introAnimations(self, duration):
-        if self.foe.animation:
-            frames = len(self.foe.animation)
-            for frame in self.foe.animation:
-                self.foe.displayImage = frame
-                self.updateScreen(cover=True)
-                pg.time.delay(int(0.75 * duration / frames))
-            self.foe.displayImage = self.foe.image
-            pg.time.delay(int(0.25 * duration))
-        else:
-
-            pg.time.delay(duration)
 
     def fightLogic(self, keys):
         action = self.moveDisplay.update(self.game.controller, keys=keys)
@@ -210,6 +197,7 @@ class Battle:
             self.friendly.moveNames.append(move.name)
 
     def displayMessage(self, text, duration=None):
+        self.battle_display.text = text
         self.battleDisplay.text = text
         self.updateUpperScreen()
         self.game.bottomSurf.blit(self.lowerScreenBase, (0, 0))
@@ -528,7 +516,7 @@ class Battle:
         self.updateScreen()
         pg.time.delay(1000)
 
-        idx = self.pokemonTeam.index(self.friendly)
+        idx = self.pokemon_team.active_index
         self.game.team.pokemon[idx] = evolution
 
         evolution.switchImage("back")
@@ -653,7 +641,7 @@ class Battle:
                 pg.display.flip()
                 pg.time.delay(int(timePerFrame))
 
-    def useItem(self, item, targetFriendly=True):
+    def use_item(self, item, targetFriendly=True):
         # Ensure that the pokeball targets the friendly pokemon
         if item.type == "Pokeball":
             targetFriendly = False
@@ -782,7 +770,7 @@ class Battle:
             elif self.state == State.bag:
                 res = self.game.bag.loop(self.game.bottomSurf, self.game.controller, battle=self)
                 if res != BagAction.home:
-                    self.useItem(res, targetFriendly=True)
+                    self.use_item(res, targetFriendly=True)
 
                 self.game.bag.display.set_default_view()
                 self.state = State.home
@@ -836,14 +824,14 @@ class Battle:
 
     def tag_in_teammate(self, teammate: PartyAction):
         pkIndex = self.activePokemon.index(self.friendly)
-        self.activePokemon[pkIndex] = self.pokemonTeam[teammate.value]
+        self.activePokemon[pkIndex] = self.pokemon_team.pokemon[teammate.value]
         self.friendly = self.activePokemon[pkIndex]
         self.moveDisplay = MoveDisplay(self.screenSize, self.friendly.moves)
 
     def loop2(self):
         while self.running:
             # get speed of wild Pokémon
-            self.battleDisplay.text = str.format("What will {} do?", self.friendly.name)
+            self.battle_display.text = f"What will {self.friendly.name} do?"
             friendlyAction = self.select_action()
 
             moveIdx = randint(0, len(self.foe.moves) - 1)
@@ -891,8 +879,6 @@ class Battle:
                             self.displayMessage(str.format("{} is hurt by its poison", pokemon.name), 1000)
 
             self.moveDisplay.updateScreen(self.friendly.moves)
-            self.teamDisplay.updateScreen(self.pokemonTeam)
-            self.bagDisplay.updateScreens(self.game.bag)
 
             if not end:
                 self.checkKOs()
@@ -900,8 +886,7 @@ class Battle:
             self.state = State.home
 
         # anything here happens after all the Pokémon have fainted
-
-        for pk in self.pokemonTeam:
+        for pk in self.pokemon_team.pokemon:
             pk.resetStatStages()
 
         self.game.bottomSurf.blit(self.lowerScreenBase, (0, 0))
@@ -910,7 +895,7 @@ class Battle:
 
     def clearSurfaces(self):
 
-        for pk in self.pokemonTeam:
+        for pk in self.pokemon_team.pokemon:
             pk.clearImages()
 
         for pk in self.activePokemon:
@@ -918,9 +903,7 @@ class Battle:
 
         self.battleDisplay.clearSurfaces()
         self.homeDisplay = None
-        self.bagDisplay = None
         self.moveDisplay = None
-        self.teamDisplay = None
         self.learnMoveDisplay = None
         self.levelUpDisplay = None
         self.evolveDisplay = None
@@ -939,10 +922,10 @@ if __name__ == '__main__':
 
     demo_bag = Bag(**bag_data)
 
-    game = Game(scale=1, fromPickle=True, overwrite=False)
+    demo_game = Game(scale=1, fromPickle=False, overwrite=False)
 
-    game.bag = Bag(**bag_data)
+    demo_game.bag = Bag(**bag_data)
 
-    battle = Battle(game, routeName="Route 201", wildName="Abra", wildLevel=100)
+    battle = Battle(demo_game, routeName="Route 201", wildName="Abra", wildLevel=100)
 
     battle.loop2()

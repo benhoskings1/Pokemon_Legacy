@@ -5,10 +5,10 @@ from math import ceil
 import pandas as pd
 import pygame as pg
 
-import General.Move
+import general.Move
 from pokemon import Pokemon
-from General.Colours import Colours
-from General.Selector import Selector3
+from general.Colours import Colours
+from general.Selector import Selector3
 from screen import Screen, BlitLocation, FontOption
 
 levelUpValues = pd.read_csv("game_data/Level Up.tsv", delimiter='\t')
@@ -274,7 +274,7 @@ class TeamDisplay:
 
         for idx, move in enumerate(pk.moves):
             position = movePositions[idx] * (15 / 8)
-            move: General.Move.Move2
+            move: general.Move.Move2
 
             screen4.addText2(move.name.upper(), position + pg.Vector2(int(63 * 15 / 8), int(17 * 15 / 8)),
                              location=BlitLocation.centre, colour=Colours.white.value)

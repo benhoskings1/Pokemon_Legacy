@@ -14,6 +14,11 @@ class Team:
         self.battle_display = TeamDisplay(display_size, self)
         self.display_running = False
 
+        self.active_index = 0
+
+    def get_active_pokemon(self):
+        return self.pokemon[self.active_index]
+
     def display_loop(self, surface, controller,):
         self.display_running = True
 
@@ -26,8 +31,11 @@ class Team:
             if action != PartyAction.nothing:
                 if action == PartyAction.home:
                     self.display_running = False
-                else:
                     return action
+                else:
+                    self.display_running = False
+                    if action.value != self.active_index:
+                        return action
 
             surface.blit(self.battle_display.getSurface(), (0, 0))
             pg.display.flip()

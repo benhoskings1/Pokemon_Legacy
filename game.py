@@ -10,11 +10,11 @@ import pygame as pg
 from bag import Bag
 from battle import Battle, State
 from Displays.LoadDisplay import LoadDisplay
-from General.Animations import createAnimation
-from General.Colours import Colours
-from General.Controller import Controller
-from General.Direction import Direction
-from General.Time import Time
+from general.Animations import createAnimation
+from general.Colours import Colours
+from general.Controller import Controller
+from general.Direction import Direction
+from general.Time import Time
 from Map_Files.TiledMap import TiledMap
 from player import Player, Movement
 from pokemon import Pokemon
