@@ -7,4 +7,12 @@ class BattleActionType(Enum):
     heal = "heal",
     switch = "switch"
 
+
+class BattleAction:
+    def __init__(self, action_type: BattleActionType,):
+        self.action_type = action_type
+
+        self.animation = None
+
+
     
