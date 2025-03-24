@@ -1,6 +1,6 @@
 import os
 
-import cv2.cv2 as cv2
+import cv2
 from pygame import Vector2 as vec
 
 
