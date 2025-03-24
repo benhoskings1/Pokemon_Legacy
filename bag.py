@@ -158,12 +158,13 @@ class Bag:
                 print(action)
                 if action == BagAction.home:
                     self.running = False
+                    return BagAction.home, None
                 elif action == BagAction.item:
                     item = self.select_item(battle)
                     if item:
                         print(item.name)
                         self.running = False
-                        return item
+                        return BagAction.item, item
 
             surface.blit(self.display.getSurface(), (0, 0))
             pg.display.flip()

@@ -1,9 +1,10 @@
 import os
-from math import ceil
+from math import floor, ceil
 
 from general.Environment import Environment
-from screen_V2 import Screen, GameObjects, BlitLocation, Colours, FontOption
-from sprite_screen import SpriteScreen
+from screen_V2 import Screen, BlitLocation, Colours, FontOption
+from battle_action import BattleAction, BattleAttack, BattleActionType
+from sprite_screen import SpriteScreen, GameObjects, PokeballCatchAnimation
 from pokemon import Pokemon
 import pygame as pg
 
@@ -11,8 +12,11 @@ from font.Font import Font, LevelFont
 
 
 class BattleDisplayV2(SpriteScreen):
-    def __init__(self, size, time, environment: Environment):
+    def __init__(self, window, size, time, environment: Environment):
         super().__init__(size, colour=Colours.black)
+
+        self.window = window
+        self.info_surface = pg.Surface(size, pg.SRCALPHA)
 
         self.image_scale = pg.Vector2(15 / 8, 15 / 8)
 
@@ -28,8 +32,6 @@ class BattleDisplayV2(SpriteScreen):
         self.foe: Pokemon = None
 
         self.text: str = None
-
-        print(self.size)
 
     def add_pokemon_sprites(self, pokemon):
         for pk in pokemon:
@@ -95,12 +97,14 @@ class BattleDisplayV2(SpriteScreen):
         if self.foe.visible:
             # add the name of the Pokémon
             # print(detail_rect_foe, detail_rect_foe.size.scale_by(self.image_scale.x, self.image_scale.y))
-            self.addText(self.foe.name, pos=pg.Vector2(int((4 - offset * (not friendly)) * 15 / 8), int(27 * 15 / 8)))
+            self.addText(self.foe.name, pos=pg.Vector2(int((4 - offset * (not friendly)) * 15 / 8), int(27 * 15 / 8)),
+                         surface=self.info_surface,)
 
             # add the level of the Pokémon
             wildLevel = str.format("Lv{}", self.foe.level)
             self.addText(wildLevel, pg.Vector2(int((70 - offset * (not friendly)) * self.image_scale.x),
-                                               int(29 * self.image_scale.x)), fontOption=FontOption.main.level)
+                                               int(29 * self.image_scale.x)), fontOption=FontOption.main.level,
+                         surface=self.info_surface,)
 
             # if the Pokémon has any status conditions, add display them
             if self.foe.status:
@@ -116,12 +120,14 @@ class BattleDisplayV2(SpriteScreen):
         if self.friendly.visible:
             # # add the name of the Pokémon
             self.addText(self.friendly.name,
-                         pg.Vector2(int((152 - offset * friendly) * 15 / 8), int(103 * 15 / 8)))
+                         pg.Vector2(int((152 - offset * friendly) * 15 / 8), int(103 * 15 / 8)),
+                         surface=self.info_surface,)
 
             # add the level of the Pokémon
             friendlyLevel = str.format("Lv{}", self.friendly.level)
             self.addText(friendlyLevel, pg.Vector2(int((221 - offset * friendly) * 15 / 8), int(105 * 15 / 8)),
-                         fontOption=FontOption.level)
+                         fontOption=FontOption.level,
+                         surface=self.info_surface,)
 
             # if the Pokémon has any status conditions, add display them
             if self.friendly.status:
@@ -138,16 +144,20 @@ class BattleDisplayV2(SpriteScreen):
             self.addText(str.format("{0}/{1}", round(health), self.friendly.stats.health),
                          pg.Vector2(int((246 - offset * friendly) * 15 / 8), int(125 * 15 / 8)),
                          location=BlitLocation.topRight,
-                         fontOption=FontOption.level)
+                         fontOption=FontOption.level,
+                         surface=self.info_surface,)
 
         if self.text:
             if lines:
-                self.addText(self.text, pg.Vector2(int(16 * 15 / 8), int(156 * 15 / 8)), lines=lines)
+                self.addText(self.text, pg.Vector2(int(16 * 15 / 8), int(156 * 15 / 8)), lines=lines,
+                             surface=self.info_surface,)
             else:
                 self.addText(self.text, pg.Vector2(int(16 * 15 / 8), int(156 * 15 / 8)),
-                             lines=ceil(len(self.text) / 28))
+                             lines=ceil(len(self.text) / 28),
+                             surface=self.info_surface,)
 
-    def show_action_animation(self, ):
+        pg.draw.rect(self.surface, Colours.red.value, self.friendly.rect, width=2)
+        pg.draw.rect(self.surface, Colours.red.value, self.foe.rect, width=2)
 
     def intro_animations(self, window: pg.Surface, duration):
         if self.foe.animation:
@@ -169,6 +179,105 @@ class BattleDisplayV2(SpriteScreen):
         self.render_pokemon_details()
         window.blit(self.get_surface(), (0, 0))
         pg.display.flip()
+
+    def catch_animation(self, duration, checks):
+        frames = 100
+        timePerFrame = duration / frames
+        images = 22
+
+        # the proportion of frames for each of the 21 images!
+        frameWeight = [1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1,
+                       1, 1, 1, 1, 3, 1, 1.5, 1, 2, 2, 2]
+
+        imageFrames = []
+        for [idx, weight] in enumerate(frameWeight):
+            if idx == 0:
+                imageFrames.append(frames * (weight / sum(frameWeight)))
+            else:
+                imageFrames.append(imageFrames[idx - 1] + (frames * (weight / sum(frameWeight))))
+
+        for idx, frameCount in enumerate(imageFrames):
+            imageFrames[idx] = floor(frameCount)
+
+        throwFrames = imageFrames[15]
+        shakeFrames = imageFrames[19]
+
+        animation = PokeballCatchAnimation()
+        self.sprites.add(animation)
+
+        for frame in range(throwFrames):
+            animation.image_idx = images
+            for idx in range(images - 1, -1, -1):
+                if frame <= imageFrames[idx]:
+                    animation.image_idx  = idx
+
+            animation.update(frame)
+
+            if animation.image_idx == 10:
+                self.foe.image.set_alpha(0)
+
+            self.refresh()
+            self.render_pokemon_details()
+            self.window.blit(self.get_surface(), (0, 0))
+            pg.display.flip()
+            pg.time.delay(int(timePerFrame))
+
+        # for check in range(checks):
+        #     for frame in range(throwFrames, shakeFrames):
+        #         imageIdx = images
+        #         for idx in range(images - 1, -1, -1):
+        #             if frame <= imageFrames[idx]:
+        #                 imageIdx = idx
+        #
+        #         path = str.format("Sprites/Pokeball Sprites/Poke ball/Catch Animation {}.png", imageIdx)
+        #
+        #         x, y = int(192 * 15 / 8), int(80 * 15 / 8)
+        #
+        #         self.updateUpperScreen()
+        #         self.battleDisplay.screen2.loadImage(path, (x, y), scale=pg.Vector2(2, 2))
+        #         self.game.topSurf.blit(self.battleDisplay.getSurface(), (0, 0))
+        #         pg.display.flip()
+        #         pg.time.delay(int(timePerFrame))
+        #     pg.time.delay(500)
+        #
+        # if checks != 3:
+        #     # break free!
+        #     pass
+        # else:
+        #     for frame in range(shakeFrames, frames):
+        #         imageIdx = images
+        #         for idx in range(images - 1, -1, -1):
+        #             if frame <= imageFrames[idx]:
+        #                 imageIdx = idx
+        #
+        #         path = str.format("Sprites/Pokeball Sprites/pokeball/Catch Animation {}.png", imageIdx)
+        #
+        #         x, y = int(192 * 15 / 8), int(80 * 15 / 8)
+        #
+        #         self.updateUpperScreen()
+        #         self.battleDisplay.screen2.loadImage(path, (x, y), scale=pg.Vector2(2, 2))
+        #         self.game.topSurf.blit(self.battleDisplay.getSurface(), (0, 0))
+        #         pg.display.flip()
+        #         pg.time.delay(int(timePerFrame))
+
+    def refresh(self):
+        self.surface = pg.Surface(self.size, pg.SRCALPHA)
+        self.info_surface = pg.Surface(self.size, pg.SRCALPHA)
+        self.sprite_surface = pg.Surface(self.size, pg.SRCALPHA)
+
+    def get_surface(self, show_sprites=True):
+        if self.power_off:
+            return self.power_off_surface
+
+        if show_sprites:
+            self.sprites.draw(self)
+
+        display_surf = self.base_surface.copy()
+        display_surf.blit(self.surface, (0, 0))
+        display_surf.blit(self.info_surface, (0, 0))
+        display_surf.blit(self.sprite_surface, (0, 0))
+
+        return display_surf
 
 
 if __name__ == "__main__":

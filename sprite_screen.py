@@ -1,4 +1,53 @@
-from screen_V2 import Screen, GameObjects, GameButton, Colours
+import pygame as pg
+from math import floor
+from screen_V2 import Screen, GameButton, Colours
+
+
+class PokeballCatchAnimation(pg.sprite.Sprite):
+    def __init__(self):
+        super().__init__(self)
+
+        self.frames = 100
+        self.frame_weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1,
+                              1, 1, 1, 1, 3, 1, 1.5, 1, 2, 2, 2]
+        self.images = [
+            pg.transform.scale2x(
+            pg.image.load(
+                f"action_animations/catch_animations/pokeball/frame_{image_idx}.png"
+            ) for image_idx in range(22))
+        ]
+
+        self.image_idx = 0
+        self.image = self.images[0]
+        self.frame_idx = 0
+        self.rect = self.image.get_rect()
+
+        self.sprite_type = "pokeball"
+
+    def update(self, frame_idx):
+        self.image = self.images[self.image_idx]
+
+        if self.image_idx <= 7:
+            x = frame_idx * 13
+            y = 200 + 0.003 * x * (x - 500)
+        elif 7 < self.image_idx <= 14:
+            x, y = int(192 * 15 / 8), int(50 * 15 / 8)
+        else:
+            x, y = int(192 * 15 / 8), int(80 * 15 / 8)
+
+        self.rect.topleft = (x, y)
+
+
+class GameObjects(pg.sprite.Group):
+    def __init__(self, sprites):
+        super().__init__(self, sprites)
+
+    def draw(self, screen: Screen, bgsurf=None, special_flags: int = 0):
+        for obj in self.sprites():
+            if (obj.sprite_type == "pokemon" or
+                    obj.sprite_type == "animation" or
+                    obj.sprite_type == "pokeball"):
+                screen.add_surf(obj.image, pos=obj.rect.topleft, sprite=True)
 
 
 class SpriteScreen(Screen):

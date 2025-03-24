@@ -6,8 +6,9 @@ from random import randint
 
 import pygame as pg
 
+from battle_action import BattleAction, BattleActionType, BattleAttack
 from Displays.bag_display import BagAction
-from Displays.battle_display_V2 import BattleDisplayV2
+from Displays.battle_display import BattleDisplayV2
 from Displays.BattleDisplay import BattleDisplay
 from Displays.EvolveDisplay import EvolveDisplay
 from Displays.HomeDisplay import HomeDisplay, HomeAction
@@ -104,8 +105,7 @@ class Battle:
 
         self.activePokemon = [self.friendly, self.foe]
 
-        print(self.screenSize, self.battleDisplay.screen2.size)
-        self.battle_display = BattleDisplayV2(self.screenSize, self.timeOfDay, self.environment)
+        self.battle_display = BattleDisplayV2(self.game.topSurf ,self.screenSize, self.timeOfDay, self.environment)
         self.battle_display.add_pokemon_sprites(self.activePokemon)
 
         # Top screen
@@ -258,11 +258,23 @@ class Battle:
             if target.health > 0:
                 hitCount += 1
                 if hit == 0:
-                    self.displayMessage(str.format("{0} used {1}!", attacker.name, move.name), displayTime)
+                    self.displayMessage(f"{attacker.name} used {move.name}!", displayTime)
                 else:
                     self.displayMessage(None, displayTime)
 
                 # Do attack graphics
+                battle_attack = BattleAttack(attacker=attacker)
+                self.battle_display.sprites.add(battle_attack)
+
+                for frame in range(battle_attack.frame_count):
+                    battle_attack.frame_idx = frame
+                    battle_attack.update()
+                    self.game.topSurf.blit(self.battle_display.get_surface(show_sprites=True), (0, 0))
+                    pg.display.flip()
+                    pg.time.delay(80)
+                    self.battle_display.refresh()
+
+                self.battle_display.sprites.remove(battle_attack)
 
                 # Health reduction
                 self.reduceHealth(target, damage, frames, attackTimePerFrame)
@@ -584,7 +596,7 @@ class Battle:
                 if frame <= imageFrames[idx]:
                     imageIdx = idx
 
-            path = str.format("Sprites/Pokeball Sprites/Poke Ball/Catch Animation {}.png", imageIdx)
+            path = str.format("Sprites/Pokeball Sprites/pokeball/Catch Animation {}.png", imageIdx)
 
             if imageIdx <= 7:
                 x = frame * 13
@@ -631,7 +643,7 @@ class Battle:
                     if frame <= imageFrames[idx]:
                         imageIdx = idx
 
-                path = str.format("Sprites/Pokeball Sprites/Poke Ball/Catch Animation {}.png", imageIdx)
+                path = str.format("Sprites/Pokeball Sprites/pokeball/Catch Animation {}.png", imageIdx)
 
                 x, y = int(192 * 15 / 8), int(80 * 15 / 8)
 
@@ -642,7 +654,7 @@ class Battle:
                 pg.time.delay(int(timePerFrame))
 
     def use_item(self, item, targetFriendly=True):
-        # Ensure that the pokeball targets the friendly pokemon
+        # Ensure that the pokeball targets the friendly Pokémon
         if item.type == "Pokeball":
             targetFriendly = False
 
@@ -681,7 +693,7 @@ class Battle:
                 if fail:
                     break
 
-            self.catchAnimation(3000, target, check)
+            self.battle_display.catch_animation(3000, check)
 
             if not fail:
                 self.displayMessage(str.format("The wild {} was caught!", target.name), 2000)
@@ -768,9 +780,9 @@ class Battle:
                 action = self.fightLogic(keys)
 
             elif self.state == State.bag:
-                res = self.game.bag.loop(self.game.bottomSurf, self.game.controller, battle=self)
-                if res != BagAction.home:
-                    self.use_item(res, targetFriendly=True)
+                action, item = self.game.bag.loop(self.game.bottomSurf, self.game.controller, battle=self)
+                if action == BagAction.item:
+                    self.use_item(item, targetFriendly=True)
 
                 self.game.bag.display.set_default_view()
                 self.state = State.home
@@ -920,12 +932,10 @@ if __name__ == '__main__':
     with open("test_data/bag/test_bag.json", "r") as read_file:
         bag_data = json.load(read_file)
 
-    demo_bag = Bag(**bag_data)
-
     demo_game = Game(scale=1, fromPickle=False, overwrite=False)
 
     demo_game.bag = Bag(**bag_data)
 
-    battle = Battle(demo_game, routeName="Route 201", wildName="Abra", wildLevel=100)
+    battle = Battle(demo_game, routeName="Route 201", wildName="Abra", wildLevel=20)
 
     battle.loop2()

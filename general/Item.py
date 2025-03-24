@@ -32,6 +32,7 @@ class Item:
 
 class Pokeball(Item):
     def __init__(self, name):
+        print(name)
         data = item_data.loc[item_data["name"] == name].iloc[0]
         if pd.isna(data.description):
             super().__init__(data, type="Pokeball")
