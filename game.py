@@ -441,12 +441,12 @@ class Game:
         try:
             teamData = []
             for pokemon in self.team.pokemon:
-                teamData.append(pokemon.getJSONData())
+                teamData.append(pokemon.get_json_data())
 
             with open("game_data/Save States/Save Test/Team.json", "w") as write_file:
                 json.dump(teamData, write_file, indent=4)
 
-            bagData = self.bag.getJSONData()
+            bagData = self.bag.get_json_data()
 
             with open("game_data/Save States/Save Test/Bag.json", "w") as write_file:
                 json.dump(bagData, write_file, indent=4)

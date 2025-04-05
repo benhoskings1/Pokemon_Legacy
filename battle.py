@@ -568,91 +568,6 @@ class Battle:
                     self.game.save()
                 quit()
 
-    def catchAnimation(self, duration, target, checks):
-        frames = 100
-        timePerFrame = duration / frames
-        images = 22
-
-        # the proportion of frames for each of the 21 images!
-        frameWeight = [1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1,
-                       1, 1, 1, 1, 3, 1, 1.5, 1, 2, 2, 2]
-
-        imageFrames = []
-        for [idx, weight] in enumerate(frameWeight):
-            if idx == 0:
-                imageFrames.append(frames * (weight / sum(frameWeight)))
-            else:
-                imageFrames.append(imageFrames[idx - 1] + (frames * (weight / sum(frameWeight))))
-
-        for idx, frameCount in enumerate(imageFrames):
-            imageFrames[idx] = floor(frameCount)
-
-        throwFrames = imageFrames[15]
-        shakeFrames = imageFrames[19]
-
-        for frame in range(throwFrames):
-            imageIdx = images
-            for idx in range(images - 1, -1, -1):
-                if frame <= imageFrames[idx]:
-                    imageIdx = idx
-
-            path = str.format("Sprites/Pokeball Sprites/pokeball/Catch Animation {}.png", imageIdx)
-
-            if imageIdx <= 7:
-                x = frame * 13
-                y = 200 + 0.003 * x * (x - 500)
-            elif 7 < imageIdx <= 14:
-                x, y = int(192 * 15 / 8), int(50 * 15 / 8)
-            else:
-                x, y = int(192 * 15 / 8), int(80 * 15 / 8)
-
-            if imageIdx == 10:
-                target.image.set_alpha(0)
-
-            self.updateUpperScreen()
-            self.battleDisplay.screen2.loadImage(path, (x, y), scale=pg.Vector2(2, 2))
-            self.game.topSurf.blit(self.battleDisplay.getSurface(), (0, 0))
-            pg.display.flip()
-            pg.time.delay(int(timePerFrame))
-
-        for check in range(checks):
-            for frame in range(throwFrames, shakeFrames):
-                imageIdx = images
-                for idx in range(images - 1, -1, -1):
-                    if frame <= imageFrames[idx]:
-                        imageIdx = idx
-
-                path = str.format("Sprites/Pokeball Sprites/Poke ball/Catch Animation {}.png", imageIdx)
-
-                x, y = int(192 * 15 / 8), int(80 * 15 / 8)
-
-                self.updateUpperScreen()
-                self.battleDisplay.screen2.loadImage(path, (x, y), scale=pg.Vector2(2, 2))
-                self.game.topSurf.blit(self.battleDisplay.getSurface(), (0, 0))
-                pg.display.flip()
-                pg.time.delay(int(timePerFrame))
-            pg.time.delay(500)
-
-        if checks != 3:
-            # break free!
-            pass
-        else:
-            for frame in range(shakeFrames, frames):
-                imageIdx = images
-                for idx in range(images - 1, -1, -1):
-                    if frame <= imageFrames[idx]:
-                        imageIdx = idx
-
-                path = str.format("Sprites/Pokeball Sprites/pokeball/Catch Animation {}.png", imageIdx)
-
-                x, y = int(192 * 15 / 8), int(80 * 15 / 8)
-
-                self.updateUpperScreen()
-                self.battleDisplay.screen2.loadImage(path, (x, y), scale=pg.Vector2(2, 2))
-                self.game.topSurf.blit(self.battleDisplay.getSurface(), (0, 0))
-                pg.display.flip()
-                pg.time.delay(int(timePerFrame))
-
     def use_item(self, item, targetFriendly=True):
         # Ensure that the pokeball targets the friendly Pokémon
         if item.type == "Pokeball":
@@ -783,6 +698,8 @@ class Battle:
                 action, item = self.game.bag.loop(self.game.bottomSurf, self.game.controller, battle=self)
                 if action == BagAction.item:
                     self.use_item(item, targetFriendly=True)
+                else:
+                    action = None
 
                 self.game.bag.display.set_default_view()
                 self.state = State.home

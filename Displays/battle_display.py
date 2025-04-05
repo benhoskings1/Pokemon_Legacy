@@ -156,8 +156,8 @@ class BattleDisplayV2(SpriteScreen):
                              lines=ceil(len(self.text) / 28),
                              surface=self.info_surface,)
 
-        pg.draw.rect(self.surface, Colours.red.value, self.friendly.rect, width=2)
-        pg.draw.rect(self.surface, Colours.red.value, self.foe.rect, width=2)
+        # pg.draw.rect(self.surface, Colours.red.value, self.friendly.rect, width=2)
+        # pg.draw.rect(self.surface, Colours.red.value, self.foe.rect, width=2)
 
     def intro_animations(self, window: pg.Surface, duration):
         if self.foe.animation:
@@ -209,7 +209,7 @@ class BattleDisplayV2(SpriteScreen):
             animation.image_idx = images
             for idx in range(images - 1, -1, -1):
                 if frame <= imageFrames[idx]:
-                    animation.image_idx  = idx
+                    animation.image_idx = idx
 
             animation.update(frame)
 
@@ -222,43 +222,41 @@ class BattleDisplayV2(SpriteScreen):
             pg.display.flip()
             pg.time.delay(int(timePerFrame))
 
-        # for check in range(checks):
-        #     for frame in range(throwFrames, shakeFrames):
-        #         imageIdx = images
-        #         for idx in range(images - 1, -1, -1):
-        #             if frame <= imageFrames[idx]:
-        #                 imageIdx = idx
-        #
-        #         path = str.format("Sprites/Pokeball Sprites/Poke ball/Catch Animation {}.png", imageIdx)
-        #
-        #         x, y = int(192 * 15 / 8), int(80 * 15 / 8)
-        #
-        #         self.updateUpperScreen()
-        #         self.battleDisplay.screen2.loadImage(path, (x, y), scale=pg.Vector2(2, 2))
-        #         self.game.topSurf.blit(self.battleDisplay.getSurface(), (0, 0))
-        #         pg.display.flip()
-        #         pg.time.delay(int(timePerFrame))
-        #     pg.time.delay(500)
-        #
-        # if checks != 3:
-        #     # break free!
-        #     pass
-        # else:
-        #     for frame in range(shakeFrames, frames):
-        #         imageIdx = images
-        #         for idx in range(images - 1, -1, -1):
-        #             if frame <= imageFrames[idx]:
-        #                 imageIdx = idx
-        #
-        #         path = str.format("Sprites/Pokeball Sprites/pokeball/Catch Animation {}.png", imageIdx)
-        #
-        #         x, y = int(192 * 15 / 8), int(80 * 15 / 8)
-        #
-        #         self.updateUpperScreen()
-        #         self.battleDisplay.screen2.loadImage(path, (x, y), scale=pg.Vector2(2, 2))
-        #         self.game.topSurf.blit(self.battleDisplay.getSurface(), (0, 0))
-        #         pg.display.flip()
-        #         pg.time.delay(int(timePerFrame))
+        for check in range(checks):
+            for frame in range(throwFrames, shakeFrames):
+                animation.image_idx = images
+                for idx in range(images - 1, -1, -1):
+                    if frame <= imageFrames[idx]:
+                        animation.image_idx = idx
+
+                animation.update(frame)
+
+                self.refresh()
+                self.render_pokemon_details()
+                self.window.blit(self.get_surface(), (0, 0))
+                pg.display.flip()
+                pg.time.delay(int(timePerFrame))
+            pg.time.delay(500)
+
+        if checks != 3:
+            # break free!
+            pass
+        else:
+            for frame in range(shakeFrames, frames):
+                animation.image_idx = images
+                for idx in range(images - 1, -1, -1):
+                    if frame <= imageFrames[idx]:
+                        animation.image_idx = idx
+
+                animation.update(frame)
+
+                self.refresh()
+                self.render_pokemon_details()
+                self.window.blit(self.get_surface(), (0, 0))
+                pg.display.flip()
+                pg.time.delay(int(timePerFrame))
+
+        self.sprites.remove(animation)
 
     def refresh(self):
         self.surface = pg.Surface(self.size, pg.SRCALPHA)

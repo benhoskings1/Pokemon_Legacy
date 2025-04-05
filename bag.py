@@ -60,7 +60,7 @@ class Bag:
         for (item, count) in self.pokeballs:
             item.loadSurfaces()
 
-    def getJSONData(self):
+    def get_json_data(self):
         itemData = {}
         for item in self.items:
             itemData[item.name] = self.items[item]
@@ -130,7 +130,6 @@ class Bag:
                 battle.battleDisplay.text = str.format("What will {} do?", battle.friendly.name)
                 return None
 
-            # self.displayMessage("Not yet implemented...", 1500)
             battle.battleDisplay.text = str.format("What will {} do?", battle.friendly.name)
             return None
 
