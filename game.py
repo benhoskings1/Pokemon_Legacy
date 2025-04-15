@@ -9,7 +9,7 @@ import pygame as pg
 
 from bag import Bag
 from battle import Battle, State
-from Displays.LoadDisplay import LoadDisplay
+from displays.LoadDisplay import LoadDisplay
 from general.Animations import createAnimation
 from general.Colours import Colours
 from general.Controller import Controller

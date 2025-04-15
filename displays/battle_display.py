@@ -8,15 +8,33 @@ from sprite_screen import SpriteScreen, GameObjects, PokeballCatchAnimation
 from pokemon import Pokemon
 import pygame as pg
 
-from font.Font import Font, LevelFont
+from font.font import Font, LevelFont
 
 
-class BattleDisplayV2(SpriteScreen):
+class BattleDisplay(SpriteScreen):
     def __init__(self, window, size, time, environment: Environment):
+        """
+        This is the main battle display. The native screen size is
+        :param window:
+        :param size:
+        :param time:
+        :param environment:
+        """
         super().__init__(size, colour=Colours.black)
 
+        self.screen_0 = Screen(size)  # background
+        self.screen_1 = Screen(size)  #
+        self.screen_2 = Screen(size)   #
+        self.screen_3 = Screen(size)   # text box surface
+
+        self.screens = {
+            "background": self.screen_0,
+            "foreground": self.screen_1,
+            "animations": self.screen_2,
+            "text": self.screen_3
+        }
+
         self.window = window
-        self.info_surface = pg.Surface(size, pg.SRCALPHA)
 
         self.image_scale = pg.Vector2(15 / 8, 15 / 8)
 
@@ -32,6 +50,15 @@ class BattleDisplayV2(SpriteScreen):
         self.foe: Pokemon = None
 
         self.text: str = None
+
+    def add_text(self, text, pos, lines=1, location=BlitLocation.topLeft, base=False, colour=None, surface_idx=0):
+
+        words = text.split()
+        print(words)
+
+        for word in words:
+            # self.screens["text"].add
+            ...
 
     def add_pokemon_sprites(self, pokemon):
         for pk in pokemon:
@@ -98,13 +125,13 @@ class BattleDisplayV2(SpriteScreen):
             # add the name of the Pokémon
             # print(detail_rect_foe, detail_rect_foe.size.scale_by(self.image_scale.x, self.image_scale.y))
             self.addText(self.foe.name, pos=pg.Vector2(int((4 - offset * (not friendly)) * 15 / 8), int(27 * 15 / 8)),
-                         surface=self.info_surface,)
+                         surface=self.info_surface, )
 
             # add the level of the Pokémon
             wildLevel = str.format("Lv{}", self.foe.level)
             self.addText(wildLevel, pg.Vector2(int((70 - offset * (not friendly)) * self.image_scale.x),
                                                int(29 * self.image_scale.x)), fontOption=FontOption.main.level,
-                         surface=self.info_surface,)
+                         surface=self.info_surface, )
 
             # if the Pokémon has any status conditions, add display them
             if self.foe.status:
@@ -121,13 +148,13 @@ class BattleDisplayV2(SpriteScreen):
             # # add the name of the Pokémon
             self.addText(self.friendly.name,
                          pg.Vector2(int((152 - offset * friendly) * 15 / 8), int(103 * 15 / 8)),
-                         surface=self.info_surface,)
+                         surface=self.info_surface, )
 
             # add the level of the Pokémon
             friendlyLevel = str.format("Lv{}", self.friendly.level)
             self.addText(friendlyLevel, pg.Vector2(int((221 - offset * friendly) * 15 / 8), int(105 * 15 / 8)),
                          fontOption=FontOption.level,
-                         surface=self.info_surface,)
+                         surface=self.info_surface, )
 
             # if the Pokémon has any status conditions, add display them
             if self.friendly.status:
@@ -145,16 +172,13 @@ class BattleDisplayV2(SpriteScreen):
                          pg.Vector2(int((246 - offset * friendly) * 15 / 8), int(125 * 15 / 8)),
                          location=BlitLocation.topRight,
                          fontOption=FontOption.level,
-                         surface=self.info_surface,)
+                         surface=self.info_surface, )
 
         if self.text:
             if lines:
-                self.addText(self.text, pg.Vector2(int(16 * 15 / 8), int(156 * 15 / 8)), lines=lines,
-                             surface=self.info_surface,)
+                self.add_text(self.text, pg.Vector2(int(16 * 15 / 8), int(156 * 15 / 8)), surface_idx=3)
             else:
-                self.addText(self.text, pg.Vector2(int(16 * 15 / 8), int(156 * 15 / 8)),
-                             lines=ceil(len(self.text) / 28),
-                             surface=self.info_surface,)
+                self.add_text(self.text, pg.Vector2(int(16 * 15 / 8), int(156 * 15 / 8)), surface_idx=3, )
 
         # pg.draw.rect(self.surface, Colours.red.value, self.friendly.rect, width=2)
         # pg.draw.rect(self.surface, Colours.red.value, self.foe.rect, width=2)
@@ -272,7 +296,11 @@ class BattleDisplayV2(SpriteScreen):
 
         display_surf = self.base_surface.copy()
         display_surf.blit(self.surface, (0, 0))
-        display_surf.blit(self.info_surface, (0, 0))
+
+        for screen in self.screens.values():
+            screen: Screen
+            display_surf.blit(screen.get_surface(), (0, 0))
+
         display_surf.blit(self.sprite_surface, (0, 0))
 
         return display_surf
@@ -284,7 +312,7 @@ if __name__ == "__main__":
     pg.init()
     window = pg.display.set_mode(pg.Vector2(240, 180) * 2)
 
-    bd = BattleDisplayV2(size=window.get_size())
+    bd = BattleDisplay(size=window.get_size())
 
     window.blit(bd.get_surface(), (0, 0))
 

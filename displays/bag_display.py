@@ -129,7 +129,7 @@ class BagDisplay:
             else:
                 for screen in screens:
                     screen.loadImage(
-                        "Images/Battle/Bag/Item Displays/Base.png", base=True)
+                        "Images/Battle/Bag/Item displays/Base.png", base=True)
                     screen.scaleSurface(15 / 8)
 
         for screen in self.restoreScreens:
@@ -165,7 +165,7 @@ class BagDisplay:
             offset = pg.Vector2(0, 2)
         else:
             offset = pg.Vector2(0, 0)
-        screen.loadImage(str.format("Images/Battle/Bag/Item Displays/{} Container.png", type),
+        screen.loadImage(str.format("Images/Battle/Bag/Item displays/{} Container.png", type),
                          pos=pg.Vector2(positions[count % 6]) + offset)
 
     def updateScreens(self, bag):
@@ -223,11 +223,11 @@ class BagDisplay:
             if idx != 0:
                 for screen in screens:
                     if len(screens) > 1:
-                        screen.loadImage("Images/Battle/Bag/Item Displays/Up.png", (1, 152))
-                        screen.loadImage("Images/Battle/Bag/Item Displays/Down.png", (41, 152))
+                        screen.loadImage("Images/Battle/Bag/Item displays/Up.png", (1, 152))
+                        screen.loadImage("Images/Battle/Bag/Item displays/Down.png", (41, 152))
                     else:
-                        screen.loadImage("Images/Battle/Bag/Item Displays/Empty Up.png", (1, 152))
-                        screen.loadImage("Images/Battle/Bag/Item Displays/Empty Down.png", (41, 152))
+                        screen.loadImage("Images/Battle/Bag/Item displays/Empty Up.png", (1, 152))
+                        screen.loadImage("Images/Battle/Bag/Item displays/Empty Down.png", (41, 152))
                     screen.scaleSurface(15 / 8)
 
             if idx == 1:

@@ -1,6 +1,6 @@
 import time
 import pygame as pg
-from Displays.team_display_battle import TeamDisplay, PartyAction
+from displays.team_display_battle import TeamDisplay, PartyAction
 from pokemon import Pokemon
 
 

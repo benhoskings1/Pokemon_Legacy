@@ -2,7 +2,7 @@ from enum import Enum
 
 import pygame as pg
 
-from font.Font import Font, LevelFont
+from font.font import Font, LevelFont
 from general.Colours import Colours
 
 
@@ -43,11 +43,11 @@ class Screen:
 
         if colour:
             if shadowColour:
-                textSurf = self.font.renderText(text, lineCount=lines, colour=colour, shadowColour=shadowColour)
+                textSurf = self.font.render_text(text, lineCount=lines, colour=colour, shadowColour=shadowColour)
             else:
-                textSurf = self.font.renderText(text, lineCount=lines, colour=colour)
+                textSurf = self.font.render_text(text, lineCount=lines, colour=colour)
         else:
-            textSurf = self.font.renderText(text, lineCount=lines)
+            textSurf = self.font.render_text(text, lineCount=lines)
         blitPos = pos
         size = pg.Vector2(textSurf.get_size())
         if location == BlitLocation.centre:

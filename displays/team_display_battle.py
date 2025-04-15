@@ -33,7 +33,7 @@ class PartyState(Enum):
 class TeamDisplay:
     def __init__(self, size, team):
         self.screen = Screen(pg.Vector2(256, 192))
-        self.screen.loadImage("Images/Battle/Party Displays/Screen 1/Base.png", base=True)
+        self.screen.loadImage("Images/Battle/Party displays/Screen 1/Base.png", base=True)
 
         selectorImage = pg.image.load("Images/Medium Selector.png")
         cancelImage = pg.image.load("Images/Battle/Bag/Cancel Selector.png")
@@ -59,7 +59,7 @@ class TeamDisplay:
                               sizes=sizes2, imageType=[0, 0, 0, 1], images=[selectorImage, cancelImage])
 
         screen2 = Screen(pg.Vector2(256, 192))
-        screen2.loadImage("Images/Battle/Party Displays/Screen 2/Base.png", base=True)
+        screen2.loadImage("Images/Battle/Party displays/Screen 2/Base.png", base=True)
         screen2.refresh()
         screen2.scaleSurface(15 / 8, base=True)
         screen2.addText2("SHIFT", (int(128 * 15 / 8), int(110 * 15 / 8)), location=BlitLocation.centre, base=True,
@@ -71,7 +71,7 @@ class TeamDisplay:
         screen2.refresh()
 
         summaryScreen = Screen(pg.Vector2(256, 192))
-        summaryScreen.loadImage("Images/Battle/Party Displays/Summary/Base.png", base=True)
+        summaryScreen.loadImage("Images/Battle/Party displays/Summary/Base.png", base=True)
         summaryScreen.refresh()
         summaryScreen.scaleSurface(15 / 8, base=True)
         summaryScreen.addText2("CHECK MOVES", (int(148 * 15 / 8), int(172 * 15 / 8)), location=BlitLocation.centre,
@@ -87,7 +87,7 @@ class TeamDisplay:
                                     sizes=summarySizes, imageType=[1, 1, 0, 1], images=[selectorImage, cancelImage])
 
         checkScreen = Screen(pg.Vector2(256, 192))
-        checkScreen.loadImage("Images/Battle/Party Displays/Check Moves/Base.png", base=True)
+        checkScreen.loadImage("Images/Battle/Party displays/Check Moves/Base.png", base=True)
         checkScreen.refresh()
 
         checkPositions = [(int(1 * 15 / 8), int(48 * 15 / 8)), (int(130 * 15 / 8), int(48 * 15 / 8)),
@@ -105,7 +105,7 @@ class TeamDisplay:
                                   images=[selectorImage, cancelImage])
 
         moveScreen = Screen((256, 192))
-        moveScreen.loadImage("Images/Battle/Party Displays/Move Display/Base.png", base=True)
+        moveScreen.loadImage("Images/Battle/Party displays/Move Display/Base.png", base=True)
         moveScreen.refresh()
         movePositions = [(int(88 * 15 / 8), int(153 * 15 / 8)), (int(128 * 15 / 8), int(153 * 15 / 8)),
                          (int(217 * 15 / 8), int(152 * 15 / 8)), (int(88 * 15 / 8), int(168 * 15 / 8)),
@@ -138,9 +138,9 @@ class TeamDisplay:
 
         screen1 = self.screens[0]
         screen1.refresh()
-        activeContainer = pg.image.load("Images/Battle/Party Displays/Screen 1/Active Container.png")
-        teamContainer = pg.image.load("Images/Battle/Party Displays/Screen 1/Team Container.png")
-        emptyContainer = pg.image.load("Images/Battle/Party Displays/Screen 1/Empty Container.png")
+        activeContainer = pg.image.load("Images/Battle/Party displays/Screen 1/Active Container.png")
+        teamContainer = pg.image.load("Images/Battle/Party displays/Screen 1/Team Container.png")
+        emptyContainer = pg.image.load("Images/Battle/Party displays/Screen 1/Empty Container.png")
         positions = [pg.Vector2(1, 2), pg.Vector2(129, 10),
                      pg.Vector2(1, 50), pg.Vector2(129, 58),
                      pg.Vector2(1, 98), pg.Vector2(129, 106)]
@@ -189,7 +189,7 @@ class TeamDisplay:
                 hpRect = pg.Rect(0, 0, 0, 0)
                 colour = "Low"
 
-            imPath = str.format("Images/Battle/Party Displays/Screen 1/Health {}.png", colour)
+            imPath = str.format("Images/Battle/Party displays/Screen 1/Health {}.png", colour)
             screen1.loadImage(imPath, pos=hpRect.topleft, size=hpRect.size)
 
         screen2 = self.screens[1]
@@ -250,8 +250,8 @@ class TeamDisplay:
         screen4 = self.screens[3]
         screen4.refresh()
         # screen4.scaleSurface(15 / 8)
-        move = pg.image.load("Images/Battle/Party Displays/Check Moves/Move Container.png")
-        emptyContainer = pg.image.load("Images/Battle/Party Displays/Check Moves/Empty Container.png")
+        move = pg.image.load("Images/Battle/Party displays/Check Moves/Move Container.png")
+        emptyContainer = pg.image.load("Images/Battle/Party displays/Check Moves/Empty Container.png")
         movePositions = [pg.Vector2(1, 48), pg.Vector2(130, 48), pg.Vector2(1, 97), pg.Vector2(130, 97)]
         for idx in range(4):
             position = movePositions[idx]
@@ -289,15 +289,15 @@ class TeamDisplay:
         screen5.refresh()
         move = pk.moves[self.moveIdx]
         movePositions = [(88, 153), (128, 153), (88, 168), (128, 168)]
-        selectedContainer = pg.image.load("Images/Battle/Party Displays/Move Display/Selected Container.png")
-        otherContainer = pg.image.load("Images/Battle/Party Displays/Move Display/Container.png")
+        selectedContainer = pg.image.load("Images/Battle/Party displays/Move Display/Selected Container.png")
+        otherContainer = pg.image.load("Images/Battle/Party displays/Move Display/Container.png")
         for idx in range(4):
             if idx == self.moveIdx:
                 screen5.addImage(selectedContainer, movePositions[idx])
             else:
                 screen5.addImage(otherContainer, movePositions[idx])
 
-        screen5.loadImage(str.format("Images/Battle/Party Displays/Move Display/{}.png", move.category.title()),
+        screen5.loadImage(str.format("Images/Battle/Party displays/Move Display/{}.png", move.category.title()),
                           (9, 81))
         screen5.loadImage(str.format("Images/Type Labels/{} Label.png", move.type.title()), (110, 41))
 

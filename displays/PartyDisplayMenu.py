@@ -23,10 +23,10 @@ class PartyDisplay:
         self.screens = [Screen(size) for _ in range(len(team) + 1)]
 
         for screen in self.screens:
-            screen.loadImage("Images/Battle/Party Displays/Party Base.png", fill=True, base=True)
+            screen.loadImage("Images/Battle/Party displays/Party Base.png", fill=True, base=True)
 
-        container = pg.image.load("Images/Battle/Party Displays/Pokemon Container.png")
-        selectedContainer = pg.image.load("Images/Battle/Party Displays/Selected Container.png")
+        container = pg.image.load("Images/Battle/Party displays/Pokemon Container.png")
+        selectedContainer = pg.image.load("Images/Battle/Party displays/Selected Container.png")
         primarySelected = pg.image.load("Images/Base Selected 0.png")
 
         size = pg.Vector2(container.get_size())

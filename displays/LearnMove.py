@@ -130,7 +130,7 @@ class LearnMoveDisplay:
         screen3 = self.screens[2]
         move = allMoves[self.moveIdx]
         screen3.refresh()
-        screen3.loadImage(str.format("Images/Battle/Party Displays/Move Display/{}.png", move.category.title()),
+        screen3.loadImage(str.format("Images/Battle/Party displays/Move Display/{}.png", move.category.title()),
                           (9, 81))
         screen3.loadImage(str.format("Images/Type Labels/{} Label.png", move.type.title()), (110, 41))
 

@@ -13,7 +13,7 @@ class Baseline(Enum):
     lower = 1
 
 
-def colourChange(surface, baseColours, shadowColours=None):
+def colour_change(surface, baseColours, shadowColours=None):
 
     pixels = pg.surfarray.pixels3d(surface)
 
@@ -97,7 +97,7 @@ class Font:
 
         self.size = 10
 
-    def renderText(self, text: str, lineCount=1, colour=None, shadowColour=None):
+    def render_text(self, text: str, lineCount=1, colour=None, shadowColour=None):
         words = text.split(" ")
         lines = []
         totalLetters = len("".join(words))
@@ -176,9 +176,9 @@ class Font:
             textColours = [pg.Color(16, 24, 32), colour]
             if shadowColour:
                 shadowColours = [pg.Color(168, 184, 184), shadowColour]
-                textSurf = colourChange(textSurf, textColours, shadowColours=shadowColours)
+                textSurf = colour_change(textSurf, textColours, shadowColours=shadowColours)
             else:
-                textSurf = colourChange(textSurf, textColours)
+                textSurf = colour_change(textSurf, textColours)
 
         return textSurf
 
@@ -205,7 +205,7 @@ class LevelFont:
             self.sizes[letter] = newImage.get_size()
             self.letters[letter] = newImage
 
-    def renderText(self, text: str, lineCount, colour=None, shadowColour=None):
+    def render_text(self, text: str, lineCount, colour=None, shadowColour=None):
 
         width = 0
 
@@ -237,9 +237,9 @@ class LevelFont:
             textColours = [pg.Color(16, 24, 32), colour]
             if shadowColour:
                 shadowColours = [pg.Color(168, 184, 184), shadowColour]
-                textSurf = colourChange(surf, textColours, shadowColours=shadowColours)
+                textSurf = colour_change(surf, textColours, shadowColours=shadowColours)
             else:
-                textSurf = colourChange(surf, textColours)
+                textSurf = colour_change(surf, textColours)
 
         return surf
 
@@ -267,7 +267,7 @@ class ClockFont:
                 self.sizes[letter] = newImage.get_size()
                 self.letters[letter] = newImage
 
-    def renderText(self, text: str):
+    def render_text(self, text: str):
         size = pg.Vector2(0, 0)
         size.y = self.sizes["0"][1]
         for letter in text:

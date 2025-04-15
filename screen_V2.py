@@ -3,7 +3,7 @@ from enum import Enum
 
 import pygame as pg
 import pygame.freetype
-from font.Font import LevelFont, Font
+from font.font import LevelFont, Font
 
 
 class Colours(Enum):
@@ -48,13 +48,13 @@ class BlitPosition(Enum):
 
 # class Fonts:
 #     def __init__(self):
-#         self.large = pg.font.Font("font/calibri-regular.ttf", 50)
-#         self.normal = pg.font.Font("font/calibri-regular.ttf", 30)
-#         self.small = pg.font.Font("font/calibri-regular.ttf", 15)
+#         self.large = pg.font.font("font/calibri-regular.ttf", 50)
+#         self.normal = pg.font.font("font/calibri-regular.ttf", 30)
+#         self.small = pg.font.font("font/calibri-regular.ttf", 15)
 #         self.custom = self.normal
 #
 #     def update_custom(self, size):
-#         self.custom = pg.font.Font("font/calibri-regular.ttf", size=size)
+#         self.custom = pg.font.font("font/calibri-regular.ttf", size=size)
 
 
 fonts = {"Main": Font(2), "Level": LevelFont(2)}
@@ -163,35 +163,6 @@ class Screen:
         else:
             surf.blit(image, pos)
 
-    def add_text(self, text, pos, lines=1, colour=Colours.black, bg_colour=None, location=BlitLocation.topLeft,
-                 sprite=False, base=False):
-        # pos will be either a tuple (x, y), or BlitPosition
-
-        text_surf = self.font.render(text, True, colour.value)
-        if bg_colour:
-            bg_surf = pg.Surface(text_surf.get_size(), pg.SRCALPHA)
-            bg_surf.fill(bg_colour.value)
-            bg_surf.blit(text_surf, (0, 0))
-            text_surf = bg_surf
-
-        blitPos = pos
-        size = pg.Vector2(text_surf.get_size())
-        if location == BlitLocation.centre:
-            blitPos -= size / 2
-        elif location == BlitLocation.topRight:
-            blitPos -= pg.Vector2(size.x, 0)
-        elif location == BlitLocation.midTop:
-            blitPos -= pg.Vector2(size.x / 2, 0)
-        elif location == BlitLocation.midBottom:
-            blitPos -= pg.Vector2(size.x / 2, size.y)
-
-        if sprite:
-            self.sprite_surface.blit(text_surf, blitPos)
-        elif base:
-            self.base_surface.blit(text_surf, blitPos)
-        else:
-            self.surface.blit(text_surf, blitPos)
-
     def add_multiline_text(self, text, rect, location=BlitLocation.topLeft, center_horizontal=False,
                            center_vertical=False,
                            colour=None, bg_colour=None, font_size=None, font_option: FontOption = None, border_width=2,
@@ -271,11 +242,11 @@ class Screen:
 
         if colour:
             if shadowColour:
-                textSurf = self.font.renderText(text, lineCount=lines, colour=colour, shadowColour=shadowColour)
+                textSurf = self.font.render_text(text, lineCount=lines, colour=colour, shadowColour=shadowColour)
             else:
-                textSurf = self.font.renderText(text, lineCount=lines, colour=colour)
+                textSurf = self.font.render_text(text, lineCount=lines, colour=colour)
         else:
-            textSurf = self.font.renderText(text, lineCount=lines)
+            textSurf = self.font.render_text(text, lineCount=lines)
         blitPos = pos
         size = pg.Vector2(textSurf.get_size())
         if location == BlitLocation.centre:

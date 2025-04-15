@@ -3,7 +3,7 @@ from enum import Enum
 
 import pygame as pg
 
-from font.Font import ClockFont
+from font.font import ClockFont
 from screen import Screen, BlitLocation
 
 largeClockFont = ClockFont(1.85)
@@ -42,13 +42,13 @@ class Poketech:
         self.time = time
         self.clockDisplay.refresh()
         self.clockDisplay.scaleSurface(15 / 8)
-        surf = largeClockFont.renderText(self.time.strftime("%H:%M"))
+        surf = largeClockFont.render_text(self.time.strftime("%H:%M"))
         self.clockDisplay.addImage(surf, pos=(int(4 * 15 / 8), int(36 * 15 / 8)))
 
     def updatePedometer(self):
         self.pedometerDisplay.refresh()
         self.pedometerDisplay.scaleSurface(15 / 8)
-        surf = smallClockFont.renderText(str(self.pedometerSteps))
+        surf = smallClockFont.render_text(str(self.pedometerSteps))
         self.pedometerDisplay.addImage(surf, pos=(int(96 * 15 / 8), int(48 * 15 / 8)), location=BlitLocation.centre)
 
     def getSurface(self):

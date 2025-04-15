@@ -9,7 +9,7 @@ from general.Item import Item, Pokeball, MedicineItem
 
 # Used for visualisation
 from general.Controller import Controller
-from Displays.bag_display import BagDisplay, BagAction, BagState
+from displays.bag_display import BagDisplay, BagAction, BagState
 from battle import Battle
 
 pokeballs = pd.read_csv("game_data/Items/pokeballs.tsv", delimiter="\t", index_col=0)

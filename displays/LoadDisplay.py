@@ -10,8 +10,8 @@ class LoadDisplay:
         self.topScreen = Screen(size)
         self.bottomScreen = Screen(size, colour=pg.Color(255, 255, 255))
 
-        self.topScreen.loadImage("Images/Load Displays/Upper.png", fill=True, base=True)
-        self.topScreen.loadImage("Images/Load Displays/Title Image.png", pos=pg.Vector2(256, 156), size=(380, 120),
+        self.topScreen.loadImage("Images/Load displays/Upper.png", fill=True, base=True)
+        self.topScreen.loadImage("Images/Load displays/Title Image.png", pos=pg.Vector2(256, 156), size=(380, 120),
                                  base=True, location=BlitLocation.centre)
 
         self.topScreen.refresh()

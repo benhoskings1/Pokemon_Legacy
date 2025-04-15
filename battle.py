@@ -7,15 +7,14 @@ from random import randint
 import pygame as pg
 
 from battle_action import BattleAction, BattleActionType, BattleAttack
-from Displays.bag_display import BagAction
-from Displays.battle_display import BattleDisplayV2
-from Displays.BattleDisplay import BattleDisplay
-from Displays.EvolveDisplay import EvolveDisplay
-from Displays.HomeDisplay import HomeDisplay, HomeAction
-from Displays.LearnMove import LearnMoveDisplay, LearnAction
-from Displays.LevelUpDisplay import LevelUpDisplay
-from Displays.MoveDisplay import MoveDisplay, FightAction
-from Displays.team_display_battle import PartyAction
+from displays.bag_display import BagAction
+from displays.battle_display import BattleDisplay
+from displays.EvolveDisplay import EvolveDisplay
+from displays.HomeDisplay import HomeDisplay, HomeAction
+from displays.LearnMove import LearnMoveDisplay, LearnAction
+from displays.LevelUpDisplay import LevelUpDisplay
+from displays.MoveDisplay import MoveDisplay, FightAction
+from displays.team_display_battle import PartyAction
 from general.Animations import createAnimation
 from general.Colours import Colours
 from general.Condition import StatusCondition
@@ -72,8 +71,8 @@ class Battle:
             self.environment = pickleData.environment
             self.timeOfDay = pickleData.timeOfDay
 
-            self.battleDisplay = BattleDisplay(self.screenSize, self.environment, self.timeOfDay)
-            self.battleDisplay.text = pickleData.battleDisplay.text
+            # self.battleDisplay = BattleDisplay(self.screenSize, self.environment, self.timeOfDay)
+            # self.battleDisplay.text = pickleData.battleDisplay.text
 
             self.state = pickleData.state
 
@@ -96,8 +95,8 @@ class Battle:
             self.environment = environment
             self.timeOfDay = self.game.getTimeOfDay()
 
-            self.battleDisplay = BattleDisplay(self.screenSize, self.environment, self.timeOfDay)
-            self.battleDisplay.text = str.format("A wild {} appeared!", self.foe.name)
+            # self.battleDisplay = BattleDisplay(self.screenSize, self.environment, self.timeOfDay)
+            # self.battleDisplay.text = str.format("A wild {} appeared!", self.foe.name)
 
             self.state = State.home
 
@@ -105,7 +104,7 @@ class Battle:
 
         self.activePokemon = [self.friendly, self.foe]
 
-        self.battle_display = BattleDisplayV2(self.game.topSurf ,self.screenSize, self.timeOfDay, self.environment)
+        self.battle_display = BattleDisplay(self.game.topSurf ,self.screenSize, self.timeOfDay, self.environment)
         self.battle_display.add_pokemon_sprites(self.activePokemon)
 
         # Top screen
@@ -119,7 +118,6 @@ class Battle:
 
         self.moveDisplay.updateScreen(self.friendly.moves)
         self.moveDisplay.update(self.game.controller)
-        self.battleDisplay.updateScreen(self.friendly, self.foe)
 
         lowerScreenBase = pg.image.load("Images/Battle/Other/Lower Base.png")
         self.lowerScreenBase = pg.transform.scale(lowerScreenBase, game.bottomSurf.get_size())
@@ -198,7 +196,6 @@ class Battle:
 
     def displayMessage(self, text, duration=None):
         self.battle_display.text = text
-        self.battleDisplay.text = text
         self.updateUpperScreen()
         self.game.bottomSurf.blit(self.lowerScreenBase, (0, 0))
         pg.display.flip()
@@ -213,7 +210,7 @@ class Battle:
 
     def learnMove(self, display, keys, move):
         action, text = display.update(keys, self.game.controller, self.friendly, move)
-        self.battleDisplay.text = text
+        # self.battleDisplay.text = text
         self.updateScreen()
         if action == LearnAction.giveUp:
             self.displayMessage(str.format("{} did not learn {}", self.friendly.name, move.name), 1000)
@@ -386,7 +383,6 @@ class Battle:
                 self.displayMessage(str.format("{}{}'s {} {}", start, modified.name, modify[1], descriptor), 2000)
 
         target.health = round(target.health)
-        self.battleDisplay.text = str.format("What will {} do?", self.friendly.name)
 
     def fadeOut(self, duration):
         blackSurf = pg.Surface(self.screenSize)
@@ -402,7 +398,7 @@ class Battle:
 
     def wildKO(self):
         self.friendly.updateEVs(self.foe.name)
-        self.battleDisplay.text = str.format("The wild {} fainted", self.foe.name)
+        # self.battleDisplay.text = str.format("The wild {} fainted", self.foe.name)
         self.updateUpperScreen()
         pg.display.flip()
         self.KOAnimation(1500)
@@ -432,7 +428,7 @@ class Battle:
                 self.movesToLearn.pop(self.movesToLearn.index(move))
 
     def friendlyKO(self):
-        self.battleDisplay.text = str.format("{} fainted!", self.friendly.name)
+        # self.battleDisplay.text = str.format("{} fainted!", self.friendly.name)
         self.updateUpperScreen()
         pg.display.flip()
         self.KOAnimation(1500, friendly=True)
@@ -452,30 +448,30 @@ class Battle:
             self.friendly.level += 1
 
             prevStats = self.friendly.stats
-            self.battleDisplay.text = str.format("{0} grew to Lv. {1}!", self.friendly.name, self.friendly.level)
+            # self.battleDisplay.text = str.format("{0} grew to Lv. {1}!", self.friendly.name, self.friendly.level)
 
             self.friendly.updateStats()
             newStats = self.friendly.stats
             self.friendly.health += newStats.health - prevStats.health
 
-            self.battleDisplay.updateScreen(self.friendly, self.foe, lines=2)
+            # self.battleDisplay.updateScreen(self.friendly, self.foe, lines=2)
             self.levelUpDisplay.update(newStats, oldStats=prevStats)
-            self.battleDisplay.screen2.surface.blit(self.levelUpDisplay.getSurface(), pg.Vector2(226, 90))
-            self.game.topSurf.blit(self.battleDisplay.getSurface(), (0, 0))
+            # self.battleDisplay.screen2.surface.blit(self.levelUpDisplay.getSurface(), pg.Vector2(226, 90))
+            # self.game.topSurf.blit(self.battleDisplay.getSurface(), (0, 0))
             pg.display.flip()
             pg.time.delay(duration)
 
-            self.battleDisplay.updateScreen(self.friendly, self.foe, lines=2)
+            # self.battleDisplay.updateScreen(self.friendly, self.foe, lines=2)
             self.levelUpDisplay.update(newStats)
-            self.battleDisplay.screen2.surface.blit(self.levelUpDisplay.getSurface(), pg.Vector2(226, 90))
-            self.game.topSurf.blit(self.battleDisplay.getSurface(), (0, 0))
+            # self.battleDisplay.screen2.surface.blit(self.levelUpDisplay.getSurface(), pg.Vector2(226, 90))
+            # self.game.topSurf.blit(self.battleDisplay.getSurface(), (0, 0))
             pg.display.flip()
             pg.time.delay(duration)
 
     def gainExp(self, duration):
         xpGain = round(self.foe.getFaintXP())
         self.friendly.exp += xpGain
-        self.battleDisplay.text = str.format("{0} gained {1} Exp. Points", self.friendly.name, xpGain)
+        # self.battleDisplay.text = str.format("{0} gained {1} Exp. Points", self.friendly.name, xpGain)
         self.updateUpperScreen()
         pg.display.flip()
         pg.time.delay(duration)
@@ -646,8 +642,6 @@ class Battle:
                 elif item.status == "Sleeping":
                     self.displayMessage(str.format("{} woke up", target.name), 1500)
 
-            self.battleDisplay.text = str.format("What will {} do?", self.friendly.name)
-
         return False
 
     def checkKOs(self):
@@ -801,7 +795,7 @@ class Battle:
                 if pokemon.health > 0 and not end:
                     if pokemon.status:
                         if type(pokemon.status) == Burn:
-                            self.battleDisplay.text = str.format("{} is hurt by its burn", pokemon.name)
+                            # self.battleDisplay.text = str.format("{} is hurt by its burn", pokemon.name)
                             self.reduceHealth(pokemon, pokemon.status.damage * pokemon.stats.health, 100, 10)
                         elif type(pokemon.status) == Poison:
                             pokemon.health -= pokemon.status.damage * pokemon.stats.health
@@ -830,7 +824,8 @@ class Battle:
         for pk in self.activePokemon:
             pk.clearImages()
 
-        self.battleDisplay.clearSurfaces()
+        # self.battleDisplay.clearSurfaces()
+        self.battle_display.clear_surfaces()
         self.homeDisplay = None
         self.moveDisplay = None
         self.learnMoveDisplay = None
