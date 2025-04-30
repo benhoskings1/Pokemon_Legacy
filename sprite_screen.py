@@ -4,9 +4,10 @@ from screen_V2 import Screen, Colours
 
 
 class PokeballCatchAnimation(pg.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, sprite_id):
         pg.sprite.Sprite.__init__(self)
 
+        self.id = sprite_id
         self.frames = 100
         self.frame_weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1,
                               1, 1, 1, 1, 3, 1, 1.5, 1, 2, 2, 2]
@@ -54,10 +55,12 @@ class GameObjects(pg.sprite.Group):
             elif (obj.sprite_type == "animation" or
                     obj.sprite_type == "pokeball"):
                 screen.add_surf(obj.image, pos=obj.rect.topleft, sprite=True)
+            else:
+                screen.add_surf(obj.image, pos=obj.rect.topleft, sprite=True)
 
 
 class SpriteScreen(Screen):
-    def __init__(self, size, colour=Colours.white):
+    def __init__(self, size, colour=None):
         super().__init__(size, colour=colour)
 
         self.sprites = GameObjects([])

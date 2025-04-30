@@ -1,4 +1,5 @@
 import os
+import re
 
 import cv2
 import numpy as np
@@ -168,7 +169,20 @@ class ImageEditor:
         return surf
 
 
-# editor = ImageEditor(file="Learn Move.png")
-# editor.resizeImage((256, 192), overwrite=True)
-# editor.saveImage(name="Learn Move edit.png")
+if __name__ == "__main__":
+    IMAGE_REGEX = r"\d{8}"
+    move = "growl"
+    target = "friendly"
+    base_dir = f"/Users/benhoskings/Desktop/pokemon_sprites/animations/"
+    save_dir = f"../assets/battle/move_animations/"
 
+    move_dir = os.path.join(base_dir, move, target)
+    files = os.listdir(move_dir)
+    files = sorted([file_name for file_name in files if re.match(IMAGE_REGEX, file_name)])
+    print(files)
+
+    for idx, file in enumerate(files):
+
+        editor = ImageEditor(file=os.path.join(move_dir, file))
+        editor.eraseColour([0, 0, 0], overwrite=True)
+        editor.saveImage(directory=os.path.join(save_dir, move, target), name=f"{move}_{idx}.png")

@@ -104,7 +104,7 @@ class Battle:
 
         self.activePokemon = [self.friendly, self.foe]
 
-        self.battle_display = BattleDisplay(self.game.topSurf ,self.screenSize, self.timeOfDay, self.environment)
+        self.battle_display = BattleDisplay(self.game.topSurf,self.screenSize, self.timeOfDay, self.environment)
         self.battle_display.add_pokemon_sprites(self.activePokemon)
 
         # Top screen
@@ -129,10 +129,10 @@ class Battle:
             pg.event.pump()
             print("starting animation")
             self.battle_display.intro_animations(self.game.topSurf, 2000)
+            self.battle_display.bounce_friendly_stat = True
 
     def updateUpperScreen(self, opacity=None, friendly=False):
         if self.state != State.evolve:
-            self.battle_display.render_pokemon_details()
             self.game.topSurf.blit(self.battle_display.get_surface(show_sprites=True), (0, 0))
         else:
             self.game.topSurf.blit(self.evolveDisplay.getUpperSurface(), (0, 0))
@@ -195,7 +195,7 @@ class Battle:
             self.friendly.moveNames.append(move.name)
 
     def displayMessage(self, text, duration=None):
-        self.battle_display.text = text
+        self.battle_display.update_display_text(text)
         self.updateUpperScreen()
         self.game.bottomSurf.blit(self.lowerScreenBase, (0, 0))
         pg.display.flip()
@@ -260,21 +260,26 @@ class Battle:
                     self.displayMessage(None, displayTime)
 
                 # Do attack graphics
-                battle_attack = BattleAttack(attacker=attacker)
-                self.battle_display.sprites.add(battle_attack)
+                battle_attack = BattleAttack(target=target, move=move, animation_size=self.battle_display.size)
+                # self.battle_display.sprites.add(battle_attack)
+                self.battle_display.bounce_friendly_stat = False
 
-                for frame in range(battle_attack.frame_count):
-                    battle_attack.frame_idx = frame
-                    battle_attack.update()
-                    self.game.topSurf.blit(self.battle_display.get_surface(show_sprites=True), (0, 0))
-                    pg.display.flip()
-                    pg.time.delay(80)
-                    self.battle_display.refresh()
+                if battle_attack.animation:
+                    for frame in range(battle_attack.frame_count):
+                        battle_attack.frame_idx = frame
+                        battle_attack.update()
+                        if battle_attack.animation.frames:
+                            self.battle_display.screens["animations"].surface = battle_attack.get_animation_frame(frame)
+                        self.game.topSurf.blit(self.battle_display.get_surface(show_sprites=True), (0, 0))
+                        pg.display.flip()
+                        pg.time.delay(15)
+                        self.battle_display.refresh(text=False)
 
-                self.battle_display.sprites.remove(battle_attack)
+                    self.battle_display.screens["animations"].refresh()
 
                 # Health reduction
                 self.reduceHealth(target, damage, frames, attackTimePerFrame)
+                self.battle_display.bounce_friendly_stat = True
 
         if heal:
             health = floor(damage * (heal / 100))
@@ -670,7 +675,8 @@ class Battle:
 
     def reduceHealth(self, target, damage, frames, delay):
         for frame in range(frames):
-            target.health -= damage / frames
+            target.health = max(0, target.health - damage / frames)
+            self.battle_display.render_pokemon_details()
             self.updateUpperScreen()
             pg.display.flip()
             pg.time.delay(int(delay))
@@ -754,7 +760,8 @@ class Battle:
     def loop2(self):
         while self.running:
             # get speed of wild Pokémon
-            self.battle_display.text = f"What will {self.friendly.name} do?"
+            self.battle_display.update_display_text(f"What will {self.friendly.name} do?")
+            # self.battle_display.text = f"What will {self.friendly.name} do?"
             friendlyAction = self.select_action()
 
             moveIdx = randint(0, len(self.foe.moves) - 1)
@@ -848,6 +855,6 @@ if __name__ == '__main__':
 
     demo_game.bag = Bag(**bag_data)
 
-    battle = Battle(demo_game, routeName="Route 201", wildName="Abra", wildLevel=20)
+    battle = Battle(demo_game, routeName="Route 201", wildName="Abra", wildLevel=50)
 
     battle.loop2()

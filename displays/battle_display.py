@@ -1,6 +1,8 @@
 import os
 from math import floor, ceil
 
+from PIL.ImageChops import hard_light
+
 from general.Environment import Environment
 from screen_V2 import Screen, BlitLocation, Colours, FontOption
 from battle_action import BattleAction, BattleAttack, BattleActionType
@@ -11,38 +13,90 @@ import pygame as pg
 from font.font import Font, LevelFont
 
 
+class StatContainer(pg.sprite.Sprite):
+    def __init__(self, sprite_id, friendly=True):
+        pg.sprite.Sprite.__init__(self)
+
+        # convention across game to be able to retrieve sprites
+        self.id = sprite_id
+        self.friendly = friendly
+
+        self.base_image = pg.image.load(
+            f"assets/battle/main_display/stat_container_{'friendly' if friendly else 'foe'}.png"
+        )
+        self.image = self.base_image
+        self.image = pg.transform.scale(self.image, pg.Vector2(self.image.get_size()) * 15 / 8)
+        self.rect = self.image.get_rect()
+
+        self.sprite_type = "stat_container"
+
+        if friendly:
+            self.rect.topright = pg.Vector2(256, 97) * 15 / 8
+        else:
+            self.rect.topleft = pg.Vector2(0, 21) * 15 / 8
+
+    def initialise_info(self, name, sex, level, base_health=None):
+        print("initialising info")
+        font, level_font = Font(scale=2), LevelFont(scale=2)
+        name_text = font.render_text(name, lineCount=1)
+        if self.friendly:
+            self.image.blit(name_text, pg.Vector2(16, 5) * 15/8)
+            self.image.blit(level_font.render_text(f"Lv{level}", lineCount=1), pg.Vector2(90, 8) * 15/8)
+        else:
+            self.image.blit(name_text, pg.Vector2(5, 5) * 15 / 8)
+            self.image.blit(level_font.render_text(f"Lv{level}", lineCount=1), pg.Vector2(70, 8) * 15 / 8)
+
+        self.base_image = self.image
+
+    def update_stats(self, current_health, max_health):
+        health_ratio = current_health / max_health
+
+        self.image = self.base_image.copy()
+
+        if self.friendly:
+            bar_rect = pg.Rect(pg.Vector2(117, 39), pg.Vector2(48 * health_ratio * 15 / 8, 4))
+        else:
+            bar_rect = pg.Rect(pg.Vector2(94, 39), pg.Vector2(48 * health_ratio * 15 / 8, 4))
+
+        if health_ratio > 0.5:
+            colour = "high"
+        elif health_ratio > 0.25:
+            colour = "medium"
+        else:
+            colour = "low"
+
+        health_bar = pg.image.load(f"assets/battle/main_display/health_bar/health_{colour}.png")
+        health_bar = pg.transform.scale(health_bar, bar_rect.size)
+        self.image.blit(health_bar, bar_rect.topleft)
+
+        if self.friendly:
+            level_font = LevelFont(scale=2)
+            health_text = level_font.render_text(f"{floor(current_health)}/{max_health}", lineCount=1)
+            heath_text_rect = pg.Rect(pg.Vector2(115, 36) * 15 / 8, health_text.get_size())
+            heath_text_rect.topleft -= pg.Vector2(health_text.get_size())
+            self.image.blit(health_text, heath_text_rect.topleft)
+
+
 class BattleDisplay(SpriteScreen):
     def __init__(self, window, size, time, environment: Environment):
         """
-        This is the main battle display. The native screen size is
-        :param window:
-        :param size:
-        :param time:
+        This is the main battle display. The native screen size is 256x192 px
+        :param window: The pygame surface to blit the display onto
+        :param size: the size of the display
+        :param time: the time of day, used to configure the battle background option
         :param environment:
         """
         super().__init__(size, colour=Colours.black)
 
-        self.screen_0 = Screen(size)  # background
-        self.screen_1 = Screen(size)  #
-        self.screen_2 = Screen(size)   #
-        self.screen_3 = Screen(size)   # text box surface
+        self.layer_names = ["background", "stats", "animations", "text"]
 
         self.screens = {
-            "background": self.screen_0,
-            "foreground": self.screen_1,
-            "animations": self.screen_2,
-            "text": self.screen_3
+            name: SpriteScreen(size) for name in self.layer_names
         }
 
         self.window = window
 
         self.image_scale = pg.Vector2(15 / 8, 15 / 8)
-
-        self.load_image(f"Images/Battle/Backgrounds/{environment.value} {time.value}.png",
-                        base=True, scale=self.image_scale)
-        self.text_rect = self.load_image("Images/Battle/Top Screen/Text box.png", pg.Vector2(size.x / 2, size.y - 5),
-                                         base=True, scale=self.image_scale,
-                                         location=BlitLocation.midBottom)
 
         self.sprites = GameObjects([])
 
@@ -51,14 +105,37 @@ class BattleDisplay(SpriteScreen):
 
         self.text: str = None
 
+        # configure base surfaces for each screen level
+        self.screens["background"].load_image(
+            f"assets/battle/main_display/backgrounds/{environment.value}_{time.value}.png",
+            base=True, scale=self.image_scale
+        )
+
+        self.text_rect = self.screens["text"].load_image(
+            "assets/battle/main_display/text_box_main.png", pg.Vector2(size.x / 2, size.y - 5),
+            base=True, scale=self.image_scale, location=BlitLocation.midBottom
+        )
+
+        self.screens["stats"].sprites.add([
+            StatContainer(sprite_id="friendly", friendly=True),
+            StatContainer(sprite_id="foe", friendly=False)
+        ])
+
+        self.bounce_friendly_stat = False
+        self.friendly_stat_bounce_val = 0
+
     def add_text(self, text, pos, lines=1, location=BlitLocation.topLeft, base=False, colour=None, surface_idx=0):
 
         words = text.split()
-        print(words)
+        # print(words)
 
         for word in words:
             # self.screens["text"].add
             ...
+
+    def update_display_text(self, text):
+        self.screens["text"].refresh()
+        self.screens["text"].addText(text, pg.Vector2(int(16 * 15 / 8), int(156 * 15 / 8)))
 
     def add_pokemon_sprites(self, pokemon):
         for pk in pokemon:
@@ -66,6 +143,15 @@ class BattleDisplay(SpriteScreen):
 
         self.friendly = pokemon[0]
         self.foe = pokemon[1]
+
+        #
+        self.screens["stats"].get_object("friendly").initialise_info(
+            name=self.friendly.name, sex=self.friendly.gender, level=self.friendly.level
+        )
+
+        self.screens["stats"].get_object("foe").initialise_info(
+            name=self.foe.name, sex=self.foe.gender, level=self.foe.level
+        )
 
     def render_pokemon_details(self, opacity=None, friendly=False, lines=None):
         self.refresh()
@@ -75,63 +161,13 @@ class BattleDisplay(SpriteScreen):
         else:
             offset = 0
 
-        # add pokemon names, level, hp,
-        if self.foe.visible:
-            detail_rect_foe = self.load_image("Images/Battle/Top Screen/Opponent HP.png",
-                                              pg.Vector2(0 - offset * (not friendly), 21))
-
-            wildRatio = (self.foe.health / self.foe.stats.health)
-            # 50
-            if self.foe.health > 0:
-                wRect = pg.Rect(50, 41, 48 * wildRatio, 4)
-                if self.foe.health >= self.foe.stats.health * 0.5:
-                    wColour = "High"
-                elif self.foe.health >= self.foe.stats.health * 0.25:
-                    wColour = "Medium"
-                else:
-                    wColour = "Low"
-            else:
-                wRect = pg.Rect(0, 0, 0, 0)
-                wColour = "Low"
-
-            # Draw the health bar on the screen
-            self.load_image(str.format("Images/Battle/Other/Health {}.png", wColour),
-                            wRect.topleft, size=wRect.size)
-
-        if self.friendly.visible:
-            self.load_image("Images/Battle/Top Screen/Friendly HP.png", pg.Vector2(256 + offset * friendly, 97),
-                            location=BlitLocation.topRight)
-            fRatio = (self.friendly.health / self.friendly.stats.health)
-            if self.friendly.health > 0:
-                fRect = pg.Rect(198, 117, 48 * fRatio, 4)
-                if self.friendly.health >= self.friendly.stats.health * 0.5:
-                    fColour = "High"
-                elif self.friendly.health >= self.friendly.stats.health * 0.25:
-                    fColour = "Medium"
-                else:
-                    fColour = "Low"
-            else:
-                fRect = pg.Rect(0, 0, 0, 0)
-                fColour = "Low"
-
-            # Draw the health bar on the screen
-            self.load_image(str.format("Images/Battle/Other/Health {}.png", fColour),
-                            fRect.topleft, size=fRect.size)
-
-        self.scale_surface(self.image_scale.x)
-
         # Display options for the wild Pokémon
         if self.foe.visible:
+            # print(self.foe.health, self.foe.health / self.foe.stats.health)
             # add the name of the Pokémon
-            # print(detail_rect_foe, detail_rect_foe.size.scale_by(self.image_scale.x, self.image_scale.y))
-            self.addText(self.foe.name, pos=pg.Vector2(int((4 - offset * (not friendly)) * 15 / 8), int(27 * 15 / 8)),
-                         surface=self.info_surface, )
-
-            # add the level of the Pokémon
-            wildLevel = str.format("Lv{}", self.foe.level)
-            self.addText(wildLevel, pg.Vector2(int((70 - offset * (not friendly)) * self.image_scale.x),
-                                               int(29 * self.image_scale.x)), fontOption=FontOption.main.level,
-                         surface=self.info_surface, )
+            self.screens["stats"].get_object("foe").update_stats(
+                current_health=self.foe.health, max_health=self.foe.stats.health
+            )
 
             # if the Pokémon has any status conditions, add display them
             if self.foe.status:
@@ -145,50 +181,17 @@ class BattleDisplay(SpriteScreen):
 
         # Display options for the friendly Pokémon
         if self.friendly.visible:
-            # # add the name of the Pokémon
-            self.addText(self.friendly.name,
-                         pg.Vector2(int((152 - offset * friendly) * 15 / 8), int(103 * 15 / 8)),
-                         surface=self.info_surface, )
-
-            # add the level of the Pokémon
-            friendlyLevel = str.format("Lv{}", self.friendly.level)
-            self.addText(friendlyLevel, pg.Vector2(int((221 - offset * friendly) * 15 / 8), int(105 * 15 / 8)),
-                         fontOption=FontOption.level,
-                         surface=self.info_surface, )
-
-            # if the Pokémon has any status conditions, add display them
-            if self.friendly.status:
-                ...
-                # self.loadImage(str.format("Images/Status Labels/{}.png", self.friendly.status.name),
-                #                        pg.Vector2(int((152 - offset * friendly) * 15 / 8), int(103 * 15 / 8)))
-
-            # add the text showing the Pokémon's health
-            if self.friendly.health > 0:
-                health = self.friendly.health
-            else:
-                health = 0
-
-            self.addText(str.format("{0}/{1}", round(health), self.friendly.stats.health),
-                         pg.Vector2(int((246 - offset * friendly) * 15 / 8), int(125 * 15 / 8)),
-                         location=BlitLocation.topRight,
-                         fontOption=FontOption.level,
-                         surface=self.info_surface, )
-
-        if self.text:
-            if lines:
-                self.add_text(self.text, pg.Vector2(int(16 * 15 / 8), int(156 * 15 / 8)), surface_idx=3)
-            else:
-                self.add_text(self.text, pg.Vector2(int(16 * 15 / 8), int(156 * 15 / 8)), surface_idx=3, )
-
-        # pg.draw.rect(self.surface, Colours.red.value, self.friendly.rect, width=2)
-        # pg.draw.rect(self.surface, Colours.red.value, self.foe.rect, width=2)
+            # draw the health onto the screen
+            self.screens["stats"].get_object("friendly").update_stats(
+                current_health=self.friendly.health, max_health=self.friendly.stats.health
+            )
 
     def intro_animations(self, window: pg.Surface, duration):
+        self.render_pokemon_details()
         if self.foe.animation:
             frames = len(self.foe.animation)
             for frame in self.foe.animation:
                 self.foe.image = frame
-                self.render_pokemon_details()
                 window.blit(self.get_surface(), (0, 0))
                 pg.display.flip()
                 pg.time.delay(int(0.75 * duration / frames))
@@ -197,10 +200,8 @@ class BattleDisplay(SpriteScreen):
             self.foe.displayImage = self.foe.image
             pg.time.delay(int(0.25 * duration))
         else:
-
             pg.time.delay(duration)
 
-        self.render_pokemon_details()
         window.blit(self.get_surface(), (0, 0))
         pg.display.flip()
 
@@ -241,7 +242,7 @@ class BattleDisplay(SpriteScreen):
                 self.foe.image.set_alpha(0)
 
             self.refresh()
-            self.render_pokemon_details()
+            # self.render_pokemon_details()
             self.window.blit(self.get_surface(), (0, 0))
             pg.display.flip()
             pg.time.delay(int(timePerFrame))
@@ -256,7 +257,7 @@ class BattleDisplay(SpriteScreen):
                 animation.update(frame)
 
                 self.refresh()
-                self.render_pokemon_details()
+                # self.render_pokemon_details()
                 self.window.blit(self.get_surface(), (0, 0))
                 pg.display.flip()
                 pg.time.delay(int(timePerFrame))
@@ -275,16 +276,19 @@ class BattleDisplay(SpriteScreen):
                 animation.update(frame)
 
                 self.refresh()
-                self.render_pokemon_details()
+                # self.render_pokemon_details()
                 self.window.blit(self.get_surface(), (0, 0))
                 pg.display.flip()
                 pg.time.delay(int(timePerFrame))
 
         self.sprites.remove(animation)
 
-    def refresh(self):
+    def refresh(self, text=True):
         self.surface = pg.Surface(self.size, pg.SRCALPHA)
-        self.info_surface = pg.Surface(self.size, pg.SRCALPHA)
+        self.screens["stats"].refresh()
+        if text:
+            self.screens["text"].refresh()
+
         self.sprite_surface = pg.Surface(self.size, pg.SRCALPHA)
 
     def get_surface(self, show_sprites=True):
@@ -297,11 +301,17 @@ class BattleDisplay(SpriteScreen):
         display_surf = self.base_surface.copy()
         display_surf.blit(self.surface, (0, 0))
 
-        for screen in self.screens.values():
-            screen: Screen
-            display_surf.blit(screen.get_surface(), (0, 0))
+        for name in self.layer_names:
+            display_surf.blit(self.screens[name].get_surface(show_sprites=True), (0, 0))
 
         display_surf.blit(self.sprite_surface, (0, 0))
+
+        if self.bounce_friendly_stat:
+            self.screens["stats"].refresh()
+            self.friendly_stat_bounce_val = (self.friendly_stat_bounce_val + 1) % 7
+
+            stat_container: pg.sprite.Sprite = self.screens["stats"].get_object("friendly")
+            stat_container.rect.top += self.friendly_stat_bounce_val - 3
 
         return display_surf
 

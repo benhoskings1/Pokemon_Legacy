@@ -82,7 +82,7 @@ class BattleDisplay:
                                    wRect.topleft, size=wRect.size)
 
         if fPk.visible:
-            self.screen2.loadImage("Images/Battle/Top Screen/Friendly HP.png", pg.Vector2(256 + offset * friendly, 97),
+            self.screen2.loadImage("Images/Battle/Top Screen/stat_container_friendly.png", pg.Vector2(256 + offset * friendly, 97),
                                    location=BlitLocation.topRight)
             fRatio = (fPk.health / fPk.stats.health)
             if fPk.health > 0:

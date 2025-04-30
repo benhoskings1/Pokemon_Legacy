@@ -5,13 +5,15 @@
         "XP": 318,
         "Move_Names": [
             "Scratch",
-            "Leer",
-            "Ember"
+            "Tackle",
+            "Ember",
+            "Growl"
         ],
         "Move_PPs": [
             35,
             30,
-            25
+            25,
+            40
         ],
         "Health": 25,
         "Status": null,
