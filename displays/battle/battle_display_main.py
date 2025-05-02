@@ -1,8 +1,6 @@
 import os
 from math import floor, ceil
 
-from PIL.ImageChops import hard_light
-
 from general.Environment import Environment
 from screen_V2 import Screen, BlitLocation, Colours, FontOption
 from battle_action import BattleAction, BattleAttack, BattleActionType
@@ -77,7 +75,7 @@ class StatContainer(pg.sprite.Sprite):
             self.image.blit(health_text, heath_text_rect.topleft)
 
 
-class BattleDisplay(SpriteScreen):
+class BattleDisplayMain(SpriteScreen):
     def __init__(self, window, size, time, environment: Environment):
         """
         This is the main battle display. The native screen size is 256x192 px
@@ -322,7 +320,7 @@ if __name__ == "__main__":
     pg.init()
     window = pg.display.set_mode(pg.Vector2(240, 180) * 2)
 
-    bd = BattleDisplay(size=window.get_size())
+    bd = BattleDisplayMain(size=window.get_size())
 
     window.blit(bd.get_surface(), (0, 0))
 

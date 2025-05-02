@@ -8,7 +8,7 @@ import pygame as pg
 
 from battle_action import BattleAction, BattleActionType, BattleAttack
 from displays.bag_display import BagAction
-from displays.battle_display import BattleDisplay
+from displays.battle.battle_display_main import BattleDisplayMain
 from displays.EvolveDisplay import EvolveDisplay
 from displays.HomeDisplay import HomeDisplay, HomeAction
 from displays.LearnMove import LearnMoveDisplay, LearnAction
@@ -104,7 +104,7 @@ class Battle:
 
         self.activePokemon = [self.friendly, self.foe]
 
-        self.battle_display = BattleDisplay(self.game.topSurf,self.screenSize, self.timeOfDay, self.environment)
+        self.battle_display = BattleDisplayMain(self.game.topSurf, self.screenSize, self.timeOfDay, self.environment)
         self.battle_display.add_pokemon_sprites(self.activePokemon)
 
         # Top screen
