@@ -40,7 +40,9 @@ class Game:
         self.timeOfDay = self.getTimeOfDay()
         self.controller = Controller()
 
-        self.displaySize = pg.Vector2(480, 720)
+        native_size = pg.Vector2(256, 382)
+        self.graphics_scale = 2
+        self.displaySize = native_size * self.graphics_scale
 
         # load all attributes which utilise any pygame surfaces!
 

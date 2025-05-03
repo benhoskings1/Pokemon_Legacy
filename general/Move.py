@@ -13,44 +13,6 @@ class EffectType(Enum):
     multiple = "Multiple"
 
 
-class Move:
-    def __init__(self, name, moveType, cat, power, accuracy, PP, description, effect):
-
-        self.name = name
-
-        self.type = moveType.title()
-        self.category = cat
-
-        if power != "-":
-            self.power = int(power)
-        else:
-            self.power = None
-
-        if accuracy != "-":
-            self.accuracy = int(accuracy)
-        else:
-            self.accuracy = None
-
-        self.maxPP = int(PP)
-        self.PP = int(PP)
-
-        if pd.isna(description):
-            self.description = None
-        else:
-            self.description = description
-
-        if pd.isna(effect):
-            self.effect = None
-            self.effectType = None
-        else:
-            self.effectType = EffectType(effect[0])
-
-            if self.effectType == EffectType.stat:
-                self.statProb = effect[1]
-                self.statMag = effect[2]
-                self.statType = effect[3]
-
-
 def getMove(name):
     moveData = movesData.loc[name]
 

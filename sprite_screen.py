@@ -94,3 +94,5 @@ class SpriteScreen(Screen):
         for game_object in self.sprites:
             if game_object.id == object_id:
                 return game_object
+
+        return None

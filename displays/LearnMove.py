@@ -4,7 +4,7 @@ from math import ceil
 import pygame as pg
 
 from general.Colours import Colours
-from general.Move import Move, getMove
+from general.Move import getMove, Move2
 from general.Selector import Selector3
 from pokemon import Pokemon
 from screen import Screen, BlitLocation
@@ -96,7 +96,7 @@ class LearnMoveDisplay:
         self.screenIdx = 0
         self.moveIdx = 0
 
-    def updateScreens(self, pk: Pokemon, newMove: Move):
+    def updateScreens(self, pk: Pokemon, newMove: Move2):
         screen2 = self.screens[1]
         screen2.refresh()
         screen2.scaleSurface(15 / 8)
