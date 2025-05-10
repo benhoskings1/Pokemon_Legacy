@@ -699,7 +699,8 @@ class Battle:
                             return res[1]  # returns the selected move
 
                         elif res[0] == "item_container":
-                            select_display = BattleDisplayItemSelect(self.screenSize, item=res[1], parent=self.active_touch_display.parent_display_type, scale=2)
+                            item, count = res[1]
+                            select_display = BattleDisplayItemSelect(self.screenSize, item=item, count=count, parent=self.active_touch_display.parent_display_type, scale=2)
                             self.active_touch_display = select_display
                             self.update_screen()
 

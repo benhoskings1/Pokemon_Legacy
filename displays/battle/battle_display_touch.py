@@ -36,7 +36,7 @@ BAG_DISPLAY_ITEM_TYPE_MAP = {
 }
 
 # ======== CONTAINERS ==============
-class DisplayContainer(pg.sprite.Sprite):
+class DisplayContainer(pg.sprite.Sprite, Screen):
     def __init__(self, image_path, sprite_id, pos=(0, 0), scale=None):
         pg.sprite.Sprite.__init__(self)
 
@@ -51,6 +51,9 @@ class DisplayContainer(pg.sprite.Sprite):
         self.id = sprite_id
         self.scale = scale
 
+        Screen.__init__(self, self.image.get_size())
+        self.load_image(image_path, base=True, scale=pg.Vector2(scale, scale))
+
     def click_return(self):
         return self.sprite_type, self.id
 
@@ -61,7 +64,7 @@ class DisplayContainer(pg.sprite.Sprite):
             return False
 
 
-class MoveContainer(DisplayContainer, Screen):
+class MoveContainer(DisplayContainer):
     def __init__(self, move, pos=(0, 0), scale=None):
 
         img_path = f"Images/Battle/Fight/Move Containers/{move.type} Container.png"
@@ -69,9 +72,6 @@ class MoveContainer(DisplayContainer, Screen):
 
         self.sprite_type = "move"
 
-        Screen.__init__(self, self.image.get_size())
-
-        self.load_image(img_path, base=True, scale=pg.Vector2(scale, scale))
         self.addText(move.name, pg.Vector2((int(62 * scale), int(13 * scale))), base=True, location=BlitLocation.midTop)
 
         self.addText("PP", pg.Vector2((int(56 * scale), int(31 * scale))),
@@ -90,7 +90,7 @@ class MoveContainer(DisplayContainer, Screen):
         self.image = self.get_surface()
 
 
-class ItemContainer(DisplayContainer, Screen):
+class ItemContainer(DisplayContainer):
     def __init__(self, item, count, parent_display_type, pos=pg.Vector2(0, 0), scale=None):
         container= "pokeball"
         if isinstance(item, Pokeball):
@@ -102,11 +102,8 @@ class ItemContainer(DisplayContainer, Screen):
         self.sprite_type = "item_container"
         self.parent_display_type = parent_display_type
 
-        Screen.__init__(self, self.image.get_size())
-
         self.item = item
-
-        self.load_image(f"assets/containers/item_{container}.png", base=True, scale=pg.Vector2(scale, scale))
+        self.count = count
         self.addText(item.name, pg.Vector2(67.5, 11) * scale, colour=Colours.white.value, shadowColour=Colours.lightGrey.value, base=True, location=BlitLocation.midTop)
         self.addText(f"x{count}", pos=pg.Vector2(62, 31) * scale, colour=Colours.white.value, shadowColour=Colours.lightGrey.value,)
         self.add_image(item.image, pos=pg.Vector2(39, 33) * scale, location=BlitLocation.centre, base=True, scale=pg.Vector2(scale, scale))
@@ -118,8 +115,11 @@ class ItemContainer(DisplayContainer, Screen):
                      shadowColour=Colours.lightGrey.value, )
         self.image = self.get_surface()
 
+    def click_return(self):
+        return self.sprite_type, (self.item, self.count)
 
-class PokemonContainer(DisplayContainer, Screen):
+
+class PokemonContainer(DisplayContainer):
     def __init__(self, pokemon, primary=False, pos=pg.Vector2(0, 0), scale=None):
         if pokemon is not None:
             container_type = "primary" if primary else "secondary"
@@ -127,9 +127,6 @@ class PokemonContainer(DisplayContainer, Screen):
             container_type = "empty"
 
         DisplayContainer.__init__(self, f"assets/containers/team_{container_type}.png", pokemon, pos=pos, scale=scale)
-        Screen.__init__(self, self.image.get_size())
-
-        self.load_image(f"assets/containers/team_{container_type}.png", base=True, scale=pg.Vector2(scale, scale))
 
         self.pokemon = pokemon
         self.sprite_type = "pokemon_container"
@@ -271,7 +268,7 @@ class BattleDisplayBagItem(SpriteScreen):
 
 
 class BattleDisplayItemSelect(SpriteScreen):
-    def __init__(self, size, item, parent, scale):
+    def __init__(self, size, item, count, parent, scale):
         super().__init__(size, colour=Colours.black)
         self.display_type = TouchDisplayStates.bag
         self.scale = scale
@@ -285,12 +282,19 @@ class BattleDisplayItemSelect(SpriteScreen):
                         scale=pg.Vector2(self.scale, self.scale))
 
         self.add_image(item.image, pos=pg.Vector2(36, 40) * self.scale, scale=pg.Vector2(self.scale, self.scale), location=BlitLocation.centre)
+        self.addText(item.name, pos=pg.Vector2(56, 35) * self.scale, colour=Colours.white.value, shadowColour=Colours.darkGrey.value)
+        self.addText(f"x{count}", pos=pg.Vector2(160, 35) * self.scale, colour=Colours.white.value, shadowColour=Colours.darkGrey.value)
+        if item.description:
+            self.addText(item.description.replace("é", "e"), pos=pg.Vector2(20, 75) * self.scale, lines=3,
+                               colour=Colours.white.value, shadowColour=Colours.darkGrey.value)
 
         return_container = DisplayContainer("assets/containers/bag_return.png", self.parent_display_type, pos=(217, 152),
                                             scale=self.scale)
 
         select_container = DisplayContainer("assets/containers/item_select_pokeball.png", item, pos=(1, 152), scale=self.scale)
         select_container.sprite_type = "item"
+        select_container.addText("USE", pos=pg.Vector2(92, 17) * self.scale, colour=Colours.white.value, shadowColour=Colours.darkGrey.value)
+        select_container.image = select_container.get_surface()
 
         self.sprites.add([return_container, select_container])
 
