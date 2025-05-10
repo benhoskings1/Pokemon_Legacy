@@ -78,7 +78,7 @@ def getImages(ID, shiny=False):
     backImage = editor.createSurface()
 
     editor.loadData(smallData)
-    smallScale = 3
+    smallScale = 2
     editor.scaleImage((smallScale, smallScale), overwrite=True)
     smallImage = editor.createSurface()
 
@@ -104,8 +104,18 @@ class Stats:
         self.speed = speed
         self.exp = exp
 
+    def __sub__(self, other):
+        return Stats(
+            health=self.health-other.health, attack=self.attack-other.attack, defence=self.defence-other.defence,
+            spAttack=self.spAttack - other.spAttack, spDefence=self.spDefence - other.spDefence, speed=self.speed - other.speed,
+            exp=self.exp - other.exp
+        )
+
     def display(self):
         print(self.health, self.attack, self.defence, self.spAttack, self.spDefence, self.speed)
+
+    def get_values(self):
+        return [self.health, self.attack, self.defence, self.spAttack, self.spDefence, self.speed]
 
 
 class StatStages:
@@ -240,6 +250,8 @@ class Pokemon(pg.sprite.Sprite):
         else:
             self.image = front
 
+        self.sprite_mask = pg.mask.from_surface(self.image)
+
         self.smallImage = small
 
         self.animation = None
@@ -286,11 +298,12 @@ class Pokemon(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
 
         if self.friendly:
-            self.rect.midbottom = pg.Vector2(int(66 * 15 / 8), int(144 * 15 / 8))
+            self.rect.midbottom = pg.Vector2(64, 153) * 2
         else:
             self.rect.midbottom = pg.Vector2(int(192 * 15 / 8), int(90 * 15 / 8))
 
         self.visible = Visible
+        self.sprite_mask = None
 
     def loadAnimation(self):
         animations = createAnimation(self.name)

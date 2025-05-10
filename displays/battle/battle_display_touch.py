@@ -1,27 +1,41 @@
+import os
 from screen_V2 import Colours, FontOption, Screen, BlitLocation
-from sprite_screen import SpriteScreen
+from sprite_screen import SpriteScreen, PokeballCatchAnimation
 import pygame as pg
 from enum import Enum
 
+from general.Item import Pokeball, MedicineItem, BattleItemType
+from bag import BagV2
+
 
 MOVE_CONTAINER_POSITIONS = [(2, 25), (130, 25), (2, 85), (130, 85)]
+ITEM_CONTAINER_POSITIONS = [(1, 6), (130, 6), (2, 85), (130, 85)]
+TEAM_CONTAINER_POSITIONS = [(1, 1), (129, 9), (1, 49), (129, 56), (1, 96), (129, 104)]
 
-
-class TouchDisplayTypes(Enum):
+class TouchDisplayStates(Enum):
     home = 0
     fight = 1
     team = 2
     bag = 3
 
 
-class BagDisplayTypes(Enum):
+class BagDisplayStates(Enum):
     home = 0
     restore = 1
     pokeball = 2
     healers = 3
-    items = 4
+    battle_items = 4
+    select = 5
 
 
+BAG_DISPLAY_ITEM_TYPE_MAP = {
+    BagDisplayStates.restore: BattleItemType.restore,
+    BagDisplayStates.pokeball: BattleItemType.pokeball,
+    BagDisplayStates.healers: BattleItemType.healer,
+    BagDisplayStates.battle_items: BattleItemType.battle_item
+}
+
+# ======== CONTAINERS ==============
 class DisplayContainer(pg.sprite.Sprite):
     def __init__(self, image_path, sprite_id, pos=(0, 0), scale=None):
         pg.sprite.Sprite.__init__(self)
@@ -35,6 +49,7 @@ class DisplayContainer(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
         self.id = sprite_id
+        self.scale = scale
 
     def click_return(self):
         return self.sprite_type, self.id
@@ -46,7 +61,7 @@ class DisplayContainer(pg.sprite.Sprite):
             return False
 
 
-class MoveContainer(DisplayContainer):
+class MoveContainer(DisplayContainer, Screen):
     def __init__(self, move, pos=(0, 0), scale=None):
 
         img_path = f"Images/Battle/Fight/Move Containers/{move.type} Container.png"
@@ -54,26 +69,82 @@ class MoveContainer(DisplayContainer):
 
         self.sprite_type = "move"
 
-        self.screen = Screen(self.image.get_size())
-        self.screen.load_image(img_path, base=True, scale=pg.Vector2(scale, scale))
-        self.screen.addText(move.name, pg.Vector2((int(62 * scale), int(13 * scale))), base=True, location=BlitLocation.midTop)
+        Screen.__init__(self, self.image.get_size())
 
-        self.screen.addText("PP", pg.Vector2((int(56 * scale), int(31 * scale))),
+        self.load_image(img_path, base=True, scale=pg.Vector2(scale, scale))
+        self.addText(move.name, pg.Vector2((int(62 * scale), int(13 * scale))), base=True, location=BlitLocation.midTop)
+
+        self.addText("PP", pg.Vector2((int(56 * scale), int(31 * scale))),
                              colour=pg.Color(63, 48, 41), shadowColour=pg.Color(153, 158, 136), base=True,
                              location=BlitLocation.midTop)
 
-        self.image = self.screen.get_surface()
+        self.image = self.get_surface()
 
         self.scale = scale
 
     def update_info(self, move):
-        self.screen.refresh()
-        self.screen.addText(f"{move.PP}/{move.maxPP}", pg.Vector2((int(108 * self.scale), int(34 * self.scale))),
+        self.refresh()
+        self.addText(f"{move.PP}/{move.maxPP}", pg.Vector2((int(108 * self.scale), int(34 * self.scale))),
                              fontOption=FontOption.level, location=BlitLocation.topRight)
 
-        self.image = self.screen.get_surface()
+        self.image = self.get_surface()
 
 
+class ItemContainer(DisplayContainer, Screen):
+    def __init__(self, item, count, parent_display_type, pos=pg.Vector2(0, 0), scale=None):
+        container= "pokeball"
+        if isinstance(item, Pokeball):
+            container = "pokeball"
+        elif isinstance(item, MedicineItem):
+            container = item.battle_item_type.value  # edit this
+
+        DisplayContainer.__init__(self, f"assets/containers/item_{container}.png", item, pos=pos, scale=scale)
+        self.sprite_type = "item_container"
+        self.parent_display_type = parent_display_type
+
+        Screen.__init__(self, self.image.get_size())
+
+        self.item = item
+
+        self.load_image(f"assets/containers/item_{container}.png", base=True, scale=pg.Vector2(scale, scale))
+        self.addText(item.name, pg.Vector2(67.5, 11) * scale, colour=Colours.white.value, shadowColour=Colours.lightGrey.value, base=True, location=BlitLocation.midTop)
+        self.addText(f"x{count}", pos=pg.Vector2(62, 31) * scale, colour=Colours.white.value, shadowColour=Colours.lightGrey.value,)
+        self.add_image(item.image, pos=pg.Vector2(39, 33) * scale, location=BlitLocation.centre, base=True, scale=pg.Vector2(scale, scale))
+        self.image = self.get_surface()
+
+    def update_info(self, count):
+        self.refresh()
+        self.addText(f"x{count}", pos=pg.Vector2(62, 31) * self.scale, colour=Colours.white.value,
+                     shadowColour=Colours.lightGrey.value, )
+        self.image = self.get_surface()
+
+
+class PokemonContainer(DisplayContainer, Screen):
+    def __init__(self, pokemon, primary=False, pos=pg.Vector2(0, 0), scale=None):
+        if pokemon is not None:
+            container_type = "primary" if primary else "secondary"
+        else:
+            container_type = "empty"
+
+        DisplayContainer.__init__(self, f"assets/containers/team_{container_type}.png", pokemon, pos=pos, scale=scale)
+        Screen.__init__(self, self.image.get_size())
+
+        self.load_image(f"assets/containers/team_{container_type}.png", base=True, scale=pg.Vector2(scale, scale))
+
+        self.pokemon = pokemon
+        self.sprite_type = "pokemon_container"
+        if pokemon:
+            self.addText(pokemon.name, pg.Vector2(31, 9) * self.scale, base=True, colour=Colours.white.value, shadowColour=Colours.lightGrey.value,)
+            self.addText(f"{pokemon.health}/{pokemon.stats.health}", pg.Vector2(72, 32) * self.scale,
+                         colour=Colours.white.value,shadowColour=Colours.white.value, fontOption=FontOption.level)
+            self.addText(f"Lv{pokemon.level}", pg.Vector2(12, 32) * self.scale,
+                         colour=Colours.white.value, shadowColour=Colours.white.value, fontOption=FontOption.level)
+            self.add_image(pokemon.smallImage, pos=pg.Vector2(15, 15) * self.scale, location=BlitLocation.centre,)
+
+        self.image = self.get_surface()
+
+
+# ======== DISPLAYS ==============
 class BattleDisplayTouch(SpriteScreen):
     def __init__(self, window, window_size, scale):
         """
@@ -85,7 +156,7 @@ class BattleDisplayTouch(SpriteScreen):
         """
         super().__init__(window_size, colour=Colours.black)
 
-        self.display_type = TouchDisplayTypes.home
+        self.display_type = TouchDisplayStates.home
 
         self.window = window
 
@@ -93,10 +164,10 @@ class BattleDisplayTouch(SpriteScreen):
 
         self.load_image("assets/battle/touch_display/home/background.png", base=True, scale=pg.Vector2(self.scale, self.scale))
 
-        fight_container = DisplayContainer("assets/containers/battle_fight.png", TouchDisplayTypes.fight, pos=(20, 35), scale=self.scale)
-        bag_container = DisplayContainer("assets/containers/battle_bag.png", TouchDisplayTypes.bag, pos=(1, 145), scale=self.scale)
+        fight_container = DisplayContainer("assets/containers/battle_fight.png", TouchDisplayStates.fight, pos=(20, 35), scale=self.scale)
+        bag_container = DisplayContainer("assets/containers/battle_bag.png", TouchDisplayStates.bag, pos=(1, 145), scale=self.scale)
         run_container = DisplayContainer("assets/containers/battle_run.png", "run", pos=(89, 153), scale=self.scale)
-        team_container = DisplayContainer("assets/containers/battle_team.png", TouchDisplayTypes.team, pos=(177, 145), scale=self.scale)
+        team_container = DisplayContainer("assets/containers/battle_team.png", TouchDisplayStates.team, pos=(177, 145), scale=self.scale)
 
         self.sprites.add([fight_container, bag_container, run_container, team_container])
 
@@ -111,7 +182,7 @@ class BattleDisplayFight(SpriteScreen):
         :param environment:
         """
         super().__init__(size, colour=Colours.black)
-        self.display_type = TouchDisplayTypes.fight
+        self.display_type = TouchDisplayStates.fight
 
         self.window = window
 
@@ -120,8 +191,8 @@ class BattleDisplayFight(SpriteScreen):
         self.load_image("assets/battle/touch_display/fight/background.png", base=True,
                         scale=pg.Vector2(self.scale, self.scale))
 
-        cancel_container = DisplayContainer("assets/containers/fight_cancel.png", TouchDisplayTypes.home, pos=(9, 153),
-                                           scale=self.scale)
+        cancel_container = DisplayContainer("assets/containers/fight_cancel.png", TouchDisplayStates.home, pos=(9, 153),
+                                            scale=self.scale)
 
         self.sprites.add([cancel_container])
 
@@ -142,7 +213,7 @@ class BattleDisplayFight(SpriteScreen):
 
 
 class BattleDisplayBag(SpriteScreen):
-    def __init__(self, window, size, scale):
+    def __init__(self, window, size, bag: BagV2, scale):
         """
         This is the main battle display. The native screen size is 256x192 px
         :param window: The pygame surface to blit the display onto
@@ -151,59 +222,102 @@ class BattleDisplayBag(SpriteScreen):
         :param environment:
         """
         super().__init__(size, colour=Colours.black)
-        self.display_type = TouchDisplayTypes.bag
+        self.display_type = TouchDisplayStates.bag
 
         self.window = window
 
         self.scale = scale
 
+        self.bag = bag
+
         self.load_image("assets/battle/touch_display/bag/background_home.png", base=True, scale=pg.Vector2(self.scale, self.scale))
 
-        return_container = DisplayContainer("assets/containers/bag_return.png", TouchDisplayTypes.home, pos=(217, 152),
-                                           scale=self.scale)
-
-        restore_container = DisplayContainer("assets/containers/bag_restore.png", BagDisplayTypes.restore, pos=(1, 8), scale=self.scale)
-        pokeball_container = DisplayContainer("assets/containers/bag_pokeball.png", BagDisplayTypes.pokeball, pos=(129, 8),scale=self.scale)
-        healer_container = DisplayContainer("assets/containers/bag_healers.png", BagDisplayTypes.healers, pos=(1, 80),
-                                             scale=self.scale)
-        item_container = DisplayContainer("assets/containers/bag_items.png", BagDisplayTypes.items, pos=(129, 80),
-                                             scale=self.scale)
+        return_container = DisplayContainer("assets/containers/bag_return.png", TouchDisplayStates.home, pos=(217, 152), scale=self.scale)
+        restore_container = DisplayContainer("assets/containers/bag_restore.png", BagDisplayStates.restore, pos=(1, 8), scale=self.scale)
+        pokeball_container = DisplayContainer("assets/containers/bag_pokeball.png", BagDisplayStates.pokeball, pos=(129, 8), scale=self.scale)
+        healer_container = DisplayContainer("assets/containers/bag_healers.png", BagDisplayStates.healers, pos=(1, 80), scale=self.scale)
+        item_container = DisplayContainer("assets/containers/bag_items.png", BagDisplayStates.battle_items, pos=(129, 80), scale=self.scale)
 
         self.sprites.add([return_container, restore_container, pokeball_container, healer_container, item_container])
 
         self.sub_displays = {
-            BagDisplayTypes.restore: BattleDisplayBagItem(self.window, size, scale),
-            BagDisplayTypes.pokeball: BattleDisplayBagItem(self.window, size, scale),
-            BagDisplayTypes.healers: BattleDisplayBagItem(self.window, size, scale),
-            BagDisplayTypes.items: BattleDisplayBagItem(self.window, size, scale),
+            state: BattleDisplayBagItem(
+                size, state, self.bag.get_items(battle_item_type=BAG_DISPLAY_ITEM_TYPE_MAP[state]), scale
+            ) for state in BagDisplayStates if state not in (BagDisplayStates.home, BagDisplayStates.select)
         }
-
-    # def load_item_sprites(self, items):
-    #
-    #     containers = [
-    #         MoveContainer(move, pos=MOVE_CONTAINER_POSITIONS[idx], scale=self.scale)
-    #         for idx, move in enumerate(moves)
-    #     ]
-    #
-    #     for idx, container in enumerate(containers):
-    #         container.update_info(moves[idx])
-    #
-    #     self.sprites.add(containers)
-    #
-    # def update_container(self, move):
-    #     self.get_object(move).update_info(move)
 
 
 class BattleDisplayBagItem(SpriteScreen):
-    def __init__(self, window, size, scale):
+    def __init__(self, size, display_type, items, scale):
         super().__init__(size, colour=Colours.black)
-        self.display_type = TouchDisplayTypes.bag
 
-        self.window = window
-
+        self.parent_display_type = display_type
         self.scale = scale
 
         self.load_image("assets/battle/touch_display/bag/background_item.png", base=True, scale=pg.Vector2(self.scale, self.scale))
-        return_container = DisplayContainer("assets/containers/bag_return.png", TouchDisplayTypes.bag, pos=(217, 152), scale=self.scale)
+        return_container = DisplayContainer("assets/containers/bag_return.png", TouchDisplayStates.bag, pos=(217, 152), scale=self.scale)
 
         self.sprites.add([return_container])
+
+        item_containers = [ItemContainer(item, count, self.parent_display_type, pos=ITEM_CONTAINER_POSITIONS[idx], scale=scale) for idx, (item, count) in enumerate(items.items())]
+        self.sprites.add(item_containers)
+
+    def update_container(self, item, count):
+        if count == 0:
+            self.get_object(item).kill()
+            self.refresh()
+        else:
+            self.get_object(item).update_info(count)
+
+
+class BattleDisplayItemSelect(SpriteScreen):
+    def __init__(self, size, item, parent, scale):
+        super().__init__(size, colour=Colours.black)
+        self.display_type = TouchDisplayStates.bag
+        self.scale = scale
+        self.parent_display_type = parent
+
+        item_type = item.battle_item_type.value
+        if not os.path.exists(f"assets/battle/touch_display/bag/background_{item.battle_item_type.value}.png"):
+            item_type = "pokeball"
+
+        self.load_image(f"assets/battle/touch_display/bag/background_{item_type}.png", base=True,
+                        scale=pg.Vector2(self.scale, self.scale))
+
+        self.add_image(item.image, pos=pg.Vector2(36, 40) * self.scale, scale=pg.Vector2(self.scale, self.scale), location=BlitLocation.centre)
+
+        return_container = DisplayContainer("assets/containers/bag_return.png", self.parent_display_type, pos=(217, 152),
+                                            scale=self.scale)
+
+        select_container = DisplayContainer("assets/containers/item_select_pokeball.png", item, pos=(1, 152), scale=self.scale)
+        select_container.sprite_type = "item"
+
+        self.sprites.add([return_container, select_container])
+
+
+class BattleDisplayTeam(SpriteScreen):
+    def __init__(self, size, team, scale):
+        print(size)
+        super().__init__(size, colour=Colours.black)
+        self.scale = scale
+        self.display_type = TouchDisplayStates.team
+
+        self.team = team
+
+        self.load_image("assets/battle/touch_display/pokemon/background.png", base=True,
+                        scale=pg.Vector2(self.scale, self.scale))
+
+        return_container = DisplayContainer("assets/containers/bag_return.png", TouchDisplayStates.home, pos=(217, 152),
+                                            scale=self.scale)
+
+        for idx in range(6):
+            if idx == 0:
+                self.sprites.add(PokemonContainer(self.team.pokemon[0], primary=True, pos=pg.Vector2(TEAM_CONTAINER_POSITIONS[0]), scale=self.scale))
+            elif idx < len(self.team.pokemon):
+                self.sprites.add(PokemonContainer(self.team.pokemon[idx], pos=pg.Vector2(TEAM_CONTAINER_POSITIONS[idx]), scale=self.scale))
+            else:
+                self.sprites.add(PokemonContainer(None, pos=pg.Vector2(TEAM_CONTAINER_POSITIONS[idx]), scale=self.scale))
+        # textbox =
+        self.sprites.add(return_container)
+
+

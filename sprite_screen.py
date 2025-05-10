@@ -55,6 +55,9 @@ class GameObjects(pg.sprite.Group):
             elif (obj.sprite_type == "animation" or
                     obj.sprite_type == "pokeball"):
                 screen.add_surf(obj.image, pos=obj.rect.topleft, sprite=True)
+            elif obj.sprite_type == "text_box":
+                screen.add_surf(obj.image, pos=obj.rect.topleft, sprite=True)
+
             else:
                 screen.add_surf(obj.image, pos=obj.rect.topleft, sprite=True)
 

@@ -201,9 +201,9 @@ class Game:
                 self.updateDisplay(flip=False)
             else:
                 if self.battle.state == State.home:
-                    self.battle.updateScreen(cover=True, flip=False)
+                    self.battle.update_screen(cover=True, flip=False)
                 else:
-                    self.battle.updateScreen(flip=False)
+                    self.battle.update_screen(flip=False)
 
             self.topSurf.blit(blackSurf, (0, 0))
             self.bottomSurf.blit(blackSurf, (0, 0))
@@ -322,7 +322,7 @@ class Game:
     def startBattle(self, route="Route 201", name=None, level=None):
         battle = Battle(self, routeName=route, wildName=name, wildLevel=level)
         self.battle = battle
-        battle.loop2()
+        battle.loop()
         self.battle = None
 
     def battleIntro(self, time):
@@ -339,9 +339,9 @@ class Game:
 
     def loop(self):
         if self.battle:
-            self.battle.updateScreen(flip=False)
+            self.battle.update_screen(flip=False)
             self.fadeFromBlack(500, battle=True)
-            self.battle.loop2()
+            self.battle.loop()
             self.battle = None
             self.updateDisplay()
         else:

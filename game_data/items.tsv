@@ -1,21 +1,21 @@
-item_id	name	description	buy_price	sell_price
-1	Poke Ball	A device for catching wild Pokémon. It is thrown like a ball at the target. It is designed as a capsule system.	200	100
-2	Great Ball	A good, high-performance Ball that provides a higher Pokémon catch rate than a standard Poké Ball.	600	300
-3	Ultra Ball	An ultra-performance Ball that provides a higher Pokémon catch rate than a Great Ball.	1200	600
-4	Master Ball	The best Ball with the ultimate level of performance. It will catch any wild Pokémon without fail.
-5	Potion	A Spray-type medicine for wounds. It restores the HP of one Pokemon by just 20 Points
-6	Super Potion	A Spray-type medicine for wounds. It restores the HP of one Pokemon by 50 Points
-7	Hyper Potion	A Spray-type medicine for wounds. It restores the HP of one Pokemon by 200 Points
-8	Antidote
-9	Awakening
-10	Burn Heal
-11	Full Heal
-12	Full Restore
-13	Heal Powder
-14	Ice Heal
-15	Max Revive
-16	Old Gateau
-17	Paralyse Heal
-18	Revival Herb
-19	Revive
-20	Sacred Ash
+item_id	item_type_id	battle_item_type_id	name	description	buy_price	sell_price
+1	2	2	Poke Ball	A device for catching wild Pokémon. It is thrown like a ball at the target. It is designed as a capsule system.	200	100
+2	2	2	Great Ball	A good, high-performance Ball that provides a higher Pokémon catch rate than a standard Poké Ball.	600	300
+3	2	2	Ultra Ball	An ultra-performance Ball that provides a higher Pokémon catch rate than a Great Ball.	1200	600
+4	2	2	Master Ball	The best Ball with the ultimate level of performance. It will catch any wild Pokémon without fail.
+5	3	1	Potion	A Spray-type medicine for wounds. It restores the HP of one Pokemon by just 20 Points
+6	3	1	Super Potion	A Spray-type medicine for wounds. It restores the HP of one Pokemon by 50 Points
+7	3	1	Hyper Potion	A Spray-type medicine for wounds. It restores the HP of one Pokemon by 200 Points
+8	3	3	Antidote
+9	3	3	Awakening
+10	3	3	Burn Heal
+11	3	3	Full Heal
+12	3	3	Full Restore
+13	3	3	Heal Powder
+14	3	3	Ice Heal
+15	3	3	Max Revive
+16	3	3	Old Gateau
+17	3	3	Paralyse Heal
+18	3	3	Revival Herb
+19	3	3	Revive
+20	3	3	Sacred Ash
