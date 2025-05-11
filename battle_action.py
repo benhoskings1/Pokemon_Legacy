@@ -32,7 +32,12 @@ class BattleAttack(pg.sprite.Sprite, BattleAction, ):
         self.sprite_type = "animation"
         self.friendly_action = target.friendly
 
-        if os.path.isdir(f"assets/battle/move_animations/{move.name}"):
+        target = "friendly" if self.friendly_action else "foe"
+
+        if move in ["growl"]:
+            target = "foe" if self.friendly_action else "friendly"
+
+        if os.path.isdir(f"assets/battle/move_animations/{move.name}/{target}"):
             self.animation = BattleAnimation(move=move.name.lower(), size=animation_size, friendly=self.friendly_action)
             self.frame_count = len(self.animation.frames)
             self.frame_idx = 0

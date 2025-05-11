@@ -11,7 +11,7 @@ from general.Colours import Colours
 from general.Selector import Selector3
 from screen import Screen, BlitLocation, FontOption
 
-levelUpValues = pd.read_csv("game_data/Level Up.tsv", delimiter='\t')
+levelUpValues = pd.read_csv("game_data/level_up_exp.tsv", delimiter='\t')
 
 
 class PartyAction(Enum):

@@ -385,35 +385,49 @@ class Battle:
             self.game.bottomSurf.blit(blackSurf, (0, 0))
             pg.display.flip()
 
-    def wildKO(self):
+    def wild_ko(self):
         self.friendly.updateEVs(self.foe.name)
         # self.battleDisplay.text = str.format("The wild {} fainted", self.foe.name)
         self.update_upper_screen()
         pg.display.flip()
         self.KOAnimation(1500)
-        self.gainExp(1500)
-        [levelUp, levels, moves] = self.friendly.checkLevelUp()
-        if levelUp:
-            self.level_up_friendly(levels)
 
-        if self.friendly.level > self.friendly.evolveLevel:
-            self.state = State.evolve
-            # evolvedPk = Pokemon(name, friendly=True, level=level, exp=exp, moveNames=moves, EVs=EVs, IVs=IVs)
-            evolutionName = self.friendly.getEvolution()
-            evolution = Pokemon(evolutionName, Friendly=True,
-                                Level=self.friendly.level, XP=self.friendly.exp,
-                                Move_Names=self.friendly.moveNames, EVs=self.friendly.EVs,
-                                IVs=self.friendly.IVs)
+        frames, duration = 100, 1500
+        exp_gain = round(self.foe.getFaintXP())
+        self.battle_display.update_display_text(f"{self.friendly.name} gained {exp_gain} Exp.")
+        for frame in range(frames):
+            self.friendly.exp += exp_gain / frames
+            self.battle_display.render_pokemon_details()
+            self.update_screen(cover=True)
+            pg.display.flip()
+            pg.time.delay(int(duration / frames))
+            if self.friendly.exp >= self.friendly.level_up_exp:
+                self.level_up_friendly(1000)
 
-            evolution.switchImage("front")
-            self.evolveAnimation(evolution)
+        # [levelUp, levels, moves] = self.friendly.checkLevelUp()
 
-        if moves and levelUp:
-            self.movesToLearn = moves
-            for move in self.movesToLearn:
-                self.learnLogic(move)
-                self.movesToLearn: list
-                self.movesToLearn.pop(self.movesToLearn.index(move))
+        # display
+        # if levelUp:
+        #     self.level_up_friendly(levels)
+
+        # if self.friendly.level > self.friendly.evolveLevel:
+        #     self.state = State.evolve
+        #     # evolvedPk = Pokemon(name, friendly=True, level=level, exp=exp, moveNames=moves, EVs=EVs, IVs=IVs)
+        #     evolutionName = self.friendly.getEvolution()
+        #     evolution = Pokemon(evolutionName, Friendly=True,
+        #                         Level=self.friendly.level, XP=self.friendly.exp,
+        #                         Move_Names=self.friendly.moveNames, EVs=self.friendly.EVs,
+        #                         IVs=self.friendly.IVs)
+        #
+        #     evolution.switchImage("front")
+        #     self.evolveAnimation(evolution)
+        #
+        # if moves and levelUp:
+        #     self.movesToLearn = moves
+        #     for move in self.movesToLearn:
+        #         self.learnLogic(move)
+        #         self.movesToLearn: list
+        #         self.movesToLearn.pop(self.movesToLearn.index(move))
 
     def friendlyKO(self):
         # self.battleDisplay.text = str.format("{} fainted!", self.friendly.name)
@@ -421,41 +435,20 @@ class Battle:
         pg.display.flip()
         self.KOAnimation(1500, friendly=True)
 
-    def level_up_friendly(self, levels, duration=1000):
-        for level in range(levels):
-            self.friendly.level += 1
+    def level_up_friendly(self, duration=1000):
 
-            prevStats = self.friendly.stats
+        prevStats = self.friendly.stats
+        self.friendly.level_up()
+        newStats = self.friendly.stats
+        self.friendly.health += newStats.health - prevStats.health
 
-            self.friendly.updateStats()
-            newStats = self.friendly.stats
-            self.friendly.health += newStats.health - prevStats.health
-
-            for old_stats in [prevStats, None]:
-                level_up_box = LevelUpBox("level_up", self.game.graphics_scale, new_stats=newStats, old_stats=old_stats)
-                self.battle_display.sprites.add(level_up_box)
-                self.update_upper_screen()
-                pg.display.flip()
-                pg.time.delay(duration)
-                level_up_box.kill()
-
-    def gainExp(self, frames):
-        xpGain = round(self.foe.getFaintXP())
-        self.friendly.exp += xpGain
-        self.displayMessage(f"{self.friendly.name} gained {xpGain} Exp. Points", 1000)
-
-        # for frame in range(frames):
-        #     self.friendly.exp += xpGain / frames
-        #     self.battle_display.render_pokemon_details()
-        #     self.update_upper_screen()
-        #     pg.display.flip()
-        #     pg.time.delay(int(10))
-
-        self.friendly.exp = round(self.friendly.exp)
-
-        # self.update_upper_screen()
-        # pg.display.flip()
-        # pg.time.delay(duration)
+        for old_stats in [prevStats, None]:
+            level_up_box = LevelUpBox("level_up", self.game.graphics_scale, new_stats=newStats, old_stats=old_stats)
+            self.battle_display.sprites.add(level_up_box)
+            self.update_upper_screen()
+            pg.display.flip()
+            pg.time.delay(duration)
+            level_up_box.kill()
 
     def evolveAnimation(self, evolution):
 
@@ -641,7 +634,7 @@ class Battle:
                 self.running = False
                 return True
             elif pokemon.health <= 0:
-                self.wildKO()
+                self.wild_ko()
                 self.running = False
                 return True
 
@@ -723,7 +716,16 @@ class Battle:
 
                         elif res[0] == "pokemon_container":
                             pokemon = res[1]
+                            self.active_touch_display = PokemonSelector(self.screenSize, pokemon, scale=2)
+                            self.update_screen()
+
                             print(f"{pokemon.name}")
+
+                        elif res[0] == "pokemon_select":
+                            pokemon = res[1]
+                            print(f"{pokemon.name} now in battle")
+                            return pokemon
+
                         print(res)
 
                 elif event.type == pg.KEYDOWN:
@@ -750,6 +752,9 @@ class Battle:
 
         elif isinstance(action, Item):
             self.use_item(action, targetFriendly=True)
+
+        elif isinstance(action, Pokemon):
+            self.tag_in_teammate(action)
 
     def tag_in_teammate(self, teammate: PartyAction):
         pkIndex = self.activePokemon.index(self.friendly)
@@ -855,6 +860,6 @@ if __name__ == '__main__':
 
     demo_game.bag = BagV2(bag_data)
 
-    battle = Battle(demo_game, routeName="Route 201", wildName="Bidoof", wildLevel=1, pickleData=None)
+    battle = Battle(demo_game, routeName="Route 201", wildName="Bidoof", wildLevel=2, pickleData=None)
 
     battle.loop()

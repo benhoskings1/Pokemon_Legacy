@@ -1,4 +1,5 @@
 import os
+import time
 from screen_V2 import Colours, FontOption, Screen, BlitLocation
 from sprite_screen import SpriteScreen, PokeballCatchAnimation
 import pygame as pg
@@ -139,6 +140,15 @@ class PokemonContainer(DisplayContainer):
             self.add_image(pokemon.smallImage, pos=pg.Vector2(15, 15) * self.scale, location=BlitLocation.centre,)
 
         self.image = self.get_surface()
+        self.img_update = time.monotonic()
+
+    def update_stats(self, stats):
+        ...
+
+    def toggle_mini(self):
+        now = time.monotonic()
+        if now - self.img_update > 1:
+            ...
 
 
 # ======== DISPLAYS ==============
@@ -324,4 +334,36 @@ class BattleDisplayTeam(SpriteScreen):
         # textbox =
         self.sprites.add(return_container)
 
+
+class PokemonSelector(SpriteScreen):
+    def __init__(self, size, pokemon, scale):
+        print(size)
+        super().__init__(size, colour=Colours.black)
+        self.display_type = TouchDisplayStates.team
+        self.scale = scale
+
+        self.load_image("assets/battle/touch_display/pokemon/background_select.png", base=True,
+                        scale=pg.Vector2(self.scale, self.scale))
+
+        select_container = DisplayContainer("assets/containers/pokemon_container_1.png", pokemon, pos=(9, 8),
+                                             scale=self.scale)
+        select_container.addText(pokemon.name, pos=pg.Vector2(119, 35) * self.scale, location=BlitLocation.midTop, colour=Colours.white.value)
+        select_container.addText("SHIFT", pos=pg.Vector2(119, 97) * self.scale, location=BlitLocation.midTop, colour=Colours.white.value)
+        select_container.image = select_container.get_surface()
+        select_container.sprite_type = "pokemon_select"
+
+        return_container = DisplayContainer("assets/containers/bag_return.png", TouchDisplayStates.team, pos=(217, 152),
+                                            scale=self.scale)
+        summary_container = DisplayContainer("assets/containers/pokemon_container_2.png", "summary", pos=(1, 152), scale=self.scale)
+        summary_container.addText("SUMMARY", pos=pg.Vector2(51, 16) * self.scale, lines=1, location=BlitLocation.midTop,
+                                  colour=Colours.white.value, shadowColour=Colours.lightGrey.value)
+        summary_container.image = summary_container.get_surface()
+
+        check_container = DisplayContainer("assets/containers/pokemon_container_2.png", "check_moves", pos=(105, 152),
+                                             scale=self.scale)
+        check_container.addText("CHECK MOVES", pos=pg.Vector2(51, 16) * self.scale, lines=1, location=BlitLocation.midTop,
+                                  colour=Colours.white.value, shadowColour=Colours.lightGrey.value)
+        check_container.image = check_container.get_surface()
+
+        self.sprites.add([summary_container, return_container, check_container, select_container])
 

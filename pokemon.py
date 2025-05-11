@@ -19,7 +19,8 @@ with open("game_data/Pokedex/LocalDex/LocalDex.pickle", 'rb') as file:
 oldPokedex = pd.read_csv("game_data/Pokedex/Local Dex.tsv", delimiter='\t', index_col=1)
 attributes = pd.read_csv("game_data/Pokedex/AttributeDex.tsv", delimiter='\t', index_col=1)
 effectiveness = pd.read_csv("game_data/Effectiveness.csv", index_col=0)
-levelUpValues = pd.read_csv("game_data/Level Up.tsv", delimiter='\t')
+level_up_values = pd.read_csv("game_data/level_up_exp.tsv", delimiter='\t', index_col=6)
+print(level_up_values.head())
 natures = pd.read_csv("game_data/Natures.tsv", delimiter='\t', index_col=0)
 
 capWildMoves = True
@@ -137,9 +138,7 @@ class Pokemon(pg.sprite.Sprite):
                  EVs=None, IVs=None, Gender=None, Nature=None, Ability=None, KO=False, Stat_Stages=None,
                  Friendly=False, Shiny=None, Visible=True, Catch_Location=None, Catch_Level=None,
                  Catch_Date=None):
-
-        super().__init__()
-
+        # ===== Load Default Data ======
         data = pokedex.loc[Name]
         oldData = oldPokedex.loc[Name]
 
@@ -150,7 +149,7 @@ class Pokemon(pg.sprite.Sprite):
         self.EVYield = data.EV_Yield
         self.moveData = data.Learnset
 
-        if type(data.Type) == str:
+        if isinstance(data.Type, str):
             self.type1 = data.Type
             self.type2 = None
         else:
@@ -158,14 +157,14 @@ class Pokemon(pg.sprite.Sprite):
             self.type1 = data.Type[0]
             self.type2 = data.Type[1]
 
-        if XP is None:
-            XP = int(levelUpValues.loc[Level - 1, self.growthRate])
-        if Level is None:
-            Level = randint(1, 10)
+        XP = int(level_up_values.loc[Level, self.growthRate]) if XP is None else XP
+        Level = randint(1, 10) if Level is None else Level
 
         self.level, self.exp = Level, XP
-
+        self.level_exp = int(level_up_values.loc[Level, self.growthRate])
+        self.level_up_exp = int(level_up_values.loc[Level+1, self.growthRate])
         self.evolveLevel = oldData.Evolve_Level
+        print(f"Level {self.level} {self.name} with growth rate {self.growthRate}, has {XP} XP. {self.level_up_exp - XP} XP to the next level.")
 
         if Move_Names is None:
             Move_Names = []
@@ -206,11 +205,7 @@ class Pokemon(pg.sprite.Sprite):
         self.stats = Stats(exp=data.Base_Exp)
         self.updateStats()
 
-        if Health:
-            self.health = Health
-        else:
-            self.health = self.stats.health
-
+        self.health = Health if Health else self.stats.health
         self.friendly = Friendly
 
         if Gender:
@@ -223,16 +218,8 @@ class Pokemon(pg.sprite.Sprite):
             else:
                 self.gender = "Female"
 
-        if Ability:
-            self.ability = Ability
-        else:
-            abilities = data.Abilities[:len(data.Abilities)]
-            self.ability = choice(abilities)
-
-        if Nature:
-            self.nature = Nature
-        else:
-            self.nature = natures.loc[randint(0, 24)].Name
+        self.ability = Ability if Ability else choice(data.Abilities[:len(data.Abilities)])
+        self.nature = Nature if Nature else natures.loc[randint(0, 24)].Name
 
         if Shiny:
             self.shiny = Shiny
@@ -245,17 +232,10 @@ class Pokemon(pg.sprite.Sprite):
 
         front, back, small = getImages(self.ID, self.shiny)
 
-        if Friendly:
-            self.image = back
-        else:
-            self.image = front
-
+        self.image = back if Friendly else front
         self.sprite_mask = pg.mask.from_surface(self.image)
-
         self.smallImage = small
-
         self.animation = None
-
         self.displayImage = self.image
 
         if Move_PPs:
@@ -265,15 +245,8 @@ class Pokemon(pg.sprite.Sprite):
                 else:
                     move.PP = move.maxPP
 
-        if Stat_Stages:
-            self.statStages = StatStages(**Stat_Stages)
-        else:
-            self.statStages = StatStages()
-
-        if Status:
-            self.status = StatusEffect(Status)
-        else:
-            self.status = None
+        self.statStages = StatStages(**Stat_Stages) if Stat_Stages else StatStages()
+        self.status = StatusEffect(Status) if Status else None
 
         self.KO = KO
 
@@ -293,7 +266,8 @@ class Pokemon(pg.sprite.Sprite):
             self.catchLevel = self.level
             self.catchDate = datetime.datetime.now()
 
-        # display options
+        # =========== SPRITE INITIALISATION =======
+        pg.sprite.Sprite.__init__(self)
         self.sprite_type = "pokemon"
         self.rect = self.image.get_rect()
 
@@ -474,12 +448,18 @@ class Pokemon(pg.sprite.Sprite):
 
         self.stats = Stats(maxHealth, attack, defence, spAttack, spDefence, speed, self.stats.exp)
 
+    def level_up(self):
+        self.level += 1
+        self.level_exp = int(level_up_values.loc[self.level, self.growthRate])
+        self.level_up_exp = int(level_up_values.loc[self.level + 1, self.growthRate])
+        self.updateStats()
+
     def checkLevelUp(self):
         level = 99
         levelUp = False
         moves = []
         for idx in range(99, 0, -1):
-            if self.exp < levelUpValues.loc[idx, self.growthRate]:
+            if self.exp < level_up_values.loc[idx, self.growthRate]:
                 level = idx
 
         if self.level != level:

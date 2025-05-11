@@ -275,7 +275,7 @@ class BattleDisplayMain(SpriteScreen):
             # draw the health onto the screen
             self.screens["stats"].get_object("friendly").update_stats(
                 current_health=self.friendly.health, max_health=self.friendly.stats.health,
-                current_xp=self.friendly.exp, max_xp=self.friendly.stats.exp,
+                current_xp=self.friendly.exp - self.friendly.level_exp, max_xp=self.friendly.level_up_exp - self.friendly.level_exp,
             )
 
     def intro_animations(self, window: pg.Surface, duration):
