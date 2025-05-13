@@ -55,15 +55,15 @@
     },
     {
         "Name": "Shinx",
-        "Level": 3,
-        "XP": 57,
+        "Level": 8,
+        "XP": 350,
         "Move_Names": [
             "Tackle"
         ],
         "Move_PPs": [
             35
         ],
-        "Health": 15,
+        "Health": 25,
         "Status": null,
         "EVs": [
             0,

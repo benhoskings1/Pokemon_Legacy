@@ -33,7 +33,7 @@ class StatContainer(pg.sprite.Sprite):
             f"assets/battle/main_display/stat_container_{'friendly' if friendly else 'foe'}.png"
         )
         self.image = self.base_image
-        self.image = pg.transform.scale(self.image, pg.Vector2(self.image.get_size()) * 2)
+        self.image = pg.transform.scale(self.image, pg.Vector2(self.image.get_size()) * scale)
         self.rect = self.image.get_rect()
 
         self.sprite_type = "stat_container"
@@ -245,6 +245,8 @@ class BattleDisplayMain(SpriteScreen):
             name=self.foe.name, sex=self.foe.gender, level=self.foe.level
         )
 
+        print([sp for sp in self.screens["stats"].sprites])
+
     def render_pokemon_details(self, opacity=None, friendly=False, lines=None):
         self.refresh()
 
@@ -374,6 +376,26 @@ class BattleDisplayMain(SpriteScreen):
                 pg.time.delay(int(timePerFrame))
 
         self.sprites.remove(animation)
+
+    def switch_active_pokemon(self, new_pokemon):
+        self.screens["stats"].refresh()
+        friendly_container = self.screens["stats"].get_object("friendly")
+        self.screens["stats"].sprites.remove(self.friendly)
+        self.screens["stats"].sprites.remove(friendly_container)
+
+        self.screens["stats"].sprites.add([
+            StatContainer(sprite_id="friendly", friendly=True, scale=self.scale),
+            new_pokemon
+        ])
+        self.friendly = new_pokemon
+
+        self.screens["stats"].get_object("friendly").initialise_info(
+            name=self.friendly.name, sex=self.friendly.gender, level=self.friendly.level
+        )
+
+        self.render_pokemon_details()
+
+
 
     def refresh(self, text=True):
         self.surface = pg.Surface(self.size, pg.SRCALPHA)

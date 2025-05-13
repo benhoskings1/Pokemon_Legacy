@@ -133,6 +133,23 @@ class StatStages:
         print(self.attack, self.defence, self.spAttack, self.spDefence, self.speed)
 
 
+class PokemonSpriteSmall(pg.sprite.Sprite):
+    def __init__(self, frames):
+        pg.sprite.Sprite.__init__(self)
+        self.frames = frames
+        self.frame_idx = 0
+        self.image = self.frames[0]
+        self.rect = self.image.get_rect()
+        self.sprite_type = "pokemon_small"
+
+    def update(self):
+        self.toggle_image()
+
+    def toggle_image(self):
+        self.frame_idx = (self.frame_idx + 1) % len(self.frames)
+        self.image = self.frames[self.frame_idx]
+
+
 class Pokemon(pg.sprite.Sprite):
     def __init__(self, Name, Level=None, XP=None, Move_Names=None, Move_PPs=None, Health=None, Status=None,
                  EVs=None, IVs=None, Gender=None, Nature=None, Ability=None, KO=False, Stat_Stages=None,
@@ -235,7 +252,7 @@ class Pokemon(pg.sprite.Sprite):
         self.image = back if Friendly else front
         self.sprite_mask = pg.mask.from_surface(self.image)
         self.smallImage = small
-        self.animation = None
+        self.animation, self.small_animation = None, None
         self.displayImage = self.image
 
         if Move_PPs:
@@ -269,6 +286,7 @@ class Pokemon(pg.sprite.Sprite):
         # =========== SPRITE INITIALISATION =======
         pg.sprite.Sprite.__init__(self)
         self.sprite_type = "pokemon"
+        self.id = Name
         self.rect = self.image.get_rect()
 
         if self.friendly:
@@ -279,13 +297,13 @@ class Pokemon(pg.sprite.Sprite):
         self.visible = Visible
         self.sprite_mask = None
 
-    def loadAnimation(self):
-        animations = createAnimation(self.name)
+        self.small_sprite = None
 
-        if self.shiny:
-            self.animation = animations.frontShiny
-        else:
-            self.animation = animations.front
+    def __str__(self):
+        return f"Lv.{self.level} {self.name} caught on {self.catchDate}"
+
+    def __repr__(self):
+        return f"Pokemon({self.name},Lv{self.level},Type:{self.type1})"
 
     def getMoveDamage(self, move, target, ignoreModifiers=False):
         if move.category == "Physical":
@@ -508,6 +526,7 @@ class Pokemon(pg.sprite.Sprite):
             self.image = front
 
         self.smallImage = small
+        self.small_animation = animations.small
         self.animation = animations.front
         self.displayImage = self.image
 

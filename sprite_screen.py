@@ -99,3 +99,8 @@ class SpriteScreen(Screen):
                 return game_object
 
         return None
+
+    def refresh(self, sprite_only=False):
+        if not sprite_only:
+            self.surface = pg.Surface(self.size, pg.SRCALPHA)
+        self.sprite_surface = pg.Surface(self.size, pg.SRCALPHA)

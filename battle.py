@@ -48,7 +48,6 @@ class Battle:
         # set up the displays
 
         self.friendly: Pokemon = self.pokemon_team.get_active_pokemon()
-        friendlyMoves = self.friendly.moves
 
         self.screenSize = pg.Vector2(game.topSurf.get_size())
 
@@ -116,8 +115,6 @@ class Battle:
         self.touch_displays[TouchDisplayStates.fight].load_move_sprites(self.friendly.moves)
 
         self.active_touch_display = self.touch_displays[TouchDisplayStates.home]
-
-        # Top screen
 
         self.learnMoveDisplay = LearnMoveDisplay(self.screenSize)  # Learn Move Screens
 
@@ -308,6 +305,8 @@ class Battle:
                 self.displayMessage(str.format("{}{}'s {} {}", start, modified.name, modify[1], descriptor), 2000)
 
         target.health = round(target.health)
+
+        self.touch_displays[TouchDisplayStates.team].update_stats()
 
     def learnLogic(self, move):
         if len(self.friendly.moves) == 4:
@@ -661,72 +660,81 @@ class Battle:
         target.health = round(target.health)
 
     def select_action(self):
+        def process_input(res):
+            if res[0] == "container" and res[1] in self.touch_displays.keys():
+                self.state = res[1]
+                self.active_touch_display = self.touch_displays[res[1]]
+                self.update_screen()
+
+            elif res[0] == "container" and self.state == TouchDisplayStates.bag:
+                self.active_touch_display = self.touch_displays[TouchDisplayStates.bag].sub_displays[res[1]]
+                self.update_screen()
+
+            elif res[0] == "container" and res[1] == "run":
+                if self.friendly.stats.speed > self.foe.stats.speed:
+                    self.displayMessage("Successfully fled the battle", 1500)
+                    self.running = False
+                    return True
+                else:
+                    self.displayMessage("Couldn't Escape!", 1500)
+                    return None
+
+            elif res[0] == "move":
+                return res[1]  # returns the selected move
+
+            elif res[0] == "item_container":
+                item, count = res[1]
+                select_display = BattleDisplayItemSelect(self.screenSize, item=item, count=count,
+                                                         parent=self.active_touch_display.parent_display_type,
+                                                         scale=2)
+                self.active_touch_display = select_display
+                self.update_screen()
+
+            elif res[0] == "item":
+                print(res)
+                item = res[1]
+                if isinstance(item, MedicineItem):
+                    print("medicine")
+                    # only these items have the heal attribute
+                    if (item.heal and self.friendly.health == self.friendly.stats.health) or \
+                            (item.status != self.friendly.status):
+                        # print(item.status, self.friendly.status)
+                        self.displayMessage("It will have no effect...", 1500)
+                        self.battle_display.update_display_text(f"What will {self.friendly.name} do?")
+                        self.update_screen()
+                    else:
+                        parent_display_type = self.active_touch_display.parent_display_type
+                        print(parent_display_type)
+                        self.active_touch_display = self.touch_displays[TouchDisplayStates.bag].sub_displays[
+                            parent_display_type]
+                        return item
+                else:
+                    return item
+
+            elif res[0] == "pokemon_container":
+                pokemon = res[1]
+                self.active_touch_display = PokemonSelector(self.screenSize, pokemon, scale=2)
+                self.update_screen()
+
+                print(f"{pokemon.name}")
+
+            elif res[0] == "pokemon_select":
+                pokemon = res[1]
+                print(f"{pokemon.name} now in battle")
+                return pokemon
+
         action = None
         while not action:
             for event in pg.event.get():
                 if event.type == pg.MOUSEBUTTONDOWN:
                     pos = pg.mouse.get_pos()
                     pos = pg.Vector2(pos) - pg.Vector2(0, self.battle_display.size.y)
-                    res = self.active_touch_display.click_test(pos)
+                    clicked = self.active_touch_display.click_test(pos)
 
-                    if res:
-                        if res[0] == "container" and res[1] in self.touch_displays.keys():
-                            self.state = res[1]
-                            self.active_touch_display = self.touch_displays[res[1]]
-                            self.update_screen()
-
-                        elif res[0] == "container" and self.state == TouchDisplayStates.bag:
-                            self.active_touch_display = self.touch_displays[TouchDisplayStates.bag].sub_displays[res[1]]
-                            self.update_screen()
-
-                        elif res[0] == "container" and res[1] == "run":
-                            if self.friendly.stats.speed > self.foe.stats.speed:
-                                self.displayMessage("Successfully fled the battle", 1500)
-                                self.running = False
-                                return True
-                            else:
-                                self.displayMessage("Couldn't Escape!", 1500)
-                                return None
-
-                        elif res[0] == "move":
-                            return res[1]  # returns the selected move
-
-                        elif res[0] == "item_container":
-                            item, count = res[1]
-                            select_display = BattleDisplayItemSelect(self.screenSize, item=item, count=count, parent=self.active_touch_display.parent_display_type, scale=2)
-                            self.active_touch_display = select_display
-                            self.update_screen()
-
-                        elif res[0] == "item":
-                            print(res)
-                            item = res[1]
-                            if isinstance(item, MedicineItem):
-                                print("medicine")
-                                # only these items have the heal attribute
-                                if (item.heal and self.friendly.health == self.friendly.stats.health) or \
-                                   (item.status != self.friendly.status):
-                                    # print(item.status, self.friendly.status)
-                                    self.displayMessage("It will have no effect...", 1500)
-                                    self.battle_display.update_display_text(f"What will {self.friendly.name} do?")
-                                    self.update_screen()
-                                else:
-                                    return item
-                            else:
-                                return item
-
-                        elif res[0] == "pokemon_container":
-                            pokemon = res[1]
-                            self.active_touch_display = PokemonSelector(self.screenSize, pokemon, scale=2)
-                            self.update_screen()
-
-                            print(f"{pokemon.name}")
-
-                        elif res[0] == "pokemon_select":
-                            pokemon = res[1]
-                            print(f"{pokemon.name} now in battle")
-                            return pokemon
-
-                        print(res)
+                    if clicked:
+                        action = process_input(clicked)
+                        if action:
+                            return action
 
                 elif event.type == pg.KEYDOWN:
                     # send event key to display selector
@@ -737,8 +745,7 @@ class Battle:
                         self.game.save()
                     quit()
 
-            self.update_upper_screen()
-            pg.display.flip()
+            self.update_screen()
 
         return action
 
@@ -756,10 +763,14 @@ class Battle:
         elif isinstance(action, Pokemon):
             self.tag_in_teammate(action)
 
-    def tag_in_teammate(self, teammate: PartyAction):
+    def tag_in_teammate(self, teammate: Pokemon):
         pkIndex = self.activePokemon.index(self.friendly)
-        self.activePokemon[pkIndex] = self.pokemon_team.pokemon[teammate.value]
-        self.friendly = self.activePokemon[pkIndex]
+        self.activePokemon[pkIndex] = teammate
+        self.friendly = teammate
+        self.battle_display.switch_active_pokemon(teammate)
+        self.touch_displays[TouchDisplayStates.fight].load_move_sprites(self.friendly.moves)
+        self.touch_displays[TouchDisplayStates.fight].refresh()
+        print(self.friendly.moves)
 
     def loop(self):
         while self.running:

@@ -19,21 +19,18 @@ def get_image_frame(file_name):
 
 
 class BattleAnimation:
-    def __init__(self, move, friendly, size=None):
+    def __init__(self, move, target, size=None, opacity=255):
         self.sprite_screen = SpriteScreen(size=(256, 198))
 
-        target = "friendly" if friendly else "foe"
-
-        if move in ["growl"]:
-            target = "foe" if friendly else "friendly"
-
         frame_files = sorted(os.listdir(os.path.join(ANIMATION_PATH, move, target)), key=get_image_frame)
-        # print(frame_files)
         self.frames = [pg.image.load(os.path.join(ANIMATION_PATH, move, target, frame))
                        for frame in frame_files if re.match(FRAME_REGEX, frame)]
 
         if size:
             self.frames = [pg.transform.scale(frame, size) for frame in self.frames]
+            if opacity != 255:
+                for frame in self.frames:
+                    frame.set_alpha(opacity)
 
         self.frame_pause = 15
 

@@ -20,6 +20,18 @@ class BattleAction:
 
 class BattleAttack(pg.sprite.Sprite, BattleAction, ):
     def __init__(self, target: Pokemon, move, animation_size=pg.Vector2(256, 192)):
+        """
+        Battle attacks are an object that allows the tracking of battle moves and contains the
+        wrapper for their animations too. Battle animations are stored according to who the move
+        is affecting.
+
+        For example if the move affects the foe, and the relevant animation frames can be found at
+        assets/battle/move_animations/move/foe/move_XX.png
+
+        :param target:
+        :param move:
+        :param animation_size:
+        """
         pg.sprite.Sprite.__init__(self)
         BattleAction.__init__(self, BattleActionType.attack)
 
@@ -32,13 +44,16 @@ class BattleAttack(pg.sprite.Sprite, BattleAction, ):
         self.sprite_type = "animation"
         self.friendly_action = target.friendly
 
-        target = "friendly" if self.friendly_action else "foe"
+        target_type = "friendly" if self.friendly_action else "foe"
 
-        if move in ["growl"]:
-            target = "foe" if self.friendly_action else "friendly"
+        print(f"Move: {move}, Target: {target}, Target type: {target_type}")
 
-        if os.path.isdir(f"assets/battle/move_animations/{move.name}/{target}"):
-            self.animation = BattleAnimation(move=move.name.lower(), size=animation_size, friendly=self.friendly_action)
+        if move.name in ["Growl"]:
+            target_type = "foe" if self.friendly_action else "friendly"
+
+        if os.path.isdir(f"assets/battle/move_animations/{move.name}/{target_type}"):
+            print("Creating animation")
+            self.animation = BattleAnimation(move=move.name.lower(), size=animation_size, target=target_type, opacity=220)
             self.frame_count = len(self.animation.frames)
             self.frame_idx = 0
         else:

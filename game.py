@@ -7,7 +7,7 @@ from datetime import datetime
 import pandas as pd
 import pygame as pg
 
-from bag import Bag
+from bag import Bag, BagV2
 from battle import Battle, State
 from displays.LoadDisplay import LoadDisplay
 from general.Animations import createAnimation
@@ -82,7 +82,7 @@ class Game:
             # Convert JSON file to Python Types
             bagData = json.load(read_file)
 
-        self.bag = Bag(**bagData)
+        self.bag = BagV2(bagData)
 
         spriteDirectory = "Sprites/Pokemon Sprites/Gen IV 2"
 
