@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 
 import pokemon
@@ -30,6 +31,13 @@ class BagDisplayStates(Enum):
     healers = 3
     battle_items = 4
     select = 5
+
+
+class TeamDisplayStates(Enum):
+    home = 0
+    select = 1
+    summary = 2
+    moves = 3
 
 
 BAG_DISPLAY_ITEM_TYPE_MAP = {
@@ -399,6 +407,33 @@ class BattleDisplayTeam(SpriteScreen):
 
         self.img_update = time.monotonic()
 
+        self.select_idx = 0
+
+        self.sub_displays = None
+        self.set_sub_displays(pokemon=self.team.pokemon[self.select_idx])
+
+        self.active_display = self
+
+    def set_sub_displays(self, pokemon):
+        self.sub_displays = {
+            TeamDisplayStates.select: PokemonSelector(self.size, pokemon, self.scale),
+            TeamDisplayStates.summary: PokemonSummary(self.size, pokemon, self.scale),
+        }
+
+    def select_action(self):
+        action = None
+        while not action:
+            for event in pg.event.get():
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    pos = pg.mouse.get_pos()
+                    pos = pg.Vector2(pos) - pg.Vector2(0, self.size.y)
+                    clicked = self.active_display.click_test(pos)
+
+                    if clicked:
+                        print(clicked)
+                        if action:
+                            return action
+
     def update_stats(self):
         print("refresh")
         self.refresh()
@@ -434,12 +469,12 @@ class PokemonSelector(SpriteScreen):
 
         return_container = DisplayContainer("assets/containers/bag_return.png", TouchDisplayStates.team, pos=(217, 152),
                                             scale=self.scale)
-        summary_container = DisplayContainer("assets/containers/pokemon_container_2.png", "summary", pos=(1, 152), scale=self.scale)
+        summary_container = DisplayContainer("assets/containers/pokemon_container_2.png", TeamDisplayStates.summary, pos=(1, 152), scale=self.scale)
         summary_container.addText("SUMMARY", pos=pg.Vector2(51, 16) * self.scale, lines=1, location=BlitLocation.midTop,
                                   colour=Colours.white.value, shadowColour=Colours.lightGrey.value)
         summary_container.image = summary_container.get_surface()
 
-        check_container = DisplayContainer("assets/containers/pokemon_container_2.png", "check_moves", pos=(105, 152),
+        check_container = DisplayContainer("assets/containers/pokemon_container_2.png", TeamDisplayStates.moves, pos=(105, 152),
                                              scale=self.scale)
         check_container.addText("CHECK MOVES", pos=pg.Vector2(51, 16) * self.scale, lines=1, location=BlitLocation.midTop,
                                   colour=Colours.white.value, shadowColour=Colours.lightGrey.value)
@@ -458,6 +493,131 @@ class PokemonSelector(SpriteScreen):
         display_surf.blit(self.sprite_surface, (0, 0))
 
         self.select_container.toggle_mini()
+
+        return display_surf
+
+
+class PokemonSummary(SpriteScreen):
+    def __init__(self, size, pokemon, scale):
+        self.scale = scale
+        SpriteScreen.__init__(self, size, colour=Colours.black)
+        self.load_image("assets/battle/touch_display/pokemon/background_summary.png", base=True,
+                        scale=pg.Vector2(self.scale, self.scale))
+
+        up_arrow = DisplayContainer("assets/containers/team_up_arrow.png", "up", pos=pg.Vector2(1, 152), scale=self.scale)
+        down_arrow = DisplayContainer("assets/containers/team_down_arrow.png", "up", pos=pg.Vector2(41, 152),
+                                    scale=self.scale)
+        return_container = DisplayContainer("assets/containers/bag_return.png", TouchDisplayStates.team, pos=(217, 152),
+                                            scale=self.scale)
+
+        summary_container = DisplayContainer("assets/containers/pokemon_container_2.png", TeamDisplayStates.moves, pos=(97, 152),
+                                             scale=self.scale)
+        summary_container.addText("Check Moves", pos=pg.Vector2(51, 16) * self.scale, lines=1, location=BlitLocation.midTop,
+                                  colour=Colours.white.value, shadowColour=Colours.lightGrey.value)
+        summary_container.image = summary_container.get_surface()
+
+        self.sprites.add([return_container, up_arrow, down_arrow, summary_container])
+
+        self.addText("Lv.", pos=pg.Vector2(8, 35) * self.scale, base=True,
+                     colour=Colours.white.value, shadowColour=Colours.darkGrey.value)
+        self.addText("NEXT LV", pos=pg.Vector2(8, 51) * self.scale, base=True,
+                     colour=Colours.white.value, shadowColour=Colours.darkGrey.value)
+
+        self.addText("HP", pos=pg.Vector2(168, 35) * self.scale, base=True,
+                     colour=Colours.white.value, shadowColour=Colours.darkGrey.value)
+        self.addText("ATTACK", pos=pg.Vector2(168, 59) * self.scale, base=True,
+                     colour=Colours.white.value, shadowColour=Colours.darkGrey.value)
+        self.addText("DEFENCE", pos=pg.Vector2(168, 75) * self.scale, base=True,
+                     colour=Colours.white.value, shadowColour=Colours.darkGrey.value)
+        self.addText("SP. ATK", pos=pg.Vector2(168, 91) * self.scale, base=True,
+                     colour=Colours.white.value, shadowColour=Colours.darkGrey.value)
+        self.addText("SP. DEF", pos=pg.Vector2(168, 107) * self.scale, base=True,
+                     colour=Colours.white.value, shadowColour=Colours.darkGrey.value)
+        self.addText("SPEED", pos=pg.Vector2(168, 123) * self.scale, base=True,
+                     colour=Colours.white.value, shadowColour=Colours.black.value)
+
+        self.small_sprite = None
+        self.load_pk_details(pokemon)
+        self.img_update = time.monotonic()
+
+    def load_pk_details(self, pokemon):
+        # add small sprite to the top
+        small = self.get_object("small")
+        if small:
+            small.kill()
+
+        self.small_sprite = PokemonSpriteSmall(pokemon.small_animation, pos=pg.Vector2(23, 16) * self.scale)
+        self.sprites.add(self.small_sprite)
+
+        # ======== PK Details =============
+        self.addText(pokemon.name, pos=pg.Vector2(40, 11) * self.scale,
+                     colour=Colours.white.value, shadowColour=Colours.black.value)
+
+        self.load_image(f"Images/Type Labels/{pokemon.type1} Label.png", pos=pg.Vector2(114, 9) * self.scale, scale=pg.Vector2(self.scale))
+        if pokemon.type2 is not None:
+            self.load_image(f"Images/Type Labels/{pokemon.type2} Label.png", pos=pg.Vector2(148, 9) * self.scale,
+                            scale=pg.Vector2(self.scale))
+
+        self.addText(f"{pokemon.level}", pos=pg.Vector2(40, 35) * self.scale,
+                     colour=Colours.white.value, shadowColour=Colours.black.value)
+        self.addText(f"{pokemon.level_up_exp - pokemon.exp}", pos=pg.Vector2(152, 51) * self.scale, location=BlitLocation.topRight,
+                     colour=Colours.darkGrey.value, shadowColour=Colours.midGrey.value)
+
+        self.addText(pokemon.ability, pos=pg.Vector2(9, 75) * self.scale,
+                     colour=Colours.white.value, shadowColour=Colours.black.value)
+
+        if pokemon.item is not None:
+            ...
+        else:
+            self.addText("No item held", pos=pg.Vector2(32, 130) * self.scale,
+                         colour=Colours.white.value, shadowColour=Colours.black.value)
+
+        # ======== Battle Stats =============
+        self.addText(f"{pokemon.health}/{pokemon.stats.health}", pos=pg.Vector2(205, 35) * self.scale,
+                     colour=Colours.darkGrey.value, shadowColour=Colours.midGrey.value)
+
+        self.addText(f"{pokemon.stats.attack}", pos=pg.Vector2(247, 59) * self.scale, location=BlitLocation.topRight,
+                     colour=Colours.darkGrey.value, shadowColour=Colours.midGrey.value)
+        self.addText(f"{pokemon.stats.defence}", pos=pg.Vector2(247, 75) * self.scale, location=BlitLocation.topRight,
+                     colour=Colours.darkGrey.value, shadowColour=Colours.midGrey.value)
+        self.addText(f"{pokemon.stats.spAttack}", pos=pg.Vector2(247, 91) * self.scale, location=BlitLocation.topRight,
+                     colour=Colours.darkGrey.value, shadowColour=Colours.midGrey.value)
+        self.addText(f"{pokemon.stats.spDefence}", pos=pg.Vector2(247, 107) * self.scale, location=BlitLocation.topRight,
+                     colour=Colours.darkGrey.value, shadowColour=Colours.midGrey.value)
+        self.addText(f"{pokemon.stats.speed}", pos=pg.Vector2(247, 123) * self.scale, location=BlitLocation.topRight,
+                     colour=Colours.darkGrey.value, shadowColour=Colours.midGrey.value)
+
+        # health bar
+        health_ratio = pokemon.health / pokemon.stats.health
+
+        bar_rect = pg.Rect(pg.Vector2(63, 24), pg.Vector2(48 * health_ratio, 4))
+
+        if health_ratio > 0.5:
+            colour = "high"
+        elif health_ratio > 0.25:
+            colour = "medium"
+        else:
+            colour = "low"
+
+        health_bar = pg.image.load(f"assets/battle/main_display/health_bar/health_{colour}.png")
+        health_bar = pg.transform.scale(health_bar, bar_rect.size)
+
+        self.add_image(health_bar, pos=pg.Vector2(200, 49) * self.scale, scale=pg.Vector2(self.scale, self.scale))
+
+    def get_surface(self, show_sprites=True):
+        self.refresh(sprite_only=True)
+
+        now = time.monotonic()
+        if now - self.img_update > 0.15 and self.small_sprite is not None:
+            self.small_sprite.toggle_image()
+            self.img_update = now
+
+        if show_sprites:
+            self.sprites.draw(self)
+
+        display_surf = self.base_surface.copy()
+        display_surf.blit(self.surface, (0, 0))
+        display_surf.blit(self.sprite_surface, (0, 0))
 
         return display_surf
 

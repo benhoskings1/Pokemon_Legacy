@@ -91,8 +91,8 @@ def load_pokemon_json(name):
     # if Ability:
     #     self.ability = Ability
     # else:
-    #     abilities = data.Abilities[:len(data.Abilities)]
-    #     self.ability = choice(abilities)
+    #     abilities.tsv = data.Abilities[:len(data.Abilities)]
+    #     self.ability = choice(abilities.tsv)
     #
     # if Nature:
     #     self.nature = Nature

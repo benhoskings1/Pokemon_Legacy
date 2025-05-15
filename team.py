@@ -19,6 +19,14 @@ class Team:
     def get_active_pokemon(self):
         return self.pokemon[self.active_index]
 
+    def get_pk_up(self, start_index):
+        idx = (start_index - 1) % len(self.pokemon)
+        return self.pokemon[idx], idx
+
+    def get_pk_down(self, start_index):
+        idx = (start_index + 1) % len(self.pokemon)
+        return self.pokemon[idx], idx
+
     def display_loop(self, surface, controller,):
         self.display_running = True
 

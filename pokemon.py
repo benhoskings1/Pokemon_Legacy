@@ -134,13 +134,15 @@ class StatStages:
 
 
 class PokemonSpriteSmall(pg.sprite.Sprite):
-    def __init__(self, frames):
+    def __init__(self, frames, pos=pg.Vector2(0, 0)):
         pg.sprite.Sprite.__init__(self)
         self.frames = frames
         self.frame_idx = 0
         self.image = self.frames[0]
         self.rect = self.image.get_rect()
+        self.rect.center = pos
         self.sprite_type = "pokemon_small"
+        self.id = "small"
 
     def update(self):
         self.toggle_image()
@@ -148,6 +150,10 @@ class PokemonSpriteSmall(pg.sprite.Sprite):
     def toggle_image(self):
         self.frame_idx = (self.frame_idx + 1) % len(self.frames)
         self.image = self.frames[self.frame_idx]
+
+    @staticmethod
+    def is_clicked(self, pos):
+        return None
 
 
 class Pokemon(pg.sprite.Sprite):

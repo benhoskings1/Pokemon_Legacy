@@ -679,6 +679,21 @@ class Battle:
                     self.displayMessage("Couldn't Escape!", 1500)
                     return None
 
+            elif res[0] == "container" and res[1] == TeamDisplayStates.summary:
+                self.active_touch_display = self.touch_displays[TouchDisplayStates.team].sub_displays[TeamDisplayStates.summary]
+
+            elif res[0] == "container" and (res[1] == "up" or res[1] == "down"):
+                pk_idx = self.touch_displays[TouchDisplayStates.team].select_idx
+                if res[1] == "up":
+                    pk, self.touch_displays[TouchDisplayStates.team].select_idx = self.pokemon_team.get_pk_up(pk_idx)
+
+                else:
+                    pk, self.touch_displays[TouchDisplayStates.team].select_idx = self.pokemon_team.get_pk_down(pk_idx)
+
+                self.active_touch_display.refresh()
+                self.active_touch_display.load_pk_details(pk)
+                self.update_screen()
+
             elif res[0] == "move":
                 return res[1]  # returns the selected move
 
@@ -691,10 +706,8 @@ class Battle:
                 self.update_screen()
 
             elif res[0] == "item":
-                print(res)
                 item = res[1]
                 if isinstance(item, MedicineItem):
-                    print("medicine")
                     # only these items have the heal attribute
                     if (item.heal and self.friendly.health == self.friendly.stats.health) or \
                             (item.status != self.friendly.status):
@@ -716,12 +729,12 @@ class Battle:
                 self.active_touch_display = PokemonSelector(self.screenSize, pokemon, scale=2)
                 self.update_screen()
 
-                print(f"{pokemon.name}")
-
             elif res[0] == "pokemon_select":
                 pokemon = res[1]
-                print(f"{pokemon.name} now in battle")
+                print(f"{pokemon} now in battle")
                 return pokemon
+
+            print(res)
 
         action = None
         while not action:
