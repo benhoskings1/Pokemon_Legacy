@@ -410,14 +410,14 @@ class BattleDisplayTeam(SpriteScreen):
         self.select_idx = 0
 
         self.sub_displays = None
-        self.set_sub_displays(pokemon=self.team.pokemon[self.select_idx])
+        self.set_sub_displays()
 
         self.active_display = self
 
-    def set_sub_displays(self, pokemon):
+    def set_sub_displays(self):
         self.sub_displays = {
-            TeamDisplayStates.select: PokemonSelector(self.size, pokemon, self.scale),
-            TeamDisplayStates.summary: PokemonSummary(self.size, pokemon, self.scale),
+            TeamDisplayStates.select: PokemonSelector(self.size, self.team.pokemon[self.select_idx], self.scale),
+            TeamDisplayStates.summary: PokemonSummary(self.size, self.team.pokemon[self.select_idx], self.scale),
         }
 
     def select_action(self):
@@ -496,6 +496,12 @@ class PokemonSelector(SpriteScreen):
 
         return display_surf
 
+    def load_pk_details(self, pokemon):
+        print(f"loading {pokemon}")
+        self.sprites.remove(self.select_container)
+        self.select_container = PokemonContainerSingle(pokemon, pos=(9, 8), scale=self.scale)
+        self.sprites.add(self.select_container)
+
 
 class PokemonSummary(SpriteScreen):
     def __init__(self, size, pokemon, scale):
@@ -505,9 +511,9 @@ class PokemonSummary(SpriteScreen):
                         scale=pg.Vector2(self.scale, self.scale))
 
         up_arrow = DisplayContainer("assets/containers/team_up_arrow.png", "up", pos=pg.Vector2(1, 152), scale=self.scale)
-        down_arrow = DisplayContainer("assets/containers/team_down_arrow.png", "up", pos=pg.Vector2(41, 152),
+        down_arrow = DisplayContainer("assets/containers/team_down_arrow.png", "down", pos=pg.Vector2(41, 152),
                                     scale=self.scale)
-        return_container = DisplayContainer("assets/containers/bag_return.png", TouchDisplayStates.team, pos=(217, 152),
+        return_container = DisplayContainer("assets/containers/bag_return.png", TeamDisplayStates.select, pos=(217, 152),
                                             scale=self.scale)
 
         summary_container = DisplayContainer("assets/containers/pokemon_container_2.png", TeamDisplayStates.moves, pos=(97, 152),

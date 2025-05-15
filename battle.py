@@ -679,8 +679,15 @@ class Battle:
                     self.displayMessage("Couldn't Escape!", 1500)
                     return None
 
+            elif res[0] == "container" and res[1] == TeamDisplayStates.select:
+                self.active_touch_display = self.touch_displays[TouchDisplayStates.team].sub_displays[TeamDisplayStates.select]
+                display_pk_idx = self.touch_displays[TouchDisplayStates.team].select_idx
+                pk_select = self.pokemon_team.pokemon[display_pk_idx]
+                self.active_touch_display.load_pk_details(pk_select)
+
             elif res[0] == "container" and res[1] == TeamDisplayStates.summary:
-                self.active_touch_display = self.touch_displays[TouchDisplayStates.team].sub_displays[TeamDisplayStates.summary]
+                self.active_touch_display = self.touch_displays[TouchDisplayStates.team].sub_displays[
+                    TeamDisplayStates.summary]
 
             elif res[0] == "container" and (res[1] == "up" or res[1] == "down"):
                 pk_idx = self.touch_displays[TouchDisplayStates.team].select_idx
@@ -692,6 +699,7 @@ class Battle:
 
                 self.active_touch_display.refresh()
                 self.active_touch_display.load_pk_details(pk)
+                print(self.touch_displays[TouchDisplayStates.team].select_idx)
                 self.update_screen()
 
             elif res[0] == "move":
@@ -726,7 +734,9 @@ class Battle:
 
             elif res[0] == "pokemon_container":
                 pokemon = res[1]
-                self.active_touch_display = PokemonSelector(self.screenSize, pokemon, scale=2)
+                self.active_touch_display.select_idx = self.pokemon_team.get_index(pokemon)
+                self.active_touch_display.set_sub_displays()
+                self.active_touch_display = self.active_touch_display.sub_displays[TeamDisplayStates.select]
                 self.update_screen()
 
             elif res[0] == "pokemon_select":

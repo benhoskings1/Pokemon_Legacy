@@ -19,6 +19,9 @@ class Team:
     def get_active_pokemon(self):
         return self.pokemon[self.active_index]
 
+    def get_index(self, pokemon):
+        return self.pokemon.index(pokemon) if pokemon in  self.pokemon else None
+
     def get_pk_up(self, start_index):
         idx = (start_index - 1) % len(self.pokemon)
         return self.pokemon[idx], idx
