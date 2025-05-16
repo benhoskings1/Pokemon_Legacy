@@ -10,11 +10,11 @@ from battle_action import BattleAction, BattleActionType, BattleAttack
 from displays.battle.battle_display_main import BattleDisplayMain, LevelUpBox
 from displays.battle.battle_display_touch import *
 
-from displays.EvolveDisplay import EvolveDisplay
-from displays.LearnMove import LearnMoveDisplay, LearnAction
+# from displays.EvolveDisplay import EvolveDisplay
+# from displays.LearnMove import LearnMoveDisplay, LearnAction
 from displays.team_display_battle import PartyAction
+from general.utils import *
 from general.Animations import createAnimation
-from general.Colours import Colours
 from general.Condition import StatusCondition
 from general.Environment import Environment
 from general.Image import Image
@@ -116,9 +116,10 @@ class Battle:
 
         self.active_touch_display = self.touch_displays[TouchDisplayStates.home]
 
-        self.learnMoveDisplay = LearnMoveDisplay(self.screenSize)  # Learn Move Screens
-
-        self.evolveDisplay = EvolveDisplay(self.screenSize)  # Evolve Screens
+        # self.learnMoveDisplay = LearnMoveDisplay(self.screenSize)  # Learn Move Screens
+        self.lead_display = None
+        # self.evolveDisplay = EvolveDisplay(self.screenSize)  # Evolve Screens
+        self.evolveDisplay = None
 
         lowerScreenBase = pg.image.load("Images/Battle/Other/Lower Base.png")
         self.lowerScreenBase = pg.transform.scale(lowerScreenBase, game.bottomSurf.get_size())
@@ -685,9 +686,12 @@ class Battle:
                 pk_select = self.pokemon_team.pokemon[display_pk_idx]
                 self.active_touch_display.load_pk_details(pk_select)
 
-            elif res[0] == "container" and res[1] == TeamDisplayStates.summary:
-                self.active_touch_display = self.touch_displays[TouchDisplayStates.team].sub_displays[
-                    TeamDisplayStates.summary]
+            elif res[0] == "container" and (res[1] == TeamDisplayStates.summary or res[1] == TeamDisplayStates.moves):
+                self.active_touch_display = self.touch_displays[TouchDisplayStates.team].sub_displays[res[1]]
+                display_pk_idx = self.touch_displays[TouchDisplayStates.team].select_idx
+                pk_select = self.pokemon_team.pokemon[display_pk_idx]
+                self.active_touch_display.refresh()
+                self.active_touch_display.load_pk_details(pk_select)
 
             elif res[0] == "container" and (res[1] == "up" or res[1] == "down"):
                 pk_idx = self.touch_displays[TouchDisplayStates.team].select_idx

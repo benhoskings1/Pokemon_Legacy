@@ -11,7 +11,7 @@ from bag import Bag, BagV2
 from battle import Battle, State
 from displays.LoadDisplay import LoadDisplay
 from general.Animations import createAnimation
-from general.Colours import Colours
+from general.utils import *
 from general.Controller import Controller
 from general.Direction import Direction
 from general.Time import Time

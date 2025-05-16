@@ -11,7 +11,7 @@ from general.Item import Item, Pokeball, MedicineItem, BattleItemType, ItemType
 
 # Used for visualisation
 from general.Controller import Controller
-from displays.bag_display import BagDisplay, BagAction, BagState
+from displays.bag_display import BagAction, BagState
 from battle import Battle
 
 from enum import Enum

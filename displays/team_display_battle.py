@@ -7,7 +7,7 @@ import pygame as pg
 
 import general.Move
 from pokemon import Pokemon
-from general.Colours import Colours
+from general.utils import Colours
 from general.Selector import Selector3
 from screen import Screen, BlitLocation, FontOption
 

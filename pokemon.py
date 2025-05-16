@@ -152,7 +152,7 @@ class PokemonSpriteSmall(pg.sprite.Sprite):
         self.image = self.frames[self.frame_idx]
 
     @staticmethod
-    def is_clicked(self, pos):
+    def is_clicked(self):
         return None
 
 

@@ -3,7 +3,7 @@ from enum import Enum
 import pygame as pg
 
 from font.font import Font, LevelFont
-from general.Colours import Colours
+from general.utils import *
 
 
 class BlitLocation(Enum):
