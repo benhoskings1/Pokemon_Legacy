@@ -1,16 +1,34 @@
 import os
 from enum import Enum
-from math import floor
+from math import floor, ceil
 
 import numpy as np
 import pygame as pg
 
-letterSurfaces = {}
+from general.utils import Colours
 
+class CharacterType(Enum):
+    baseline = 0
+    descender = 1
+    ascender = 2
 
 class Baseline(Enum):
     centre = 0
     lower = 1
+
+
+FONT_CHARACTER_SIZES = {
+    "a": (6, 7),  "b": (6, 10), "c": (6, 7),  "d": (6, 10), "e": (6, 7),
+    "f": (4, 10), "g": (6, 9),  "h": (6, 10), "i": (2, 9),  "j": (4, 11),
+    "k": (6, 10), "l": (3, 10), "m": (6, 7),  "n": (6, 7),  "o": (6, 7),
+    "p": (6, 9),  "q": (6, 9),  "r": (6, 7),  "s": (6, 7),  "t": (5, 8),
+    "u": (6, 7),  "v": (6, 7),  "w": (6, 7),  "x": (6, 7),  "y": (6, 9),
+    "z": (6, 7),  "0": (6, 10), "1": (4, 10), "2": (6, 10), "3": (6, 10),
+    "4": (6, 10), "5": (6, 10), "6": (6, 10), "7": (6, 10), "8": (6, 10),
+    "9": (6, 10), "/": (6, 10), "?": (6, 11), "!": (2, 11), "'": (3, 11)
+}
+
+FONT_CHARACTER_SIZES.update({k.upper(): (6, 10) for k in FONT_CHARACTER_SIZES.keys()})
 
 
 def colour_change(surface, baseColours, shadowColours=None):
@@ -97,7 +115,15 @@ class Font:
 
         self.size = 10
 
-    def render_text(self, text: str, lineCount=1, colour=None, shadowColour=None):
+    @staticmethod
+    def calculate_text_size(text: str, sep=1, scale=1) -> (list[int], int):
+        """ This function takes text in as a string and calculates how much horizontal space is needed."""
+        space_count = len(text.split(" ")) - 1
+        text = text.replace(".", "")
+        word_widths = [(sum([FONT_CHARACTER_SIZES[char][0] for char in word]) + len(word)*sep) * scale for word in text.split(" ")]
+        return word_widths, (sum([word_width for word_width in word_widths]) + space_count*3) * scale
+
+    def render_text(self, text: str, lineCount=1, colour=None, shadowColour=None) -> pg.Surface:
         words = text.split(" ")
         lines = []
         totalLetters = len("".join(words))
@@ -182,6 +208,71 @@ class Font:
 
         return textSurf
 
+    def render_text_2(self, text: str, text_box: pg.Rect, sep=1, colour: Colours | pg.Color = None, shadow_colour=None, max_chars=None) -> pg.Surface:
+        """
+        Renders the given text in the given colour or shadow colour. The max_chars should be used over
+        indexing directly into text, since this will maintain the correct line formatting as each
+        character for the words is rendered
+
+        :param text: the text to be rendered
+        :param text_box: the bounding box of the text to be rendered
+        :param colour: the primary colour of the font
+        :param shadow_colour: the secondary colour of the font
+        :param max_chars: the maximum number of characters to be rendered.
+        :return: pygame surface representing the rendered text
+        """
+        def blit_word(chars, x, y) -> int:
+            for char in chars:
+                char_size = self.letters[char].get_size()
+                v_offset = base_line - char_size[1]
+                if self.baselines[char] != Baseline.centre:
+                    v_offset += 2 * self.scale
+
+                text_surface.blit(self.letters[char], (x, y + v_offset))
+                x += char_size[0] + sep * self.scale
+
+            return x
+
+        max_chars = max_chars if max_chars is not None else len(text)
+
+        words = text.split(" ")
+        word_widths, total_width = self.calculate_text_size(text, self.scale)
+        lines = ceil(text_box.width / total_width)
+        base_line = 11 * self.scale
+
+        # begin creating surface
+        text_surface = pg.Surface(text_box.size, pg.SRCALPHA)
+
+        x_pos, y_pos = 0, 0
+        char_count = 0
+        for word, width in zip(words, word_widths):
+            if x_pos + width < text_box.width:
+                if char_count + len(word) >= max_chars:
+                    blit_word(word[:max_chars-char_count], x_pos, y_pos)
+                    break
+                else:
+                    x_pos = blit_word(word, x_pos, y_pos)
+                    char_count += len(word)
+
+                x_pos += self.space * 3
+
+            else:
+                y_pos += base_line * 1.5
+                x_pos = blit_word(word, 0, y_pos)
+                x_pos += self.space * 3
+
+        for idx, c in enumerate([colour, shadow_colour]):
+            if c is not None:
+                if isinstance(c, Colours):
+                    c = c.value
+
+                px_array = pg.PixelArray(text_surface)
+                px_array.replace(
+                    color=pg.Color(16, 24, 32) if idx == 0 else pg.Color(168, 184, 184),
+                    repcolor=c
+                )
+
+        return text_surface
 
 class LevelFont:
     def __init__(self, scale):

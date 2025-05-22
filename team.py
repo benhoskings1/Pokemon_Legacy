@@ -11,7 +11,7 @@ class Team:
             pokemon = Pokemon(**pkData)
             self.pokemon.append(pokemon)
 
-        self.battle_display = TeamDisplay(display_size, self)
+        # self.battle_display = TeamDisplay(display_size, self)
         self.display_running = False
 
         self.active_index = 0

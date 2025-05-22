@@ -56,6 +56,9 @@ class Move2:
     def __str__(self):
         return f"{self.name}: {self.type} {self.category} {self.power} {self.accuracy}"
 
+    def __repr__(self):
+        return f"Move({self.name},{self.type},{self.category},{self.power},{self.accuracy})"
+
 
 class MoveEffect:
     def __init__(self, effect):

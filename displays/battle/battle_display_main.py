@@ -8,8 +8,9 @@ import numpy as np
 from Image_Processing.ImageEditor import ImageEditor
 
 from general.Environment import Environment
-from screen_V2 import Screen, BlitLocation, Colours
-from sprite_screen import SpriteScreen, GameObjects, PokeballCatchAnimation
+from general.utils import Colours
+from screen_V2 import Screen, BlitLocation
+from sprite_screen import SpriteScreen, PokeballCatchAnimation
 from pokemon import Pokemon
 
 
@@ -192,8 +193,6 @@ class BattleDisplayMain(SpriteScreen):
 
         # self.image_scale = pg.Vector2(15 / 8, 15 / 8)
 
-        self.sprites = GameObjects([])
-
         self.friendly: Pokemon = None
         self.foe: Pokemon = None
 
@@ -208,8 +207,8 @@ class BattleDisplayMain(SpriteScreen):
         self.screens["text"].sprites.add(self.text_box)
 
         self.screens["stats"].sprites.add([
-            StatContainer(sprite_id="friendly", friendly=True, scale=self.scale),
-            StatContainer(sprite_id="foe", friendly=False, scale=self.scale)
+            StatContainer(sprite_id="friendly_stats", friendly=True, scale=self.scale),
+            StatContainer(sprite_id="foe_stats", friendly=False, scale=self.scale)
         ])
 
         self.bounce_friendly_stat = False
@@ -219,15 +218,16 @@ class BattleDisplayMain(SpriteScreen):
         self.text_box.addText(text, pos, lines, location, base, colour)
 
         words = text.split()
-        # print(words)
 
         for word in words:
             # self.screens["text"].add
             ...
 
-    def update_display_text(self, text):
+    def update_display_text(self, text, max_chars=None):
         self.text_box.refresh()
-        self.text_box.addText(text, pg.Vector2(16, 11) * self.scale)
+
+        text_rect = pg.Rect(pg.Vector2(10, 4)*self.scale, pg.Vector2(201, 40) * self.scale)
+        self.text_box.add_text_2(text, text_rect.inflate(-10, -18), max_chars=max_chars)
 
     def add_pokemon_sprites(self, pokemon):
         for pk in pokemon:
@@ -237,15 +237,13 @@ class BattleDisplayMain(SpriteScreen):
         self.foe = pokemon[1]
 
         #
-        self.screens["stats"].get_object("friendly").initialise_info(
+        self.screens["stats"].get_object("friendly_stats").initialise_info(
             name=self.friendly.name, sex=self.friendly.gender, level=self.friendly.level
         )
 
-        self.screens["stats"].get_object("foe").initialise_info(
+        self.screens["stats"].get_object("foe_stats").initialise_info(
             name=self.foe.name, sex=self.foe.gender, level=self.foe.level
         )
-
-        print([sp for sp in self.screens["stats"].sprites])
 
     def render_pokemon_details(self, opacity=None, friendly=False, lines=None):
         self.refresh()
@@ -258,7 +256,7 @@ class BattleDisplayMain(SpriteScreen):
         # Display options for the wild Pokémon
         if self.foe.visible:
             # add the name of the Pokémon
-            self.screens["stats"].get_object("foe").update_stats(
+            self.screens["stats"].get_object("foe_stats").update_stats(
                 current_health=self.foe.health, max_health=self.foe.stats.health
             )
 
@@ -275,7 +273,7 @@ class BattleDisplayMain(SpriteScreen):
         # Display options for the friendly Pokémon
         if self.friendly.visible:
             # draw the health onto the screen
-            self.screens["stats"].get_object("friendly").update_stats(
+            self.screens["stats"].get_object("friendly_stats").update_stats(
                 current_health=self.friendly.health, max_health=self.friendly.stats.health,
                 current_xp=self.friendly.exp - self.friendly.level_exp, max_xp=self.friendly.level_up_exp - self.friendly.level_exp,
             )
@@ -379,23 +377,43 @@ class BattleDisplayMain(SpriteScreen):
 
     def switch_active_pokemon(self, new_pokemon):
         self.screens["stats"].refresh()
-        friendly_container = self.screens["stats"].get_object("friendly")
+        friendly_container = self.screens["stats"].get_object("friendly_stats")
         self.screens["stats"].sprites.remove(self.friendly)
         self.screens["stats"].sprites.remove(friendly_container)
 
         self.screens["stats"].sprites.add([
-            StatContainer(sprite_id="friendly", friendly=True, scale=self.scale),
+            StatContainer(sprite_id="friendly_stats", friendly=True, scale=self.scale),
             new_pokemon
         ])
         self.friendly = new_pokemon
 
-        self.screens["stats"].get_object("friendly").initialise_info(
+        friendly_stats_container = self.screens["stats"].get_object("friendly_stats")
+
+        friendly_stats_container.initialise_info(
             name=self.friendly.name, sex=self.friendly.gender, level=self.friendly.level
+        )
+        friendly_stats_container.update_stats(
+            current_health=self.friendly.health, max_health=self.friendly.stats.health,
+            current_xp=self.friendly.exp - self.friendly.level_exp, max_xp=self.friendly.level_up_exp - self.friendly.level_exp,
         )
 
         self.render_pokemon_details()
 
+    def render_pokemon_animation(self, window, target: Pokemon, animation_type: str, duration=2000):
+        self.render_pokemon_details()
+        if target.sprite.animations[animation_type]:
+            frames = len(target.sprite.animations[animation_type])
+            for frame in target.sprite.animations[animation_type]:
+                target.image = frame
+                window.blit(self.get_surface(), (0, 0))
+                pg.display.flip()
+                pg.time.delay(int(0.75 * duration / frames))
+                self.refresh()
 
+            target.image = target.displayImage
+
+        window.blit(self.get_surface(), (0, 0))
+        pg.display.flip()
 
     def refresh(self, text=True):
         self.surface = pg.Surface(self.size, pg.SRCALPHA)
@@ -425,7 +443,7 @@ class BattleDisplayMain(SpriteScreen):
 
         if self.bounce_friendly_stat:
             self.screens["stats"].refresh()
-            self.screens["stats"].get_object("friendly").update_pos()
+            self.screens["stats"].get_object("friendly_stats").update_pos()
 
         return display_surf
 

@@ -53,7 +53,7 @@ class ImageEditor:
             for col in range(pixelDataCopy.shape[1]):
                 pixel = pixelDataCopy[row, col, 0:3]
                 if np.array_equal(pixel, np.array(colour)):
-                    pixelDataCopy[row, col, 3] = 0
+                    pixelDataCopy[row, col, :] = 0
 
         if overwrite:
             self.pixelData = pixelDataCopy
@@ -170,11 +170,14 @@ class ImageEditor:
 
 
 if __name__ == "__main__":
+
+    ...
     IMAGE_REGEX = r"\d{8}"
-    move = "growl"
-    target = "friendly"
-    base_dir = f"/Users/benhoskings/Desktop/pokemon_sprites/animations/"
-    save_dir = f"../assets/battle/move_animations/"
+    move = "bubble"
+    target = "foe"
+    base_dir = '/Users/benhoskings/Library/Mobile Documents/com~apple~CloudDocs/Desktop/pokemon_sprites/animations'
+    # base_dir = f"/Users/benhoskings/Desktop/pokemon_sprites/animations/"
+    save_dir = f"../assets/battle/move_animations"
 
     move_dir = os.path.join(base_dir, move, target)
     files = os.listdir(move_dir)

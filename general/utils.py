@@ -1,8 +1,14 @@
 from enum import Enum
+from PIL import Image
 
 import pickle
 import pandas as pd
+import numpy as np
 import pygame as pg
+
+from Image_Processing.ImageEditor import ImageEditor
+
+editor = ImageEditor()
 
 
 with open("game_data/Pokedex/LocalDex/LocalDex.pickle", 'rb') as file:
@@ -35,6 +41,35 @@ def create_display_bar(val: float, max_val: float, bar_type: str) -> pg.Surface:
     bar_size = pg.Vector2(bar_surf.get_size())
 
     return pg.transform.scale(bar_surf, pg.Vector2(bar_size.x * ratio, bar_size.y))
+
+
+def load_gif(gif_path: str, bit_mask=None, opacity=255, scale=1) -> list[pg.Surface]:
+    """
+    This function loads a gif and returns a list of pygame surfaces.
+    :param gif_path: path of the gif file
+    :return: animation representing the frames of the gif
+    """
+    frames = []
+    gif_image = Image.open(gif_path)
+    for frame in range(gif_image.n_frames):
+        gif_image.seek(frame)
+        img = gif_image.copy()
+        if scale != 1:
+            img = img.resize((int(img.size[0] * scale), int(img.size[1] * scale)))
+
+        image_data = np.asarray(img.convert("RGBA")).copy()
+        if bit_mask is not None:
+            image_data = image_data[:bit_mask.shape[0], :bit_mask.shape[1]]
+            image_data[:, :, 3] = bit_mask
+
+        editor.loadData(image_data)
+        surf = editor.createSurface(bgr=False)
+        if opacity != 255:
+            surf.set_alpha(opacity)
+
+        frames.append(surf)
+
+    return frames
 
 
 class Colours(Enum):

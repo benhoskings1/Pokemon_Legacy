@@ -25,14 +25,15 @@ pokedex = pd.read_csv("game_data/Pokedex/Local Dex.tsv", delimiter='\t', index_c
 
 
 class Game:
-    def __init__(self, scale, optimize=False, new=False, fromPickle=False, overwrite=False):
+    def __init__(self, scale, optimize=False, new=False, fromPickle=False, overwrite=False, save_slot=1):
 
-        self.overwrite: str = overwrite
+        self.overwrite: bool = overwrite
+        self.save_slot: int = save_slot
 
         if new:
             self.dataPath = "game_data/Save States/Start"
         else:
-            self.dataPath = "game_data/Save States/Current Game"
+            self.dataPath = f"game_data/save_states/save_state_{save_slot}"
 
         self.running = True
 
@@ -56,7 +57,7 @@ class Game:
 
         self.animations = {}
 
-        with open(os.path.join(self.dataPath, "Team.json"), "r") as read_file:
+        with open(os.path.join(self.dataPath, "team.json"), "r") as read_file:
             # Convert JSON file to Python Types
             teamData = json.load(read_file)
 
@@ -69,7 +70,7 @@ class Game:
                 self.topSurf.blit(top, (0, 0))
                 self.bottomSurf.blit(bottom, (0, 0))
                 pg.display.flip()
-                print("Creating ", pk.name)
+                print("Creating ", repr(pk))
                 self.animations[pk.name] = createAnimation(pk.name)
                 animations = self.animations[pk.name]
                 pk.loadImages(animations)
@@ -78,7 +79,7 @@ class Game:
 
         self.team.pokemon = self.team.pokemon
 
-        with open(os.path.join(self.dataPath, "Bag.json"), "r") as read_file:
+        with open(os.path.join(self.dataPath, "bag.json"), "r") as read_file:
             # Convert JSON file to Python Types
             bagData = json.load(read_file)
 
@@ -86,10 +87,10 @@ class Game:
 
         spriteDirectory = "Sprites/Pokemon Sprites/Gen IV 2"
 
-        if fromPickle and not os.path.exists(os.path.join(self.dataPath, "Game.pickle")):
+        if fromPickle and not os.path.exists(os.path.join(self.dataPath, "game.pickle")):
             print("No pickle data not present / corrupted")
 
-        if fromPickle and os.path.exists(os.path.join(self.dataPath, "Game.pickle")):
+        if fromPickle and os.path.exists(os.path.join(self.dataPath, "game.pickle")):
             gameFile = open(os.path.join(self.dataPath, "game.pickle"), 'rb')
             gameData = pickle.load(gameFile, encoding='bytes')
 
@@ -320,7 +321,7 @@ class Game:
                             self.startBattle(route=location)
 
     def startBattle(self, route="Route 201", name=None, level=None):
-        battle = Battle(self, routeName=route, wildName=name, wildLevel=level)
+        battle = Battle(self, route_name=route, wild_name=name, wildLevel=level)
         self.battle = battle
         battle.loop()
         self.battle = None
@@ -438,20 +439,23 @@ class Game:
             pg.event.pump()
 
     def save(self):
-        if not os.path.exists("game_data/Save States/Save Test"):
-            os.mkdir("game_data/Save States/Save Test")
+        # save_temp = f"game_data/save_states/save_{self.save_slot}"
+        save_dir = f"game_data/save_states/save_state_{self.save_slot}"
+        if not os.path.exists(save_dir):
+            os.mkdir(save_dir)
+
         try:
             teamData = []
             for pokemon in self.team.pokemon:
                 teamData.append(pokemon.get_json_data())
 
-            with open("game_data/Save States/Save Test/Team.json", "w") as write_file:
+            with open(os.path.join(save_dir, "team.json"), "w") as write_file:
                 json.dump(teamData, write_file, indent=4)
 
-            bagData = self.bag.get_json_data()
-
-            with open("game_data/Save States/Save Test/Bag.json", "w") as write_file:
-                json.dump(bagData, write_file, indent=4)
+            # bagData = self.bag.get_json_data()
+            #
+            # with open("game_data/Save States/Save Test/Bag.json", "w") as write_file:
+            #     json.dump(bagData, write_file, indent=4)
 
             # need to set all pygame surfaces to none
             self.animations = None
@@ -474,24 +478,25 @@ class Game:
             if self.battle:
                 self.battle.clearSurfaces()
 
-            with open("game_data/Save States/Save Test/Game.pickle", 'wb') as f:
+            with open(os.path.join(save_dir, "game.pickle"), 'wb') as f:
                 pickle.dump(self, f)
                 print("Successfully pickled")
 
             # can
-            for root, dirs, files in os.walk("game_data/Save States/Current Game", topdown=False):
-                for name in files:
-                    os.remove(os.path.join(root, name))
-                for name in dirs:
-                    os.rmdir(os.path.join(root, name))
+            # for root, dirs, files in os.walk("game_data/Save States/Current Game", topdown=False):
+            #     for name in files:
+            #         os.remove(os.path.join(root, name))
+            #     for name in dirs:
+            #         os.rmdir(os.path.join(root, name))
 
-            os.rename("game_data/Save States/Save Test", "game_data/Save States/Current Game")
+            # os.rename("game_data/Save States/Save Test", "game_data/Save States/Current Game")
 
-        except TypeError:
+        except TypeError as e:
+            raise e
             print("Pickle Failed")
             print("The data was not overwritten")
-            for root, dirs, files in os.walk("game_data/Save States/Save Test", topdown=False):
-                for name in files:
-                    os.remove(os.path.join(root, name))
-                for name in dirs:
-                    os.rmdir(os.path.join(root, name))
+            # for root, dirs, files in os.walk("game_data/Save States/Save Test", topdown=False):
+            #     for name in files:
+            #         os.remove(os.path.join(root, name))
+            #     for name in dirs:
+            #         os.rmdir(os.path.join(root, name))

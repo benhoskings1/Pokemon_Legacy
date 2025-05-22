@@ -19,11 +19,11 @@ def get_image_frame(file_name):
 
 
 class BattleAnimation:
-    def __init__(self, move, target, size=None, opacity=255):
+    def __init__(self, frame_dir, size=None, opacity=255):
         self.sprite_screen = SpriteScreen(size=(256, 198))
 
-        frame_files = sorted(os.listdir(os.path.join(ANIMATION_PATH, move, target)), key=get_image_frame)
-        self.frames = [pg.image.load(os.path.join(ANIMATION_PATH, move, target, frame))
+        frame_files = sorted([f for f in os.listdir(frame_dir) if f.endswith(".png")], key=get_image_frame)
+        self.frames = [pg.image.load(os.path.join(frame_dir, frame))
                        for frame in frame_files if re.match(FRAME_REGEX, frame)]
 
         if size:
@@ -43,7 +43,9 @@ if __name__ == "__main__":
     background = pg.Surface(display.get_size())
     background.fill((255, 255, 255))
 
-    animation = BattleAnimation(move="growl", friendly=False, size=display.get_size())
+    frame_path = os.path.join(ANIMATION_PATH, "growl", "friendly")
+
+    animation = BattleAnimation(frame_dir=frame_path, size=display.get_size())
 
     pg.event.pump()
 

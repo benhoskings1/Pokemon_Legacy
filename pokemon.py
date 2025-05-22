@@ -8,23 +8,22 @@ import cv2
 import pandas as pd
 import pygame as pg
 
+from general.utils import load_gif
 from general.Animations import Animations, createAnimation
 from general.Move import getMove
+from general.ability import Ability
 from Image_Processing.ImageEditor import ImageEditor
 
 with open("game_data/Pokedex/LocalDex/LocalDex.pickle", 'rb') as file:
     pokedex: pd.DataFrame = pickle.load(file)
-    print("Successfully loaded from pickle")
 
 oldPokedex = pd.read_csv("game_data/Pokedex/Local Dex.tsv", delimiter='\t', index_col=1)
 attributes = pd.read_csv("game_data/Pokedex/AttributeDex.tsv", delimiter='\t', index_col=1)
 effectiveness = pd.read_csv("game_data/Effectiveness.csv", index_col=0)
 level_up_values = pd.read_csv("game_data/level_up_exp.tsv", delimiter='\t', index_col=6)
-print(level_up_values.head())
 natures = pd.read_csv("game_data/Natures.tsv", delimiter='\t', index_col=0)
 
 capWildMoves = True
-
 
 stageMultipliers = {-6: 2 / 8, -5: 2 / 7, -4: 2 / 6, -3: 2 / 5, -2: 2 / 4, -1: 2 / 3,
                     0: 1, 1: 3 / 2, 2: 4 / 2, 3: 5 / 2, 4: 6 / 2, 5: 7 / 2, 6: 8 / 2}
@@ -38,8 +37,7 @@ editor = ImageEditor()
 
 
 def getImages(ID, shiny=False):
-    gridWidth = 5
-    perRow = 32
+    gridWidth, perRow = 5, 32
     pos = pg.Vector2((ID - 1) % (perRow / 2), floor((ID - 1) / (perRow / 2)))
 
     topleft = pg.Vector2(pos.x * (80 + gridWidth) * 2 + gridWidth, pos.y * (80 + gridWidth) * 2 + gridWidth)
@@ -108,9 +106,12 @@ class Stats:
     def __sub__(self, other):
         return Stats(
             health=self.health-other.health, attack=self.attack-other.attack, defence=self.defence-other.defence,
-            spAttack=self.spAttack - other.spAttack, spDefence=self.spDefence - other.spDefence, speed=self.speed - other.speed,
-            exp=self.exp - other.exp
+            spAttack=self.spAttack - other.spAttack, spDefence=self.spDefence - other.spDefence,
+            speed=self.speed - other.speed, exp=self.exp - other.exp
         )
+
+    def __str__(self):
+        return f"HP: {self.health}, Atk: {self.attack}, Def: {self.defence}, Sp. Atk: {self.spAttack}, Speed: {self.speed}, Exp: {self.exp}"
 
     def display(self):
         print(self.health, self.attack, self.defence, self.spAttack, self.spDefence, self.speed)
@@ -156,9 +157,41 @@ class PokemonSpriteSmall(pg.sprite.Sprite):
         return None
 
 
+class PokemonSprite(pg.sprite.Sprite):
+    def __init__(self, pk_id, shiny, friendly=True):
+        pg.sprite.Sprite.__init__(self)
+
+        self.front, self.back, self.small = getImages(pk_id, shiny=shiny)
+        self.friendly = friendly
+
+        self.image = self.back if friendly else self.front
+        self.rect = self.image.get_rect()
+
+        # numpy and pygame use different x-y coordinate systems
+        self.mask = pg.surfarray.pixels_alpha(self.image).transpose()
+
+        self.intro_animation = None
+
+        self.animations = {
+            "intro": None,
+            "stat_raise": None,
+            "stat_lower": None,
+        }
+
+        self.load_stat_stage_animations()
+
+    def load_stat_stage_animations(self):
+        for direction in ["raise", "lower"]:
+            frames = load_gif(f"assets/battle/main_display/stat_{direction}.gif", bit_mask=self.mask, opacity=150, scale=2)
+            base_image = self.back if self.friendly else self.front
+            self.animations[f"stat_{direction}"] = [base_image.copy() for _ in range(len(frames))]
+            for frame_idx in range(len(frames)):
+                self.animations[f"stat_{direction}"][frame_idx].blit(frames[frame_idx], (0, 0))
+
+
 class Pokemon(pg.sprite.Sprite):
     def __init__(self, Name, Level=None, XP=None, Move_Names=None, Move_PPs=None, Health=None, Status=None,
-                 EVs=None, IVs=None, Gender=None, Nature=None, Ability=None, KO=False, Stat_Stages=None,
+                 EVs=None, IVs=None, Gender=None, Nature=None, ability_name=None, KO=False, Stat_Stages=None,
                  Friendly=False, Shiny=None, Visible=True, Catch_Location=None, Catch_Level=None,
                  Catch_Date=None):
         # ===== Load Default Data ======
@@ -187,7 +220,6 @@ class Pokemon(pg.sprite.Sprite):
         self.level_exp = int(level_up_values.loc[Level, self.growthRate])
         self.level_up_exp = int(level_up_values.loc[Level+1, self.growthRate])
         self.evolveLevel = oldData.Evolve_Level
-        print(f"Level {self.level} {self.name} with growth rate {self.growthRate}, has {XP} XP. {self.level_up_exp - XP} XP to the next level.")
 
         if Move_Names is None:
             Move_Names = []
@@ -235,31 +267,31 @@ class Pokemon(pg.sprite.Sprite):
             self.gender = Gender
         else:
             genders = data.Gender
-            num = random() * 100
-            if num < genders[0]:
-                self.gender = "Male"
+            if genders:
+                num = random() * 100
+                self.gender = "Male" if num < genders[0] else "female"
             else:
-                self.gender = "Female"
+                self.gender = None
 
-        self.ability = Ability if Ability else choice(data.Abilities[:len(data.Abilities)])
+        ability_name = ability_name if ability_name else choice(data.Abilities[:len(data.Abilities)])
+        self.ability = Ability(name=ability_name)
         self.nature = Nature if Nature else natures.loc[randint(0, 24)].Name
 
         if Shiny:
             self.shiny = Shiny
         else:
-            num = randint(0, 4095)
-            if num == 0:
-                self.shiny = True
-            else:
-                self.shiny = False
+            # one in 4096 chance for a pokemon to be shiny
+            self.shiny = True if randint(0, 4095) == 0 else False
+
+        self.sprite = PokemonSprite(self.ID, self.shiny, friendly=self.friendly)
 
         front, back, small = getImages(self.ID, self.shiny)
 
         self.image = back if Friendly else front
+        self.displayImage = self.image.copy()
         self.sprite_mask = pg.mask.from_surface(self.image)
         self.smallImage = small
         self.animation, self.small_animation = None, None
-        self.displayImage = self.image
 
         if Move_PPs:
             for idx, move in enumerate(self.moves):
@@ -295,18 +327,14 @@ class Pokemon(pg.sprite.Sprite):
         self.id = Name
         self.rect = self.image.get_rect()
 
-        if self.friendly:
-            self.rect.midbottom = pg.Vector2(64, 153) * 2
-        else:
-            self.rect.midbottom = pg.Vector2(int(192 * 15 / 8), int(90 * 15 / 8))
+        self.rect.midbottom = pg.Vector2(64, 153) * 2 if self.friendly else pg.Vector2(192, 90) * 2
 
         self.visible = Visible
         self.sprite_mask = None
-
         self.small_sprite = None
 
     def __str__(self):
-        return f"Lv.{self.level} {self.name} caught on {self.catchDate}"
+        return f"Lv.{self.level} {self.name} caught on {self.catchDate}.\nIt likes playing \n{self.stats}"
 
     def __repr__(self):
         return f"Pokemon({self.name},Lv{self.level},Type:{self.type1})"
@@ -478,6 +506,9 @@ class Pokemon(pg.sprite.Sprite):
         self.level_up_exp = int(level_up_values.loc[self.level + 1, self.growthRate])
         self.updateStats()
 
+    def get_new_moves(self):
+        return [getMove(move_name) for move_name, level in self.moveData if level == self.level]
+
     def checkLevelUp(self):
         level = 99
         levelUp = False
@@ -523,6 +554,10 @@ class Pokemon(pg.sprite.Sprite):
         self.animation = None
         self.displayImage = None
         self.smallImage = None
+        self.small_animation = None
+        self.sprite = None
+
+        self.sprite_mask = None
 
     def loadImages(self, animations: Animations):
         front, back, small = getImages(self.ID, self.shiny)
@@ -534,7 +569,6 @@ class Pokemon(pg.sprite.Sprite):
         self.smallImage = small
         self.small_animation = animations.small
         self.animation = animations.front
-        self.displayImage = self.image
 
     def resetStatStages(self):
         self.statStages = StatStages()
@@ -546,11 +580,8 @@ class Pokemon(pg.sprite.Sprite):
         for move in self.moves:
             move.PP = move.maxPP
 
-    ######### DISPLAY FUNCTIONS BELOW
-    # def get_shimmer_frame(self):
-    #     return
-
-    def getJSONData(self):
+    # ========== DISPLAY FUNCTIONS BELOW  =============
+    def get_json_data(self):
         movePPs = [move.PP for move in self.moves]
         if self.status:
             status = self.status.value
@@ -563,7 +594,7 @@ class Pokemon(pg.sprite.Sprite):
         data = {"Name": self.name, "Level": self.level, "XP": self.exp,
                 "Move_Names": self.moveNames, "Move_PPs": movePPs, "Health": self.health,
                 "Status": status, "EVs": self.EVs, "IVs": self.IVs,
-                "Gender": self.gender, "Nature": self.nature, "Ability": self.ability,
+                "Gender": self.gender, "Nature": self.nature, "ability_name": self.ability.name,
                 "KO": self.KO, "Stat_Stages": self.statStages.__dict__,
                 "Friendly": self.friendly, "Shiny": self.shiny, "Visible": self.visible,
                 "Catch_Date": self.catchDate.strftime("%Y-%m-%d"),

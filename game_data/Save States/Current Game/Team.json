@@ -35,7 +35,7 @@
         ],
         "Gender": "Male",
         "Nature": "Bashful",
-        "Ability": "Blaze",
+        "ability_name": "Blaze",
         "KO": false,
         "Stat_Stages": {
             "attack": -1,
@@ -83,7 +83,7 @@
         ],
         "Gender": "Female",
         "Nature": "Quiet",
-        "Ability": "Rivalry",
+        "ability_name": "Rivalry",
         "KO": false,
         "Stat_Stages": {
             "attack": 0,
@@ -133,7 +133,7 @@
         ],
         "Gender": "Male",
         "Nature": "Relaxed",
-        "Ability": "Run Away",
+        "ability_name": "Run Away",
         "KO": false,
         "Stat_Stages": {
             "attack": 0,

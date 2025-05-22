@@ -213,6 +213,31 @@ class BagV2:
 
             return items
 
+    # def get_json_data(self):
+    #     itemData = {}
+    #     for item in self.items:
+    #         itemData[item.name] = self.items[item]
+    #
+    #     pokeballData = {}
+    #     for pokeball in self.pokeballs:
+    #         pokeballData[pokeball.name] = self.pokeballs[pokeball]
+    #
+    #     medicineData = {}
+    #     for medicine in self.medicine:
+    #         medicineData[medicine.name] = self.medicine[medicine]
+    #
+    #     TMData = {}
+    #     berryData = {}
+    #     battleItemData = {}
+    #     keyItemData = {}
+    #
+    #     data = {"Items": itemData, "Pokeballs": pokeballData,
+    #             "Medicine": medicineData, "TMs": TMData,
+    #             "Berries": berryData, "Battle_Items": battleItemData,
+    #             "Key_Items": keyItemData}
+    #
+    #     return data
+
 
 if __name__ == "__main__":
     # pygame setup
