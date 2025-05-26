@@ -1,57 +1,5 @@
 [
     {
-        "Name": "Piplup",
-        "Level": 10,
-        "XP": 600,
-        "Move_Names": [
-            "Pound",
-            "Growl",
-            "Bubble"
-        ],
-        "Move_PPs": [
-            33,
-            40,
-            28
-        ],
-        "Health": 14,
-        "Status": null,
-        "EVs": [
-            0,
-            3,
-            0,
-            0,
-            0,
-            1
-        ],
-        "IVs": [
-            31,
-            31,
-            31,
-            31,
-            31,
-            31
-        ],
-        "Gender": "Male",
-        "Nature": "Bold",
-        "ability_name": "Defiant",
-        "KO": false,
-        "Stat_Stages": {
-            "attack": 0,
-            "defence": 0,
-            "spAttack": 0,
-            "spDefence": 0,
-            "speed": 0,
-            "accuracy": 0,
-            "evasion": 0
-        },
-        "Friendly": true,
-        "Shiny": true,
-        "Visible": true,
-        "Catch_Date": "2025-05-18",
-        "Catch_Location": null,
-        "Catch_Level": 5
-    },
-    {
         "Name": "Chimchar",
         "Level": 5,
         "XP": 135,
@@ -63,7 +11,7 @@
             35,
             30
         ],
-        "Health": 19,
+        "Health": 15,
         "Status": null,
         "EVs": [
             0,
@@ -84,6 +32,58 @@
         "Gender": "Male",
         "Nature": "Lax",
         "ability_name": "Iron Fist",
+        "KO": false,
+        "Stat_Stages": {
+            "attack": 0,
+            "defence": 0,
+            "spAttack": 0,
+            "spDefence": 0,
+            "speed": 0,
+            "accuracy": 0,
+            "evasion": 0
+        },
+        "Friendly": true,
+        "Shiny": true,
+        "Visible": true,
+        "Catch_Date": "2025-05-18",
+        "Catch_Location": null,
+        "Catch_Level": 5
+    },
+    {
+        "Name": "Piplup",
+        "Level": 10,
+        "XP": 656,
+        "Move_Names": [
+            "Pound",
+            "Growl",
+            "Bubble"
+        ],
+        "Move_PPs": [
+            32,
+            40,
+            25
+        ],
+        "Health": 30,
+        "Status": null,
+        "EVs": [
+            0,
+            3,
+            0,
+            0,
+            0,
+            5
+        ],
+        "IVs": [
+            31,
+            31,
+            31,
+            31,
+            31,
+            31
+        ],
+        "Gender": "Male",
+        "Nature": "Bold",
+        "ability_name": "Defiant",
         "KO": false,
         "Stat_Stages": {
             "attack": 0,

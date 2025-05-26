@@ -24,9 +24,9 @@ class Colours(Enum):
 
 
 class BlitLocation(Enum):
-    topLeft = 0
-    midTop = 1
-    topRight = 2
+    topLeft = pg.Vector2(0, 0)
+    midTop = pg.Vector2(-0.5, 0)
+    topRight = pg.Vector2(-1, 0)
     bottomLeft = 3
     midBottom = 4
     bottomRight = 5
@@ -145,6 +145,8 @@ class Screen:
 
     def add_image(self, image, pos=pg.Vector2(0, 0), fill=False, scale=None, size=None, location=BlitLocation.topLeft,
                   base=False):
+        if isinstance(scale, float) or isinstance(scale, int):
+            scale = (scale, scale)
 
         if base:
             surf = self.base_surface
@@ -154,7 +156,7 @@ class Screen:
         if size:
             image = pg.transform.scale(image, size)
         elif scale:
-            image = pg.transform.scale(image, (image.get_size()[0] * scale.x, image.get_size()[1] * scale.y))
+            image = pg.transform.scale(image, (image.get_size()[0] * scale[0], image.get_size()[1] * scale[0]))
         elif fill:
             image = pg.transform.scale(image, self.size)
 
@@ -172,7 +174,7 @@ class Screen:
                    colour: Colours | pg.Color = None, shadow_colour: Colours | pg.Color = None,
                    max_chars=None, base=False):
         self.font = font_option.value
-        text_surf = self.font.render_text_2(
+        text_surf, text_box = self.font.render_text_2(
             text, text_box, colour=colour, shadow_colour=shadow_colour, max_chars=max_chars
         )
 
@@ -271,6 +273,8 @@ class Screen:
             blitPos -= pg.Vector2(size.x, 0)
         elif location == BlitLocation.midTop:
             blitPos -= pg.Vector2(size.x / 2, 0)
+        elif location == BlitLocation.bottomRight:
+            blitPos -= pg.Vector2(size)
 
         if base:
             self.base_surface.blit(textSurf, blitPos)

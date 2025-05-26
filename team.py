@@ -20,7 +20,7 @@ class Team:
         return self.pokemon[self.active_index]
 
     def get_index(self, pokemon):
-        return self.pokemon.index(pokemon) if pokemon in  self.pokemon else None
+        return self.pokemon.index(pokemon) if pokemon in self.pokemon else None
 
     def get_pk_up(self, start_index):
         idx = (start_index - 1) % len(self.pokemon)
@@ -30,34 +30,8 @@ class Team:
         idx = (start_index + 1) % len(self.pokemon)
         return self.pokemon[idx], idx
 
-    def display_loop(self, surface, controller,):
-        self.display_running = True
-
-        t1 = time.monotonic()
-        while self.display_running:
-            keys = pg.key.get_pressed()
-
-            action = self.battle_display.update(keys, controller, self.pokemon)
-
-            if action != PartyAction.nothing:
-                if action == PartyAction.home:
-                    self.display_running = False
-                    return action
-                else:
-                    self.display_running = False
-                    if action.value != self.active_index:
-                        return action
-
-            surface.blit(self.battle_display.getSurface(), (0, 0))
-            pg.display.flip()
-
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    self.display_running = False
-                    print("Quit")
-
-            while time.monotonic() - t1 < 0.1:
-                pass
-
-            t1 = time.monotonic()
+    def swap_pokemon(self, pk_1, pk_2):
+        idx_1, idx_2 = self.get_index(pk_1), self.get_index(pk_2)
+        if idx_1 is not None and idx_2 is not None:
+            self.pokemon[idx_1], self.pokemon[idx_2] = pk_2, pk_1
 

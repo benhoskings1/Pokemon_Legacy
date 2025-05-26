@@ -9,7 +9,7 @@ import pygame as pg
 
 from bag import Bag, BagV2
 from battle import Battle, State
-from displays.LoadDisplay import LoadDisplay
+from displays.load_display import LoadDisplay
 from general.Animations import createAnimation
 from general.utils import *
 from general.Controller import Controller
@@ -476,6 +476,7 @@ class Game:
             self.bottomSurf = None
 
             if self.battle:
+                # self.battle = None
                 self.battle.clearSurfaces()
 
             with open(os.path.join(save_dir, "game.pickle"), 'wb') as f:

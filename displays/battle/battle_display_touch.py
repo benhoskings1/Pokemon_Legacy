@@ -499,13 +499,7 @@ class BattleDisplayTeam(SpriteScreen):
                                             scale=self.scale)
 
         self.pk_containers = pg.sprite.Group()
-        for idx in range(6):
-            if idx == 0:
-                self.pk_containers.add(PokemonContainerTeam(self.team.pokemon[0], primary=True, pos=pg.Vector2(TEAM_CONTAINER_POSITIONS[0]), scale=self.scale))
-            elif idx < len(self.team.pokemon):
-                self.pk_containers.add(PokemonContainerTeam(self.team.pokemon[idx], pos=pg.Vector2(TEAM_CONTAINER_POSITIONS[idx]), scale=self.scale))
-            else:
-                self.pk_containers.add(PokemonContainerTeam(None, pos=pg.Vector2(TEAM_CONTAINER_POSITIONS[idx]), scale=self.scale))
+        self.load_pk_containers()
 
         self.sprites.add(return_container)
         self.sprites.add(self.pk_containers)
@@ -521,6 +515,21 @@ class BattleDisplayTeam(SpriteScreen):
         self.set_sub_displays()
 
         self.active_display = self
+
+    def load_pk_containers(self):
+        for sprite in self.sprites:
+            if sprite.sprite_type == "pokemon_container":
+                sprite.kill()
+
+        for idx in range(6):
+            if idx == 0:
+                self.pk_containers.add(PokemonContainerTeam(self.team.pokemon[0], primary=True, pos=pg.Vector2(TEAM_CONTAINER_POSITIONS[0]), scale=self.scale))
+            elif idx < len(self.team.pokemon):
+                self.pk_containers.add(PokemonContainerTeam(self.team.pokemon[idx], pos=pg.Vector2(TEAM_CONTAINER_POSITIONS[idx]), scale=self.scale))
+            else:
+                self.pk_containers.add(PokemonContainerTeam(None, pos=pg.Vector2(TEAM_CONTAINER_POSITIONS[idx]), scale=self.scale))
+
+        self.sprites.add(self.pk_containers)
 
     def set_sub_displays(self):
         self.sub_displays = {

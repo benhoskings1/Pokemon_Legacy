@@ -208,7 +208,8 @@ class Font:
 
         return textSurf
 
-    def render_text_2(self, text: str, text_box: pg.Rect, sep=1, colour: Colours | pg.Color = None, shadow_colour=None, max_chars=None) -> pg.Surface:
+    def render_text_2(self, text: str, text_box: pg.Rect | pg.Vector2 | tuple[int, int],
+                      sep=1, colour: Colours | pg.Color = None, shadow_colour=None, max_chars=None) -> pg.Surface:
         """
         Renders the given text in the given colour or shadow colour. The max_chars should be used over
         indexing directly into text, since this will maintain the correct line formatting as each
@@ -237,6 +238,11 @@ class Font:
 
         words = text.split(" ")
         word_widths, total_width = self.calculate_text_size(text, self.scale)
+
+        if isinstance(text_box, pg.Vector2) or len(text_box) == 2:
+            # treat two value pairs as x, y coordinates and only render text on one line
+            text_box = pg.Rect(text_box, (total_width*self.scale, 11*self.scale))
+
         lines = ceil(text_box.width / total_width)
         base_line = 11 * self.scale
 
@@ -272,7 +278,8 @@ class Font:
                     repcolor=c
                 )
 
-        return text_surface
+        return text_surface, text_box
+
 
 class LevelFont:
     def __init__(self, scale):

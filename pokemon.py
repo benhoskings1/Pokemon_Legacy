@@ -113,9 +113,6 @@ class Stats:
     def __str__(self):
         return f"HP: {self.health}, Atk: {self.attack}, Def: {self.defence}, Sp. Atk: {self.spAttack}, Speed: {self.speed}, Exp: {self.exp}"
 
-    def display(self):
-        print(self.health, self.attack, self.defence, self.spAttack, self.spDefence, self.speed)
-
     def get_values(self):
         return [self.health, self.attack, self.defence, self.spAttack, self.spDefence, self.speed]
 
@@ -130,8 +127,13 @@ class StatStages:
         self.accuracy = accuracy
         self.evasion = evasion
 
-    def display(self):
-        print(self.attack, self.defence, self.spAttack, self.spDefence, self.speed)
+    def __str__(self):
+        return (f"{self.attack}, {self.defence}, {self.spAttack}, {self.spDefence}, "
+                f"{self.speed}, {self.accuracy}, {self.evasion}")
+
+    def __repr__(self):
+        return (f"{self.attack}, {self.defence}, {self.spAttack}, {self.spDefence}, "
+                f"{self.speed}, {self.accuracy}, {self.evasion}")
 
 
 class PokemonSpriteSmall(pg.sprite.Sprite):
@@ -243,20 +245,11 @@ class Pokemon(pg.sprite.Sprite):
                     possibleMoves.remove(move)
 
         self.moveNames = Move_Names
-        self.moves = []
+        self.moves = [getMove(move_name) for move_name in Move_Names]
 
-        for moveName in Move_Names:
-            move = getMove(moveName)
-            self.moves.append(move)
+        self.EVs = EVs if EVs is not None else [0 for _ in range(6)]
+        self.IVs = IVs if IVs is not None else [randint(0, 31) for _ in range(6)]
 
-        if EVs is None:
-            EVs = [0 for _ in range(6)]
-        if IVs is None:
-            IVs = [randint(0, 31) for _ in range(6)]
-            if sum(IVs) >= 140:
-                print("strong pokemon")
-
-        self.EVs, self.IVs = EVs, IVs
         self.stats = Stats(exp=data.Base_Exp)
         self.updateStats()
 
@@ -295,10 +288,7 @@ class Pokemon(pg.sprite.Sprite):
 
         if Move_PPs:
             for idx, move in enumerate(self.moves):
-                if Move_PPs[idx]:
-                    move.PP = Move_PPs[idx]
-                else:
-                    move.PP = move.maxPP
+                move.PP = Move_PPs[idx] if Move_PPs[idx] else move.maxPP
 
         self.statStages = StatStages(**Stat_Stages) if Stat_Stages else StatStages()
         self.status = StatusEffect(Status) if Status else None
@@ -460,15 +450,6 @@ class Pokemon(pg.sprite.Sprite):
         for [idx, value] in enumerate(EVYield):
             self.EVs[idx] += value
 
-    def getMoves(self):
-        moveNames = "["
-        for move in self.moves:
-            moveNames += str.format("{}, ", move.name)
-
-        moveNames = moveNames[0:len(moveNames) - 2] + "]"
-
-        return moveNames
-
     def getFaintXP(self):
         a, e, f, L, Lp, p, s, t, v = 1, 1, 1, 1, 1, 1, 1, 1, 1
 
@@ -509,42 +490,9 @@ class Pokemon(pg.sprite.Sprite):
     def get_new_moves(self):
         return [getMove(move_name) for move_name, level in self.moveData if level == self.level]
 
-    def checkLevelUp(self):
-        level = 99
-        levelUp = False
-        moves = []
-        for idx in range(99, 0, -1):
-            if self.exp < level_up_values.loc[idx, self.growthRate]:
-                level = idx
-
-        if self.level != level:
-            levelUp = True
-
-        for levelVal in range(self.level + 1, level + 1):
-            for name, learnLevel in self.moveData:
-                if levelVal == learnLevel:
-                    move = getMove(name)
-                    moves.append(move)
-
-        if not moves:
-            moves = None
-
-        return [levelUp, level - self.level, moves]
-
     def switchImage(self, direction="back"):
         front, back, small = getImages(self.ID, self.shiny)
-
-        if direction == "back":
-            self.image = back
-        else:
-            self.image = front
-
-    def addMove(self, moveName, pos=None):
-        move = getMove(moveName)
-        if not pos:
-            self.moves.append(move)
-        else:
-            self.moves[pos] = move
+        self.image = back if direction == "back" else front
 
     def getEvolution(self):
         return oldPokedex[oldPokedex["ID"] == self.ID + 1].index[0]
@@ -552,12 +500,16 @@ class Pokemon(pg.sprite.Sprite):
     def clearImages(self):
         self.image = None
         self.animation = None
+
         self.displayImage = None
+
         self.smallImage = None
         self.small_animation = None
         self.sprite = None
-
+        self.small_sprite = None
         self.sprite_mask = None
+
+        print(self.__dict__)
 
     def loadImages(self, animations: Animations):
         front, back, small = getImages(self.ID, self.shiny)
@@ -591,14 +543,16 @@ class Pokemon(pg.sprite.Sprite):
         if self.friendly:
             self.visible = True
 
-        data = {"Name": self.name, "Level": self.level, "XP": self.exp,
-                "Move_Names": self.moveNames, "Move_PPs": movePPs, "Health": self.health,
-                "Status": status, "EVs": self.EVs, "IVs": self.IVs,
-                "Gender": self.gender, "Nature": self.nature, "ability_name": self.ability.name,
-                "KO": self.KO, "Stat_Stages": self.statStages.__dict__,
-                "Friendly": self.friendly, "Shiny": self.shiny, "Visible": self.visible,
-                "Catch_Date": self.catchDate.strftime("%Y-%m-%d"),
-                "Catch_Location": self.catchLocation,
-                "Catch_Level": self.catchLevel}
+        data = {
+            "Name": self.name, "Level": self.level, "XP": self.exp,
+            "Move_Names": self.moveNames, "Move_PPs": movePPs, "Health": self.health,
+            "Status": status, "EVs": self.EVs, "IVs": self.IVs,
+            "Gender": self.gender, "Nature": self.nature, "ability_name": self.ability.name,
+            "KO": self.KO, "Stat_Stages": self.statStages.__dict__,
+            "Friendly": self.friendly, "Shiny": self.shiny, "Visible": self.visible,
+            "Catch_Date": self.catchDate.strftime("%Y-%m-%d"),
+            "Catch_Location": self.catchLocation,
+            "Catch_Level": self.catchLevel
+        }
 
         return data

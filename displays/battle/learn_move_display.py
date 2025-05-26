@@ -37,7 +37,7 @@ class LearnMoveStart(SpriteScreen):
         forget_container.image = forget_container.get_surface()
 
         pass_container = DisplayContainer(
-            "assets/containers/learn_move/container_2.png", "pass",
+            "assets/containers/learn_move/container_2.png", LearnMoveStates.give_up,
             scale=scale, pos=pg.Vector2(4, 107)
         )
         pass_container.addText(
@@ -220,7 +220,7 @@ class LearnMoveDisplay:
 
                             self.state = value
 
-                        if isinstance(value, Move2):
+                        elif isinstance(value, Move2):
                             if self.state == LearnMoveStates.choose:
                                 new_move = True if value == self.new_move else False
                                 self.displays[LearnMoveStates.select] = LearnMoveSelect(
@@ -240,6 +240,9 @@ class LearnMoveDisplay:
                                     battle.active_touch_display = self.active_display
                                 else:
                                     return value
+
+                        elif value == "give_up":
+                            return None
 
                 elif event.type == pg.KEYDOWN:
                     # send event key to display selector
