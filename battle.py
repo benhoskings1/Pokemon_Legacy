@@ -712,7 +712,7 @@ class Battle:
 
             elif res[0] == "pokemon_select":
                 pokemon = res[1]
-                print(f"{pokemon} now in battle")
+                print(f"{repr(pokemon)} now in battle")
                 return pokemon
 
         action = None
