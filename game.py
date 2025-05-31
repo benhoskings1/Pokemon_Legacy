@@ -9,17 +9,24 @@ import pygame as pg
 
 from bag import Bag, BagV2
 from battle import Battle, State
+from pokedex import Pokedex
+
 from displays.load_display import LoadDisplay
 from general.Animations import createAnimation
 from general.utils import *
 from general.Controller import Controller
 from general.Direction import Direction
 from general.Time import Time
+
+# ======= Load displays =====
+from displays.game_display import GameDisplay, GameDisplayStates
+
 from Map_Files.TiledMap import TiledMap
 from player import Player, Movement
 from pokemon import Pokemon
 from Poketech.Poketech import Poketech
 from team import Team
+
 
 pokedex = pd.read_csv("game_data/Pokedex/Local Dex.tsv", delimiter='\t', index_col=1)
 
@@ -43,6 +50,7 @@ class Game:
 
         native_size = pg.Vector2(256, 382)
         self.graphics_scale = 2
+
         self.displaySize = native_size * self.graphics_scale
 
         # load all attributes which utilise any pygame surfaces!
@@ -147,6 +155,16 @@ class Game:
                             pkAnimations = createAnimation(name)
                             self.animations[name] = pkAnimations
 
+        # ========== DISPLAY INITIALISATION =========
+        self.game_display = GameDisplay(self.topSurf.get_size(), self.player, scale=scale)
+        self.pokedex = Pokedex(self)
+        self.menu_active = False
+
+        self.menu_objects = {
+            GameDisplayStates.pokedex: self.pokedex
+        }
+
+        # ========== POST INITIALISATION =========
         # happens after all attributes initialised
         self.loadDisplay.finish()
         top, bottom = self.loadDisplay.getScreens()
@@ -160,10 +178,8 @@ class Game:
     def createPokemon(self, name, friendly=False, level=None, exp=None, moveNames=None, EVs=None, IVs=None, shiny=None,
                       appearance=True, location=None):
 
-        if appearance and name not in self.appearances:
-            self.appearances[name] = 1
-        elif appearance:
-            self.appearances[name] += 1
+        if not friendly:
+            self.pokedex.data.loc[name, "appearances"] += 1
 
         if not (name in self.animations.keys()):
             print("Creating ", name)
@@ -219,15 +235,12 @@ class Game:
             return Time.night
 
     def updateDisplay(self, flip=True):
-        self.topSurf.blit(self.map.getSurface(self.topSurf.get_size(), self.player.position), (0, 0))
-        self.topSurf.blit(self.player.image, pg.Vector2(self.topSurf.get_rect().center) -
-                          pg.Vector2(self.player.image.get_rect().centerx,
-                                     self.map.data.tilewidth * self.map.scale / 2 + 16))
+        # self.topSurf.blit(self.player.image, pg.Vector2(self.topSurf.get_rect().center) -
+        #                   pg.Vector2(self.player.image.get_rect().centerx,
+        #                              self.map.data.tilewidth * self.map.scale / 2 + 16))
 
-        # pg.draw.line(self.topSurf, Colours.black.value, self.topSurf.get_rect().midtop,
-        #              self.topSurf.get_rect().midbottom, 5)
-        # pg.draw.line(self.topSurf, Colours.black.value, self.topSurf.get_rect().midleft,
-        #              self.topSurf.get_rect().midright, 5)
+        self.game_display.refresh()
+        self.topSurf.blit(self.game_display.get_surface(), (0, 0))
 
         self.bottomSurf.blit(self.poketech.getSurface(), (0, 0))
         if flip:
@@ -335,9 +348,6 @@ class Game:
             pg.time.delay(time)
             self.updateDisplay()
 
-    def addPokemon(self, pk):
-        self.team.pokemon.append(pk)
-
     def loop(self):
         if self.battle:
             self.battle.update_screen(flip=False)
@@ -373,10 +383,6 @@ class Game:
 
                 pg.time.delay(100)
 
-            elif keys[self.controller.a]:
-                print("activating bag")
-                self.bag.loop(self.bottomSurf, self.controller)
-
             if keys[self.controller.b]:
                 self.player.movement = Movement.running
 
@@ -397,6 +403,16 @@ class Game:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.running = False
+                elif event.type == pg.KEYDOWN:
+                    if event.key == self.controller.y:
+                        action = self.game_display.menu_loop(self)
+                        if isinstance(action, GameDisplayStates):
+                            # print(action, self.menu_objects.keys())
+                            if action in self.menu_objects.keys():
+                                print("entering loop")
+                                self.menu_objects[action].loop()
+
+                        self.updateDisplay()
 
         if self.overwrite:
             self.save()
@@ -460,6 +476,7 @@ class Game:
             # need to set all pygame surfaces to none
             self.animations = None
             self.loadDisplay = None
+            self.game_display = None
             self.map = None
 
             # the player image is a pygame surface

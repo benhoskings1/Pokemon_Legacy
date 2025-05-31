@@ -14,7 +14,11 @@ class Movement(Enum):
 
 class Player(pg.sprite.Sprite):
     def __init__(self, spritePath: os.PathLike, position=pg.Vector2(0, 0)):
+        # ======== INITIALISATION =======
         pg.sprite.Sprite.__init__(self)
+        self.sprite_type = "player"
+        self.id = "benji"
+
         self.spriteIdx = 3
         self.facingDirection = Direction.down
         self.leg = True
@@ -38,12 +42,10 @@ class Player(pg.sprite.Sprite):
         if self.movement == Movement.walking:
             self.sprites = self.walkingSpriteSet.sprites
             self.image = self.sprites[self.spriteIdx]
-            self.rect = self.image.get_rect()
 
         elif self.movement == Movement.running:
             self.sprites = self.walkingSpriteSet.sprites
             self.image = self.sprites[self.spriteIdx]
-            self.rect = self.image.get_rect()
 
     def getOffset(self, surfSize, gameMap):
         centre = pg.Vector2(surfSize) / 2

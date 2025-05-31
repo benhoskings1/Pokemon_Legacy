@@ -36,7 +36,7 @@ smallSprites = cv2.imread("Sprites/Pokemon/Gen_IV_Small_Sprites.png", cv2.IMREAD
 editor = ImageEditor()
 
 
-def getImages(ID, shiny=False):
+def getImages(ID, shiny=False, crop=True):
     gridWidth, perRow = 5, 32
     pos = pg.Vector2((ID - 1) % (perRow / 2), floor((ID - 1) / (perRow / 2)))
 
@@ -67,12 +67,14 @@ def getImages(ID, shiny=False):
                              smallRect.left:smallRect.right, :]
 
     editor.loadData(frontData)
-    editor.cropImage(overwrite=True)
+    if crop:
+        editor.cropImage(overwrite=True)
     editor.scaleImage((2, 2), overwrite=True)
     frontImage = editor.createSurface()
 
     editor.loadData(backData)
-    editor.cropImage(overwrite=True)
+    if crop:
+        editor.cropImage(overwrite=True)
     editor.scaleImage((2, 2), overwrite=True)
     backImage = editor.createSurface()
 

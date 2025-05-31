@@ -280,7 +280,7 @@ class TeamMoveSelect(DisplayContainer):
 class BattleDisplayTouch(SpriteScreen):
     def __init__(self, window, window_size, scale):
         """
-        This is the main battle display. The native screen size is 256x192 px
+        This is the menu battle display. The native screen size is 256x192 px
         :param window: The pygame surface to blit the display onto
         :param size: the size of the display
         :param time: the time of day, used to configure the battle background option
@@ -353,7 +353,7 @@ class BattleDisplaySummary(SpriteScreen):
 class BattleDisplayFight(SpriteScreen):
     def __init__(self, window, size, scale):
         """
-        This is the main battle display. The native screen size is 256x192 px
+        This is the menu battle display. The native screen size is 256x192 px
         :param window: The pygame surface to blit the display onto
         :param size: the size of the display
         :param time: the time of day, used to configure the battle background option
@@ -394,7 +394,7 @@ class BattleDisplayFight(SpriteScreen):
 class BattleDisplayBag(SpriteScreen):
     def __init__(self, window, size, bag, scale):
         """
-        This is the main battle display. The native screen size is 256x192 px
+        This is the menu battle display. The native screen size is 256x192 px
         :param window: The pygame surface to blit the display onto
         :param size: the size of the display
         :param time: the time of day, used to configure the battle background option

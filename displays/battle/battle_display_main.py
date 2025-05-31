@@ -152,7 +152,7 @@ class LevelUpBox(pg.sprite.Sprite, Screen):
 class BattleDisplayMain(SpriteScreen):
     def __init__(self, window, size, time, environment: Environment, scale=2):
         """
-        This is the main battle display. The native screen size is 256x192 px
+        This is the menu battle display. The native screen size is 256x192 px
         :param window: The pygame surface to blit the display onto
         :param size: the size of the display
         :param time: the time of day, used to configure the battle background option

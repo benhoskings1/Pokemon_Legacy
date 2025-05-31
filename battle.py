@@ -66,13 +66,7 @@ class Battle:
             animations = self.game.animations[self.foe.name]
             self.foe.loadImages(animations)
 
-            self.environment = pickleData.environment
-            self.timeOfDay = pickleData.timeOfDay
-
-            self.state = pickleData.state
-
         else:
-
             # wild pokemon
             if not wild_name:
                 route = Route(route_name)
@@ -80,15 +74,11 @@ class Battle:
 
                 self.foe: Pokemon = self.game.createPokemon(pkName, level=pkLevel)
             else:
-                if wildLevel:
-                    self.foe: Pokemon = self.game.createPokemon(wild_name, level=wildLevel)
-                else:
-                    self.foe: Pokemon = self.game.createPokemon(wild_name, level=10)
+                self.foe: Pokemon = self.game.createPokemon(wild_name, level=wildLevel if wildLevel else 10)
 
-            self.environment = environment
-            self.timeOfDay = self.game.getTimeOfDay()
-
-            self.state = State.home
+        self.environment = pickleData.environment if pickleData else environment
+        self.timeOfDay = pickleData.timeOfDay if pickleData else self.game.getTimeOfDay()
+        self.state = pickleData.state if pickleData else State.home
 
         self.active_pokemon = [self.friendly, self.foe]
         # self.active_pokemon_2 = {
@@ -536,7 +526,7 @@ class Battle:
                 target.friendly = True
                 target.visible = False
                 target.switchImage()
-                self.game.addPokemon(target)
+                self.pokemon_team.pokemon.append(target)
                 self.running = False
                 return True
             else:

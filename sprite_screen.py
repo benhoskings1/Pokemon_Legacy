@@ -1,6 +1,5 @@
 import pygame as pg
-from math import floor
-from screen_V2 import Screen, Colours
+from screen_V2 import Screen
 
 
 class PokeballCatchAnimation(pg.sprite.Sprite):
