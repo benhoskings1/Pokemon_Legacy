@@ -94,11 +94,13 @@ class Game:
         self.bag = BagV2(bagData)
 
         spriteDirectory = "Sprites/Pokemon Sprites/Gen IV 2"
+        gameData = None
 
         if fromPickle and not os.path.exists(os.path.join(self.dataPath, "game.pickle")):
             print("No pickle data not present / corrupted")
 
         if fromPickle and os.path.exists(os.path.join(self.dataPath, "game.pickle")):
+            print("loading game")
             gameFile = open(os.path.join(self.dataPath, "game.pickle"), 'rb')
             gameData = pickle.load(gameFile, encoding='bytes')
 
@@ -157,7 +159,11 @@ class Game:
 
         # ========== DISPLAY INITIALISATION =========
         self.game_display = GameDisplay(self.topSurf.get_size(), self.player, scale=scale)
-        self.pokedex = Pokedex(self)
+
+        self.pokedex = Pokedex(self) if not gameData else gameData.pokedex
+        self.pokedex.game = self
+        self.pokedex.load_surfaces()
+
         self.menu_active = False
 
         self.menu_objects = {
@@ -407,11 +413,11 @@ class Game:
                     if event.key == self.controller.y:
                         action = self.game_display.menu_loop(self)
                         if isinstance(action, GameDisplayStates):
-                            # print(action, self.menu_objects.keys())
                             if action in self.menu_objects.keys():
                                 print("entering loop")
                                 self.menu_objects[action].loop()
 
+                        action = self.game_display.menu_loop(self)
                         self.updateDisplay()
 
         if self.overwrite:
@@ -461,19 +467,12 @@ class Game:
             os.mkdir(save_dir)
 
         try:
-            teamData = []
-            for pokemon in self.team.pokemon:
-                teamData.append(pokemon.get_json_data())
-
+            # write team json file
             with open(os.path.join(save_dir, "team.json"), "w") as write_file:
-                json.dump(teamData, write_file, indent=4)
-
-            # bagData = self.bag.get_json_data()
-            #
-            # with open("game_data/Save States/Save Test/Bag.json", "w") as write_file:
-            #     json.dump(bagData, write_file, indent=4)
+                json.dump([pk.get_json_data() for pk in self.team.pokemon], write_file, indent=4)
 
             # need to set all pygame surfaces to none
+            self.game_display = None
             self.animations = None
             self.loadDisplay = None
             self.game_display = None
@@ -481,7 +480,7 @@ class Game:
 
             # the player image is a pygame surface
             self.player.clearSurfaces()
-
+            self.pokedex.clear_surfaces()
             self.poketech.clearSurfaces()
 
             self.bag = None
@@ -493,8 +492,8 @@ class Game:
             self.bottomSurf = None
 
             if self.battle:
-                # self.battle = None
-                self.battle.clearSurfaces()
+                self.battle = None
+                # self.battle.clearSurfaces()
 
             with open(os.path.join(save_dir, "game.pickle"), 'wb') as f:
                 pickle.dump(self, f)

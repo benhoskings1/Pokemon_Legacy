@@ -56,8 +56,7 @@ class PokedexDisplayMain(SpriteScreen):
         if self.pokedex.data.loc[name, "appearances"] > 0:
             self.add_image(front_image, pg.Vector2(16, 40)*self.scale)
         else:
-            # self.add_image(front_image, pg.Vector2(16, 40)*self.scale)
-            ...
+            self.load_image("assets/menu/pokedex/unknown_pk.png", pos=pg.Vector2(24, 48)*self.scale,scale=self.scale,)
 
         for i in sorted(range(max([-(self.pokemon_idx-1), -3]), min([4, -(self.pokemon_idx - 152)])), key=lambda x: abs(x), reverse=True):
             name = oldPokedex.loc[oldPokedex["ID"] == self.pokemon_idx+i].index.values[0]

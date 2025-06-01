@@ -847,7 +847,6 @@ class Battle:
         self.fadeOut(1000)
 
     def clearSurfaces(self):
-
         self.pokemon_team = None
         # for pk in self.pokemon_team.pokemon:
         #     pk.clearImages()

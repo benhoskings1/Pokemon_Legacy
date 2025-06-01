@@ -68,7 +68,8 @@ class GameDisplay(SpriteScreen):
                     if event.key == game.controller.y:
                         popup.kill()
                         return None
-                    elif event.key == game.controller.a:
+                    elif event.key == game.controller.a and GameDisplayStates(popup.selector.position_idx) in game.menu_objects:
+                        popup.kill()
                         return GameDisplayStates(popup.selector.position_idx)
 
                     else:

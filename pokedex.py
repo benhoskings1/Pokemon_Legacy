@@ -14,8 +14,10 @@ class Pokedex:
         if "appearances" not in self.data.columns:
             self.data["appearances"] = 0
 
-        self.main_display = PokedexDisplayMain(game.displaySize, game.graphics_scale, pokedex=self)
+        self.main_display = None
         self.touch_display = None
+
+        self.load_surfaces()
 
     def update_display(self, flip=True):
         self.game.topSurf.blit(self.main_display.get_surface(), (0, 0))
@@ -32,7 +34,9 @@ class Pokedex:
         while not action:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
-                    pg.quit()
+                    self.game.save()
+                    self.game.running = False
+                    return None
 
                 elif event.type == pg.KEYDOWN:
                     if event.key == self.controller.b:
@@ -48,3 +52,11 @@ class Pokedex:
                             self.main_display.pokemon_idx += 1
                             self.main_display.update_image()
                             self.update_display()
+
+    def clear_surfaces(self):
+        self.main_display = None
+        self.touch_display = None
+
+    def load_surfaces(self):
+        self.main_display = PokedexDisplayMain(self.game.displaySize, self.game.graphics_scale, pokedex=self)
+        self.touch_display = None
