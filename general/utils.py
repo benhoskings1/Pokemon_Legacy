@@ -42,7 +42,7 @@ def create_display_bar(val: float, max_val: float, bar_type: str) -> pg.Surface:
 
     bar_size = pg.Vector2(bar_surf.get_size())
 
-    return pg.transform.scale(bar_surf, pg.Vector2(bar_size.x * ratio, bar_size.y))
+    return pg.transform.scale(bar_surf, pg.Vector2((48 if bar_type == "HP" else 64) * ratio, bar_size.y))
 
 
 def load_gif(gif_path: str, bit_mask=None, opacity=255, scale=1) -> list[pg.Surface]:

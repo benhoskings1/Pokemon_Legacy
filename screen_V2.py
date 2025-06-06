@@ -287,20 +287,10 @@ class Screen:
         pad = (width - 1) / 2
         for x_pos in range(int(pos[0] - pad), int(pos[0] + 1 + pad)):
             for y_pos in range(int(pos[1] - pad), int(pos[1] + 1 + pad)):
-                # if np.all(pos != np.array([x_pos, y_pos])):
-                #     colour = pg.Color(colour.r, colour.g, colour.b, 0)
-                # else:
-                #     colour = pg.Color(colour.r, colour.g, colour.b, 255)
-
                 if base:
                     self.base_surface.set_at((x_pos, y_pos), colour)
                 else:
                     self.surface.set_at((x_pos, y_pos), colour)
-
-        # new_array[np.int16(positions[0, :]), np.int16(positions[1, :]), :] = [0, 0, 0]
-        # new_surf = pg.surfarray.make_surface(new_array)
-        # new_surf.set_alpha()
-        # self.surface = new_surf
 
     def refresh(self):
         self.surface = pg.Surface(self.size, pg.SRCALPHA)

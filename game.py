@@ -7,7 +7,7 @@ from datetime import datetime
 import pandas as pd
 import pygame as pg
 
-from bag import Bag, BagV2
+from bag import BagV2
 from battle import Battle, State
 from pokedex import Pokedex
 
@@ -20,6 +20,7 @@ from general.Time import Time
 
 # ======= Load displays =====
 from displays.game_display import GameDisplay, GameDisplayStates
+from displays.menu.menu_display_team import MenuTeamDisplay
 
 from Map_Files.TiledMap import TiledMap
 from player import Player, Movement
@@ -163,11 +164,15 @@ class Game:
         self.pokedex = Pokedex(self) if not gameData else gameData.pokedex
         self.pokedex.game = self
         self.pokedex.load_surfaces()
+        self.pokedex.national_dex = pd.read_csv("game_data/Pokedex/NationalDex/NationalDex.tsv", delimiter='\t', index_col=0)
+
+        print(self.pokedex.data.loc["Starly", "caught"])
 
         self.menu_active = False
 
         self.menu_objects = {
-            GameDisplayStates.pokedex: self.pokedex
+            GameDisplayStates.pokedex: self.pokedex,
+            GameDisplayStates.team: MenuTeamDisplay(self.displaySize, self.graphics_scale, self),
         }
 
         # ========== POST INITIALISATION =========
@@ -197,6 +202,7 @@ class Game:
                           Friendly=friendly, Shiny=shiny)
 
         pokemon.animation = animations.front
+        pokemon.small_animation = animations.small
 
         return pokemon
 
@@ -344,6 +350,7 @@ class Game:
         self.battle = battle
         battle.loop()
         self.battle = None
+        # print(self.animations[name])
 
     def battleIntro(self, time):
         blackSurf = pg.Surface(self.topSurf.get_size())
@@ -412,12 +419,13 @@ class Game:
                 elif event.type == pg.KEYDOWN:
                     if event.key == self.controller.y:
                         action = self.game_display.menu_loop(self)
-                        if isinstance(action, GameDisplayStates):
-                            if action in self.menu_objects.keys():
-                                print("entering loop")
-                                self.menu_objects[action].loop()
+                        while action:
+                            if isinstance(action, GameDisplayStates):
+                                if action in self.menu_objects.keys():
+                                    self.menu_objects[action].loop()
 
-                        action = self.game_display.menu_loop(self)
+                            action = self.game_display.menu_loop(self)
+                            self.updateDisplay()
                         self.updateDisplay()
 
         if self.overwrite:

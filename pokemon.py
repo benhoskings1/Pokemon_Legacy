@@ -322,14 +322,14 @@ class Pokemon(pg.sprite.Sprite):
         self.rect.midbottom = pg.Vector2(64, 153) * 2 if self.friendly else pg.Vector2(192, 90) * 2
 
         self.visible = Visible
+
         self.sprite_mask = None
-        self.small_sprite = None
 
     def __str__(self):
         return f"Lv.{self.level} {self.name} caught on {self.catchDate}.\nIt likes playing \n{self.stats}"
 
     def __repr__(self):
-        return f"Pokemon({self.name},Lv{self.level},Type:{self.type1})"
+        return f"Pokemon({self.name},Lv{self.level},Type:{self.type1}, IVs:{self.IVs})"
 
     def getMoveDamage(self, move, target, ignoreModifiers=False):
         if move.category == "Physical":
@@ -496,6 +496,8 @@ class Pokemon(pg.sprite.Sprite):
         front, back, small = getImages(self.ID, self.shiny)
         self.image = back if direction == "back" else front
 
+        self.rect.midbottom = pg.Vector2(64, 153) * 2
+
     def getEvolution(self):
         return oldPokedex[oldPokedex["ID"] == self.ID + 1].index[0]
 
@@ -511,14 +513,9 @@ class Pokemon(pg.sprite.Sprite):
         self.small_sprite = None
         self.sprite_mask = None
 
-        print(self.__dict__)
-
     def loadImages(self, animations: Animations):
         front, back, small = getImages(self.ID, self.shiny)
-        if self.friendly:
-            self.image = back
-        else:
-            self.image = front
+        self.image = back if self.friendly else front
 
         self.smallImage = small
         self.small_animation = animations.small

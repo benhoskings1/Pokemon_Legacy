@@ -183,9 +183,9 @@ class LearnMoveDisplay:
         # LearnMoveSelect(self.size, pokemon=pokemon, move=move, scale=self.scale)
 
     def transition_start(self, battle):
-        battle.displayMessage(f"{self.pokemon.name} wants to learn the move {self.new_move.name.title()}", 2000)
-        battle.displayMessage(f"But {self.pokemon.name} cant learn more than four moves", 2000)
-        battle.displayMessage("Make it forget another move?", 2000)
+        battle.display_message(f"{self.pokemon.name} wants to learn the move {self.new_move.name.title()}", 2000)
+        battle.display_message(f"But {self.pokemon.name} cant learn more than four moves", 2000)
+        battle.display_message("Make it forget another move?", 2000)
 
     def select_action(self, battle):
         action = None
@@ -209,14 +209,14 @@ class LearnMoveDisplay:
                             battle.active_touch_display = self.active_display
 
                             if self.state == LearnMoveStates.start and value == LearnMoveStates.choose:
-                                battle.displayMessage(f"Which move should be forgotten?", 2000)
+                                battle.display_message(f"Which move should be forgotten?", 2000)
 
                             elif value == LearnMoveStates.start:
                                 self.transition_start(battle)
 
                             elif value == LearnMoveStates.give_up:
-                                battle.displayMessage(f"Well then ...", 2000)
-                                battle.displayMessage(f"Should this Pokemon give up on learning this new move?", 2000)
+                                battle.display_message(f"Well then ...", 2000)
+                                battle.display_message(f"Should this Pokemon give up on learning this new move?", 2000)
 
                             self.state = value
 
@@ -232,9 +232,9 @@ class LearnMoveDisplay:
                             else:
                                 # select move to delete.
                                 if value == self.new_move:
-                                    battle.displayMessage(f"Well then ...", 2000)
-                                    battle.displayMessage(f"Should this Pokemon give up on learning this new move?",
-                                                          2000)
+                                    battle.display_message(f"Well then ...", 2000)
+                                    battle.display_message(f"Should this Pokemon give up on learning this new move?",
+                                                           2000)
                                     self.state = LearnMoveStates.give_up
                                     self.active_display = self.displays[self.state]
                                     battle.active_touch_display = self.active_display

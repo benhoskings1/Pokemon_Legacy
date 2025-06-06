@@ -11,6 +11,7 @@ class BattleActionType(Enum):
     catch = "catch",
     heal = "heal",
     switch = "switch"
+    run = "run"
 
 
 class BattleAction:
@@ -66,15 +67,7 @@ class BattleAttack(pg.sprite.Sprite, BattleAction, ):
 class BattleTagIn(pg.sprite.Sprite, BattleAction, ):
     def __init__(self, animation_size=pg.Vector2(256, 192)):
         """
-        Battle attacks are an object that allows the tracking of battle moves and contains the
-        wrapper for their animations too. Battle animations are stored according to who the move
-        is affecting.
 
-        For example if the move affects the foe, and the relevant animation frames can be found at
-        assets/battle/move_animations/move/foe/move_XX.png
-
-        :param target:
-        :param move:
         :param animation_size:
         """
         pg.sprite.Sprite.__init__(self)
@@ -82,7 +75,6 @@ class BattleTagIn(pg.sprite.Sprite, BattleAction, ):
 
         self.image_size = pg.Vector2(60, 60)
         self.image = pg.Surface((60, 60), pg.SRCALPHA)
-        # pg.draw.circle(self.image, (255, 0, 0), (30, 30), 30)
 
         self.sprite_type = "animation"
 

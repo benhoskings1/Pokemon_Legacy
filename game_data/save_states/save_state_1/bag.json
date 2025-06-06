@@ -1,7 +1,13 @@
 {
     "Items": {},
-    "Pokeballs": {},
-    "Medicine": {},
+    "Pokeballs": {
+        "Poke Ball": 10,
+        "Master Ball": 24
+    },
+    "Medicine": {
+        "Antidote": 19,
+        "Potion": 20
+    },
     "TMs": {},
     "Berries": {},
     "Battle_Items": {},

@@ -219,10 +219,7 @@ class BattleDisplayMain(SpriteScreen):
     def render_pokemon_details(self, opacity=None, friendly=False, lines=None):
         self.refresh()
 
-        if opacity:
-            offset = 120 * (1 - (opacity / 255))
-        else:
-            offset = 0
+        offset = 120 * (1 - (opacity / 255)) if opacity else 0
 
         # Display options for the wild Pokémon
         if self.foe.visible:
@@ -255,11 +252,11 @@ class BattleDisplayMain(SpriteScreen):
                 pg.time.delay(int(0.75 * duration / frames))
                 self.refresh()
 
-            self.foe.displayImage = self.foe.image
             pg.time.delay(int(0.25 * duration))
         else:
             pg.time.delay(duration)
 
+        self.foe.image = self.foe.displayImage
         window.blit(self.get_surface(), (0, 0))
         pg.display.flip()
 

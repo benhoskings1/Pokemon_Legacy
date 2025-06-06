@@ -38,6 +38,12 @@ class State(Enum):
     evolve = 6
 
 
+class BattleOutcome(Enum):
+    run = 0
+    foe_ko = 1
+    catch = 2
+
+
 class Battle:
     def __init__(self, game, environment=Environment.grassland, route_name="Route 201",
                  wild_name=None, wildLevel=None, pickleData=None):
@@ -60,7 +66,6 @@ class Battle:
                 self.game.topSurf.blit(top, (0, 0))
                 self.game.bottomSurf.blit(bottom, (0, 0))
                 pg.display.flip()
-                print("Creating ", self.foe.name)
                 self.game.animations[self.foe.name] = createAnimation(self.foe.name)
 
             animations = self.game.animations[self.foe.name]
@@ -109,12 +114,11 @@ class Battle:
             self.battle_display.intro_animations(self.game.topSurf, 2000)
             self.battle_display.bounce_friendly_stat = True
 
+        print(f"visble:{self.foe.visible}", self.foe.rect, self.foe.sprite.rect)
+
     # ======== GRAPHICS HANDLERS =========
     def update_upper_screen(self):
-        if self.state != State.evolve:
-            self.game.topSurf.blit(self.battle_display.get_surface(show_sprites=True), (0, 0))
-        else:
-            self.game.topSurf.blit(self.evolveDisplay.getUpperSurface(), (0, 0))
+        self.game.topSurf.blit(self.battle_display.get_surface(show_sprites=True), (0, 0))
 
     def update_lower_screen(self, cover=False):
         if cover:
@@ -133,7 +137,7 @@ class Battle:
         if len(self.active_pokemon[0].moves) < 4:
             self.battle_display.refresh()
             self.update_upper_screen()
-            self.displayMessage(f"{pokemon.name} learned {move.name.title()}!", duration=2000)
+            self.display_message(f"{pokemon.name} learned {move.name.title()}!", duration=2000)
             self.active_pokemon[0].moves.append(move)
         else:
             learn_display = LearnMoveDisplay(self.screenSize, self.active_pokemon[0], move, scale=2)
@@ -141,16 +145,16 @@ class Battle:
 
             if forget_move:
                 print(forget_move)
-                self.displayMessage("1 2 and... ... Poof!", duration=2000)
-                self.displayMessage(f"{pokemon.name} forgot how to use {forget_move.name}.", duration=2000)
-                self.displayMessage("And...", duration=2000)
-                self.displayMessage(f"{pokemon.name} learned {move.name}!", duration=2000)
+                self.display_message("1 2 and... ... Poof!", duration=2000)
+                self.display_message(f"{pokemon.name} forgot how to use {forget_move.name}.", duration=2000)
+                self.display_message("And...", duration=2000)
+                self.display_message(f"{pokemon.name} learned {move.name}!", duration=2000)
 
                 # replace the pokemon's move
                 self.active_pokemon[0].moves[pokemon.moves.index(forget_move)] = move
 
             else:
-                self.displayMessage(f"{pokemon.name} did not learn {move.name}", duration=2000)
+                self.display_message(f"{pokemon.name} did not learn {move.name}", duration=2000)
 
     def wait(self, duration):
         """ Wait for the given time in milliseconds"""
@@ -179,9 +183,9 @@ class Battle:
             if target.health > 0:
                 hitCount += 1
                 if hit == 0:
-                    self.displayMessage(f"{attacker.name} used {move.name}!", displayTime)
+                    self.display_message(f"{attacker.name} used {move.name}!", displayTime)
                 else:
-                    self.displayMessage(None, displayTime)
+                    self.display_message(None, displayTime)
 
                 # Do attack graphics
                 battle_attack = BattleAttack(target=target, move=move, animation_size=self.battle_display.size)
@@ -213,27 +217,27 @@ class Battle:
             if attacker.health > attacker.stats.health:
                 attacker.health = attacker.stats.health
 
-            self.displayMessage(str.format("{} had its energy drained", target.name), 1000)
+            self.display_message(str.format("{} had its energy drained", target.name), 1000)
 
         if target.health > 0:
             if inflictCondition:
                 for condition in StatusCondition:
                     if condition.value.name == inflictCondition:
-                        self.displayMessage(str.format("The wild {} was {}nd", target.name, inflictCondition), 1000)
+                        self.display_message(str.format("The wild {} was {}nd", target.name, inflictCondition), 1000)
                         target.status = condition.value
 
         if damage != 0:
             if crit:
-                self.displayMessage("A critical hit!", effectTime)
+                self.display_message("A critical hit!", effectTime)
 
             if hits != 1:
-                self.displayMessage(str.format("Hit {} times(s)", hitCount), effectTime)
+                self.display_message(str.format("Hit {} times(s)", hitCount), effectTime)
 
             if effective != 1:
                 if effective > 1:
-                    self.displayMessage("It's super effective", effectTime)
+                    self.display_message("It's super effective", effectTime)
                 else:
-                    self.displayMessage("It's not very effective...", effectTime)
+                    self.display_message("It's not very effective...", effectTime)
 
         if target.health > 0:
             if modify:
@@ -302,7 +306,7 @@ class Battle:
                 if limit:
                     descriptor = f"won't go any {'higher' if change > 0 else 'lower'}"
 
-                self.displayMessage(str.format("{}{}'s {} {}", start, modified.name, modify[1], descriptor), 2000)
+                self.display_message(str.format("{}{}'s {} {}", start, modified.name, modify[1], descriptor), 2000)
                 # self.displayMessage(, 10)
                 direction = "raise" if change > 0 else "lower"
                 self.battle_display.render_pokemon_animation(self.game.topSurf, target, f"stat_{direction}", duration=2000)
@@ -311,7 +315,7 @@ class Battle:
 
         self.touch_displays[TouchDisplayStates.team].update_stats()
 
-    def displayMessage(self, text, duration=1000):
+    def display_message(self, text, duration=1000):
         self.battle_display.update_display_text(text)
         self.update_upper_screen()
         self.game.bottomSurf.blit(self.lowerScreenBase, (0, 0))
@@ -352,7 +356,7 @@ class Battle:
 
         frames, duration = 100, 1500
         exp_gain = round(self.foe.getFaintXP())
-        self.displayMessage(f"{self.friendly.name} gained {exp_gain} Exp.", duration=2000)
+        self.display_message(f"{self.friendly.name} gained {exp_gain} Exp.", duration=2000)
         for frame in range(frames):
             self.friendly.exp += exp_gain / frames
             self.battle_display.render_pokemon_details()
@@ -381,7 +385,7 @@ class Battle:
         newStats = self.friendly.stats
         self.friendly.health += newStats.health - prevStats.health
 
-        self.displayMessage(f"{self.friendly.name} grew to Lv. {self.friendly.level}!", duration=duration)
+        self.display_message(f"{self.friendly.name} grew to Lv. {self.friendly.level}!", duration=duration)
         # stat_container = self.battle_display.screens["stats"].get_object("friendly_stats")
 
         for old_stats in [prevStats, None]:
@@ -483,9 +487,14 @@ class Battle:
         if item.type == "Pokeball":
             targetFriendly = False
 
-        self.displayMessage(str.format("Used the {}", item.name), 1000)
+        self.display_message(str.format("Used the {}", item.name), 1000)
 
         target = self.friendly if targetFriendly else self.foe
+
+        count = self.game.bag.data[item.item_type][item] -1
+        self.game.bag.decrement_item(item)
+
+        # self.active_touch_display.update_container(item, count)
 
         if isinstance(item, Pokeball):
             item: Pokeball
@@ -518,19 +527,20 @@ class Battle:
             self.battle_display.catch_animation(3000, check)
 
             if not fail:
-                self.displayMessage(str.format("The wild {} was caught!", target.name), 2000)
+                self.display_message(str.format("The wild {} was caught!", target.name), 2000)
                 target.catchDate = datetime.datetime.now()
                 target.catchLocation = self.catchLocation
                 target.catchLevel = target.level
-                target.health = 0
                 target.friendly = True
                 target.visible = False
                 target.switchImage()
                 self.pokemon_team.pokemon.append(target)
+                self.game.pokedex.data.loc[target.name, "caught"] = True
                 self.running = False
-                return True
+                return BattleOutcome.catch
             else:
                 target.image.set_alpha(255)
+                return False
 
         elif isinstance(item, MedicineItem):
             item: MedicineItem
@@ -541,38 +551,25 @@ class Battle:
                 else:
                     healAmount = item.heal
 
-                self.displayMessage(str.format("{}'s health was restored by {} Points", target.name, int(healAmount)))
+                self.display_message(str.format("{}'s health was restored by {} Points", target.name, int(healAmount)))
 
                 self.reduce_health(target, -healAmount, 100, 10)
 
             if item.status:
                 target.status = None
                 if item.status == "Burned":
-                    self.displayMessage(str.format("{} was cured of its burn", target.name), 1500)
+                    self.display_message(str.format("{} was cured of its burn", target.name), 1500)
                 elif item.status == "Poisoned":
-                    self.displayMessage(str.format("{} was cured of its poison", target.name), 1500)
+                    self.display_message(str.format("{} was cured of its poison", target.name), 1500)
                 elif item.status == "Sleeping":
-                    self.displayMessage(str.format("{} woke up", target.name), 1500)
-
-        count = self.game.bag.data[item.item_type][item] -1
-        self.game.bag.data[item.item_type][item] = count
-
-        if self.game.bag.data[item.item_type][item] == 0:
-            self.game.bag.data[item.item_type].pop(item)
-
-        self.active_touch_display.update_container(item, count)
+                    self.display_message(str.format("{} woke up", target.name), 1500)
 
         return False
 
     def checkKOs(self):
         for pokemon in self.active_pokemon:
-            if pokemon.health <= 0 and pokemon.friendly:
-                print("KO")
-                self.friendlyKO()
-                self.running = False
-                return True
-            elif pokemon.health <= 0:
-                self.wild_ko()
+            if pokemon.health <= 0:
+                self.wild_ko() if pokemon == self.foe else self.wild_ko()
                 self.running = False
                 return True
 
@@ -625,11 +622,11 @@ class Battle:
 
             elif res[0] == "container" and res[1] == "run":
                 if self.friendly.stats.speed > self.foe.stats.speed:
-                    self.displayMessage("Successfully fled the battle", 1500)
+                    self.display_message("Successfully fled the battle", 1500)
                     self.running = False
                     return True
                 else:
-                    self.displayMessage("Couldn't Escape!", 1500)
+                    self.display_message("Couldn't Escape!", 1500)
                     self.battle_display.update_display_text(f"What will {self.friendly.name} do?")
                     return None
 
@@ -682,7 +679,7 @@ class Battle:
                     if (item.heal and self.friendly.health == self.friendly.stats.health) or \
                             (item.status != self.friendly.status):
                         # print(item.status, self.friendly.status)
-                        self.displayMessage("It will have no effect...", 1500)
+                        self.display_message("It will have no effect...", 1500)
                         self.battle_display.update_display_text(f"What will {self.friendly.name} do?")
                         self.update_screen()
                     else:
@@ -706,6 +703,7 @@ class Battle:
                 return pokemon
 
         action = None
+        pg.event.clear()
         while not action:
             for event in pg.event.get():
                 if event.type == pg.MOUSEBUTTONDOWN:
@@ -740,13 +738,15 @@ class Battle:
                 self.attack(attacker=pokemon, target=self.friendly, move=action)
 
         elif isinstance(action, Item):
-            self.use_item(action, targetFriendly=True)
+            res = self.use_item(action, targetFriendly=True)
+            if res:
+                return res
 
         elif isinstance(action, Pokemon):
             self.tag_in_teammate(action)
 
     def tag_in_teammate(self, teammate: Pokemon):
-        self.displayMessage(f"{self.active_pokemon[0].name} switch out", duration=1000)
+        self.display_message(f"{self.active_pokemon[0].name} switch out", duration=1000)
         # self.battle_display.update_display_text()
         tag_in = BattleTagIn(animation_size=self.screenSize)
         self.battle_display.bounce_friendly_stat = False
@@ -786,22 +786,13 @@ class Battle:
             # self.battle_display.text = f"What will {self.friendly.name} do?"
             friendlyAction = self.select_action()
 
-            moveIdx = randint(0, len(self.foe.moves) - 1)
-            foeAction = self.foe.moves[moveIdx]
+            # process non-fighting moves
+            if isinstance(friendlyAction, Pokemon):
+                ...
 
-            speeds = []
-            for pokemon in self.active_pokemon:
-                speed = pokemon.stats.speed
-                speeds.append(speed)
+            foeAction = self.foe.moves[randint(0, len(self.foe.moves) - 1)]
 
-            speeds.sort(reverse=True)
-
-            order = []
-
-            for speed in speeds:
-                for pokemon in self.active_pokemon:
-                    if pokemon.stats.speed == speed:
-                        order.append(pokemon)
+            order = sorted(self.active_pokemon, key=lambda pk: pk.stats.speed, reverse=True)
 
             if type(friendlyAction) == bool:
                 end = friendlyAction
@@ -811,12 +802,10 @@ class Battle:
             for pokemon in order:
                 if not end:
                     if pokemon.health > 0:
-                        if pokemon.friendly:
-                            self.take_turn(pokemon, friendlyAction)
-                        else:
-                            self.take_turn(pokemon, foeAction)
+                        res = self.take_turn(pokemon, friendlyAction if pokemon.friendly else foeAction)
+                        if res == BattleOutcome.catch:
+                            end = True
                     # check if both Pokémon are still alive
-
                     if self.checkKOs():
                         end = True
 
@@ -828,7 +817,7 @@ class Battle:
                             self.reduce_health(pokemon, pokemon.status.damage * pokemon.stats.health, 100, 10)
                         elif type(pokemon.status) == Poison:
                             pokemon.health -= pokemon.status.damage * pokemon.stats.health
-                            self.displayMessage(str.format("{} is hurt by its poison", pokemon.name), 1000)
+                            self.display_message(str.format("{} is hurt by its poison", pokemon.name), 1000)
 
             if not end:
                 self.checkKOs()
@@ -868,7 +857,7 @@ class Battle:
 
 if __name__ == '__main__':
     from game import Game
-    from bag import Bag, BagV2
+    from bag import BagV2
     import json
 
     pg.init()
@@ -882,6 +871,6 @@ if __name__ == '__main__':
 
     demo_game.bag = BagV2(bag_data)
 
-    battle = Battle(demo_game, route_name="Route 201", wild_name="Abra", wildLevel=3, pickleData=None)
+    battle = Battle(demo_game, route_name="Route 201", wild_name="Abra", wildLevel=5)
 
     battle.loop()

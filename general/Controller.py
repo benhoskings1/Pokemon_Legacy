@@ -12,3 +12,5 @@ class Controller:
         self.down = down
         self.left = left
         self.right = right
+
+        self.keys = [a, b, x, up, down, left, right]

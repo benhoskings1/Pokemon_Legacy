@@ -179,7 +179,6 @@ class PokemonContainerTeam(DisplayContainer):
 
             self.sprites.add(self.small_sprite)
 
-        self.image = self.get_surface()
         self.img_update = time.monotonic()
         self.image_idx = 0
 
