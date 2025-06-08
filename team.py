@@ -1,12 +1,11 @@
 import time
 import pygame as pg
-from displays.team_display_battle import TeamDisplay, PartyAction
 from pokemon import Pokemon
 
 
 class Team:
     def __init__(self, data, display_size=pg.Vector2(480, 360)):
-        self.pokemon = []
+        self.pokemon = list()
         for pkData in data:
             pokemon = Pokemon(**pkData)
             self.pokemon.append(pokemon)
@@ -15,6 +14,13 @@ class Team:
         self.display_running = False
 
         self.active_index = 0
+
+    def __len__(self):
+        return len(self.pokemon)
+
+    def __iter__(self):
+        for pokemon in self.pokemon:
+            yield pokemon
 
     def get_active_pokemon(self):
         return self.pokemon[self.active_index]

@@ -6,9 +6,41 @@ import pickle
 import pandas as pd
 import numpy as np
 import pygame as pg
+from enum import Enum
 
 # from pokemon import pokedex
 from Image_Processing.ImageEditor import ImageEditor
+
+
+def clean_surfaces(obj, _path='root'):
+    if isinstance(obj, pg.Surface):
+        print(f"[clean_surfaces] Replacing Surface at: {_path}")
+        return None
+    elif isinstance(obj, Enum):
+        return obj  # ✅ Skip Enums
+    elif isinstance(obj, dict):
+        return {
+            k: clean_surfaces(v, f"{_path}.{k}")
+            for k, v in obj.items()
+        }
+    elif isinstance(obj, list):
+        return [
+            clean_surfaces(v, f"{_path}[{i}]")
+            for i, v in enumerate(obj)
+        ]
+    elif hasattr(obj, '__dict__'):
+        cls = obj.__class__
+        try:
+            new_obj = cls.__new__(cls)
+        except TypeError:
+            print(f"[clean_surfaces] WARNING: Could not create instance of {cls} at {_path}. Leaving as-is.")
+            return obj
+        for attr, val in vars(obj).items():
+            cleaned_val = clean_surfaces(val, f"{_path}.{attr}")
+            setattr(new_obj, attr, cleaned_val)
+        return new_obj
+    else:
+        return obj
 
 
 with open("game_data/Pokedex/LocalDex/LocalDex.pickle", 'rb') as file:
@@ -74,10 +106,6 @@ def load_gif(gif_path: str, bit_mask=None, opacity=255, scale=1) -> list[pg.Surf
     return frames
 
 
-def get_IV_range(name: str, level: int, values: list[int]) -> list[int]:
-    data = pokedex.loc[name]
-
-
 class Colours(Enum):
     clear = pg.SRCALPHA
     white = pg.Color(255, 255, 255)
@@ -89,5 +117,3 @@ class Colours(Enum):
     shadow = pg.Color(180, 180, 180)
 
 
-if __name__ == "__main__":
-    print(get_IV_range("Piplup", 11, [14, 13, 16, 18, 18]))

@@ -3,12 +3,12 @@ from enum import Enum
 
 import pygame as pg
 
+import team
 from pokemon import Pokemon, getImages
 from general.utils import Colours
 from screen_V2 import FontOption, BlitLocation
 from sprite_screen import SpriteScreen, DisplayContainer, GameObjects
 from pokemon import PokemonSpriteSmall
-
 
 CONTAINER_POSITIONS = [(1, 3), (129, 12), (1, 52), (129, 60), (1, 100), (129, 108)]
 
@@ -20,6 +20,7 @@ class MenuTeamDisplayStates(Enum):
     trainer_memo = 2
     pokemon_skills = 3
     battle_moves = 4
+    exit = 6
 
 
 class PokemonSummaryStates(Enum):
@@ -38,7 +39,7 @@ class PokemonContainer(DisplayContainer):
 
         DisplayContainer.__init__(
             self, f"assets/containers/menu/team/pokemon_container_{container_type}{selected_ext}.png",
-            pokemon, pos if not selected else pg.Vector2(pos) - pg.Vector2(0, 2)*scale, scale=scale
+            pokemon, pos if not selected else pg.Vector2(pos) - pg.Vector2(0, 2) * scale, scale=scale
         )
 
         self.pokemon = pokemon
@@ -48,11 +49,13 @@ class PokemonContainer(DisplayContainer):
         if pokemon:
             self.small_sprite = PokemonSpriteSmall(pokemon.small_animation)
             self.small_sprite.rect.center = pg.Vector2(28, 19) * self.scale
-            self.addText(pokemon.name, pg.Vector2(47, 9) * self.scale, base=True, colour=Colours.white.value, shadowColour=Colours.darkGrey.value,)
+            self.addText(pokemon.name, pg.Vector2(47, 9) * self.scale, base=True, colour=Colours.white.value,
+                         shadowColour=Colours.darkGrey.value, )
             self.addText(f"{pokemon.health}/{pokemon.stats.health}", pg.Vector2(72, 32) * self.scale,
-                         colour=Colours.white.value,shadowColour=Colours.white.value, fontOption=FontOption.level)
+                         colour=Colours.white.value, shadowColour=Colours.white.value, fontOption=FontOption.level)
             self.addText(f"Lv{pokemon.level}", pg.Vector2(12, 32) * self.scale,
-                         colour=Colours.white.value, shadowColour=Colours.white.value, fontOption=FontOption.level, base=True,)
+                         colour=Colours.white.value, shadowColour=Colours.white.value, fontOption=FontOption.level,
+                         base=True, )
 
             self.sprites.add(self.small_sprite)
 
@@ -84,15 +87,15 @@ class PokemonContainer(DisplayContainer):
 class PokemonInfoContainer(DisplayContainer):
     def __init__(self, scale=1):
         DisplayContainer.__init__(
-            self,"assets/containers/menu/team/info_container.png", PokemonSummaryStates.info, (104, 30),
+            self, "assets/containers/menu/team/info_container.png", PokemonSummaryStates.info, (104, 30),
             scale=scale
         )
 
         labels = ["Pokedex No.", "Name", "Type", "OT", "ID No.", "Exp. Points", "", "To Next Lv."]
         for idx, label in enumerate(labels):
             self.add_text_2(
-                label, pg.Rect(pg.Vector2(8, 13 + 16*idx) * self.scale, pg.Vector2(80, 12)*self.scale),
-                colour=Colours.white, shadow_colour=Colours.darkGrey, base=True
+                label, pg.Rect(pg.Vector2(8, 13 + 16 * idx) * self.scale, pg.Vector2(80, 12) * self.scale),
+                colour=Colours.white, shadow_colour=Colours.darkGrey, base=True, sep=0
             )
 
     def load_pokemon_details(self, pokemon: Pokemon):
@@ -100,8 +103,8 @@ class PokemonInfoContainer(DisplayContainer):
                   f"{pokemon.exp}", "", f"{pokemon.level_up_exp - pokemon.exp}"]
         for idx, value in enumerate(values):
             self.addText(
-                value, pg.Vector2(pg.Vector2(112, 13 + 16 * idx))* self.scale,
-                colour=Colours.black.value, shadowColour=Colours.lightGrey.value, base=True, location=BlitLocation.midTop
+                value, pg.Vector2(pg.Vector2(112, 13 + 16 * idx)) * self.scale,
+                colour=Colours.black.value, shadowColour=Colours.lightGrey.value, location=BlitLocation.midTop,
             )
 
 
@@ -143,7 +146,8 @@ class MenuTeamDisplayHome(SpriteScreen):
 
         self.get_object(self.pk_containers[selected_idx].pokemon).kill()
         selected_container = PokemonContainer(
-            self.team.pokemon[selected_idx], CONTAINER_POSITIONS[selected_idx], primary=selected_idx == 0, selected=True,
+            self.team.pokemon[selected_idx], CONTAINER_POSITIONS[selected_idx], primary=selected_idx == 0,
+            selected=True,
             scale=self.scale
         )
         self.sprites.add(selected_container)
@@ -151,7 +155,7 @@ class MenuTeamDisplayHome(SpriteScreen):
 
         self.refresh()
 
-    def process_input(self, key, controller) -> None | Pokemon | str:
+    def process_input(self, key, controller) -> None | Pokemon | MenuTeamDisplayStates:
         """
         Process a user input.
 
@@ -164,7 +168,7 @@ class MenuTeamDisplayHome(SpriteScreen):
             print(repr(self.pk_containers[self.selected_idx].pokemon))
             return self.pk_containers[self.selected_idx].pokemon
         elif key == controller.b:
-            return "back"
+            return MenuTeamDisplayStates.exit
 
         # ======= Move Selector ========
         elif self.selected_idx is None:
@@ -179,27 +183,78 @@ class MenuTeamDisplayHome(SpriteScreen):
 
 
 class MenuTeamDisplaySummary(SpriteScreen):
-    def __init__(self, size, pokemon, scale=1):
+    def __init__(self, size, team, scale=1):
         SpriteScreen.__init__(self, size)
         self.scale = scale
-        self.pokemon = pokemon
+        self.team = team
 
         self.load_image("assets/menu/team/summary_background.png", base=True, scale=scale)
 
-        front_image, _, _ = getImages(pokemon.ID, crop=False)
-        self.add_image(front_image, pg.Vector2(53, 106)*self.scale, base=True, location=BlitLocation.centre)
+        self.addText(
+            "POKeMON INFO", pg.Vector2(pg.Vector2(8, 3)) * self.scale,
+            colour=Colours.white.value, shadowColour=Colours.darkGrey.value, base=True
+        )
+
+        self.addText(
+            "Item", pg.Vector2(pg.Vector2(9, 163)) * self.scale,
+            colour=Colours.white.value, shadowColour=Colours.darkGrey.value, base=True
+        )
+
+        self.addText(
+            "Lv", pg.Vector2(pg.Vector2(12, 46)) * self.scale,
+            colour=Colours.white.value, shadowColour=Colours.darkGrey.value, base=True, fontOption=FontOption.level
+        )
+
+        self.load_image("assets/menu/team/pokeball.png", pg.Vector2(8, 25) * self.scale, base=True, scale=scale)
 
         self.containers = {
             PokemonSummaryStates.info: PokemonInfoContainer(scale=scale),
         }
 
-        for container in self.containers.values():
-            container.load_pokemon_details(pokemon)
-
         self.sprites.add(self.containers[PokemonSummaryStates.info])
 
+        self.load_pokemon_details(team.pokemon[0])
+
+        self.selected_idx = 0
+
+    def load_pokemon_details(self, pokemon: Pokemon):
+        self.refresh()
+
+        front_image, _, _ = getImages(pokemon.ID, crop=False)
+
+        self.addText(
+            pokemon.name.upper(), pg.Vector2(pg.Vector2(24, 27)) * self.scale,
+            colour=Colours.white.value, shadowColour=Colours.darkGrey.value
+        )
+        self.addText(f"{pokemon.level}", pg.Vector2(25, 43) * self.scale)
+        self.add_image(front_image, pg.Vector2(52, 104) * self.scale, location=BlitLocation.centre)
+        self.load_image(f"assets/general/{pokemon.gender}.png", pos=pg.Vector2(90, 27) * self.scale, scale=self.scale)
+        self.addText("None" if pokemon.item is None else pokemon.item.name, pg.Vector2(8, 179) * self.scale)
+
+        for container in self.containers.values():
+            container.refresh()
+            container.load_pokemon_details(pokemon)
+
     def process_input(self, key, controller):
-        ...
+        # ======= Processing Functions ========
+        if key == controller.a:
+            ...
+
+        elif key == controller.b:
+            return MenuTeamDisplayStates.home
+
+        # ======= Move Selector ========
+        # elif self.selected_idx is None:
+        #     self.update_containers(selected_idx=0)
+        #
+        elif key == controller.down:
+            self.selected_idx = (self.selected_idx + 1) % len(self.team)
+            self.load_pokemon_details(self.team.pokemon[self.selected_idx])
+            # self.update_containers(min([self.selected_idx + 1, len(self.sprites) - 1]))
+        # elif key == controller.up:
+        #     self.update_containers(max([self.selected_idx - 1, 0]))
+
+        return None
 
 
 class MenuTeamDisplay:
@@ -208,11 +263,13 @@ class MenuTeamDisplay:
 
         self.displays = {
             MenuTeamDisplayStates.home: MenuTeamDisplayHome(size, scale, game.team),
-            MenuTeamDisplayStates.summary: MenuTeamDisplaySummary(size, game.team.pokemon[0], scale=scale),
+            MenuTeamDisplayStates.summary: MenuTeamDisplaySummary(size, game.team, scale=scale),
         }
 
         self.active_display_state = MenuTeamDisplayStates.home
-        self.active_display = self.displays[self.active_display_state ]
+        self.active_display = self.displays[self.active_display_state]
+
+        self.selected_idx = None
 
     def update_display(self):
         self.game.topSurf.blit(self.active_display.get_surface(), (0, 0))
@@ -228,15 +285,20 @@ class MenuTeamDisplay:
                     if event.key in controller.keys:
                         action = self.active_display.process_input(event.key, controller)
 
+                        if isinstance(action, MenuTeamDisplayStates):
+                            if action == MenuTeamDisplayStates.exit:
+                                return None
+                            elif action == MenuTeamDisplayStates.home:
+                                self.displays[action].selected_idx = self.active_display.selected_idx
+                                self.displays[action].update_containers(selected_idx=self.active_display.selected_idx)
+                            # self.active_display.load_pokemon_details(action)
+                            self.active_display = self.displays[action]
+
                         if isinstance(action, Pokemon):
                             self.active_display = self.displays[MenuTeamDisplayStates.summary]
-
-                        elif action == "back":
-                            return None
+                            self.active_display.selected_idx = self.game.team.get_index(action)
+                            self.active_display.load_pokemon_details(action)
+                            # for container in self.active_display.containers.values():
+                            #     container.load_pokemon_details(action)
 
             self.update_display()
-
-
-
-
-

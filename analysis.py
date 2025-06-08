@@ -212,7 +212,7 @@ def convertToJson2(tiers):
     print(allObjects)
 
 
-# game = Game(1.5, fromPickle=True)
+# game = Game(1.5, from_pickle=True)
 # data = jsonTier(game.player, "player")
 #
 # with open("Analysis.json", "w") as write_file:

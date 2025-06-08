@@ -60,7 +60,7 @@ class Player(pg.sprite.Sprite):
         self.walkingSpriteSet = None
         self.runningSpriteSet = None
 
-    def loadSurfaces(self, spritePath: os.PathLike):
+    def loadSurfaces(self, spritePath: str | os.PathLike):
 
         self.walkingSpriteSet = SpriteSet2(os.path.join(spritePath, "Walking Sprites.png"),
                                            12, pg.Vector2(34, 50), pg.Vector2(0, 0))

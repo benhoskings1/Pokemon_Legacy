@@ -100,7 +100,6 @@ class PokedexDisplayInfo(SpriteScreen):
         name = oldPokedex.loc[oldPokedex["ID"] == self.pokedex_display.pokemon_idx].index.values[0]
         data = self.pokedex.data.loc[name]
 
-        print(self.pokedex.national_dex.index)
         species = self.pokedex.national_dex.loc[name, "Species"]
         container = NameContainer2(self.pokedex_display.pokemon_idx, name, species, pg.Vector2(107, 22), scale=self.scale)
 

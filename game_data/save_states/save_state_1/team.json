@@ -1,8 +1,8 @@
 [
     {
         "Name": "Piplup",
-        "Level": 11,
-        "XP": 794,
+        "Level": 5,
+        "XP": 135,
         "Move_Names": [
             "Pound",
             "Growl",
@@ -10,18 +10,18 @@
         ],
         "Move_PPs": [
             35,
-            40,
-            27
+            28,
+            30
         ],
-        "Health": 31,
+        "Health": 20,
         "Status": null,
         "EVs": [
-            14,
-            4,
-            5,
-            1,
             0,
-            12
+            0,
+            0,
+            0,
+            0,
+            0
         ],
         "IVs": [
             31,
@@ -31,9 +31,9 @@
             31,
             31
         ],
-        "Gender": "Male",
-        "Nature": "Bold",
-        "ability_name": "Defiant",
+        "Gender": "male",
+        "Nature": "Hasty",
+        "ability_name": "Torrent",
         "KO": false,
         "Stat_Stages": {
             "attack": 0,
@@ -47,7 +47,7 @@
         "Friendly": true,
         "Shiny": true,
         "Visible": true,
-        "Catch_Date": "2025-06-01",
+        "Catch_Date": "2025-06-08",
         "Catch_Location": null,
         "Catch_Level": 5
     },
@@ -61,7 +61,7 @@
         ],
         "Move_PPs": [
             35,
-            30
+            28
         ],
         "Health": 19,
         "Status": null,
@@ -81,8 +81,8 @@
             31,
             31
         ],
-        "Gender": "Male",
-        "Nature": "Quiet",
+        "Gender": "female",
+        "Nature": "Quirky",
         "ability_name": "Blaze",
         "KO": false,
         "Stat_Stages": {
@@ -97,106 +97,8 @@
         "Friendly": true,
         "Shiny": true,
         "Visible": true,
-        "Catch_Date": "2025-06-01",
+        "Catch_Date": "2025-06-08",
         "Catch_Location": null,
         "Catch_Level": 5
-    },
-    {
-        "Name": "Starly",
-        "Level": 3,
-        "XP": 57,
-        "Move_Names": [
-            "Growl",
-            "Tackle"
-        ],
-        "Move_PPs": [
-            40,
-            35
-        ],
-        "Health": 15,
-        "Status": null,
-        "EVs": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-        ],
-        "IVs": [
-            29,
-            22,
-            29,
-            4,
-            7,
-            20
-        ],
-        "Gender": "Male",
-        "Nature": "Rash",
-        "ability_name": "Reckless",
-        "KO": false,
-        "Stat_Stages": {
-            "attack": 0,
-            "defence": 0,
-            "spAttack": 0,
-            "spDefence": 0,
-            "speed": 0,
-            "accuracy": 0,
-            "evasion": 0
-        },
-        "Friendly": true,
-        "Shiny": false,
-        "Visible": true,
-        "Catch_Date": "2025-06-02",
-        "Catch_Location": "Route 202",
-        "Catch_Level": 3
-    },
-    {
-        "Name": "Shinx",
-        "Level": 3,
-        "XP": 57,
-        "Move_Names": [
-            "Tackle"
-        ],
-        "Move_PPs": [
-            35
-        ],
-        "Health": 15,
-        "Status": null,
-        "EVs": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-        ],
-        "IVs": [
-            1,
-            23,
-            30,
-            23,
-            18,
-            25
-        ],
-        "Gender": "Male",
-        "Nature": "Naive",
-        "ability_name": "Guts",
-        "KO": false,
-        "Stat_Stages": {
-            "attack": 0,
-            "defence": 0,
-            "spAttack": 0,
-            "spDefence": 0,
-            "speed": 0,
-            "accuracy": 0,
-            "evasion": 0
-        },
-        "Friendly": true,
-        "Shiny": false,
-        "Visible": true,
-        "Catch_Date": "2025-06-02",
-        "Catch_Location": "Route 202",
-        "Catch_Level": 3
     }
 ]

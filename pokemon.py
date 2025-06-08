@@ -259,12 +259,12 @@ class Pokemon(pg.sprite.Sprite):
         self.friendly = Friendly
 
         if Gender:
-            self.gender = Gender
+            self.gender = Gender.lower()
         else:
             genders = data.Gender
             if genders:
                 num = random() * 100
-                self.gender = "Male" if num < genders[0] else "female"
+                self.gender = "male" if num < genders[0] else "female"
             else:
                 self.gender = None
 

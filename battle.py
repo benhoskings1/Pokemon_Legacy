@@ -11,15 +11,12 @@ from displays.battle.battle_display_main import BattleDisplayMain, LevelUpBox
 from displays.battle.battle_display_touch import *
 from displays.battle.learn_move_display import LearnMoveDisplay
 
-# from displays.EvolveDisplay import EvolveDisplay
-# from displays.LearnMove import LearnMoveDisplay, LearnAction
-from displays.team_display_battle import PartyAction
 from general.utils import *
 from general.Animations import createAnimation
 from general.Condition import StatusCondition
 from general.Environment import Environment
 from general.Image import Image
-from general.Item import Item, Pokeball, MedicineItem, medicine
+from general.Item import Item, Pokeball, MedicineItem
 from general.Move import Move2
 from general.Route import Route
 from general.Status_Conditions.Burn import Burn
@@ -866,7 +863,7 @@ if __name__ == '__main__':
     with open("test_data/bag/test_bag.json", "r") as read_file:
         bag_data = json.load(read_file)
 
-    demo_game = Game(scale=1, fromPickle=False, overwrite=False, optimize=False)
+    demo_game = Game(scale=1, from_pickle=False, overwrite=False, optimize=False)
     print("game loaded")
 
     demo_game.bag = BagV2(bag_data)

@@ -2,6 +2,8 @@ import json
 import os
 import pickle
 import random
+import shutil
+import warnings
 from datetime import datetime
 
 import pandas as pd
@@ -22,7 +24,7 @@ from general.Time import Time
 from displays.game_display import GameDisplay, GameDisplayStates
 from displays.menu.menu_display_team import MenuTeamDisplay
 
-from Map_Files.TiledMap import TiledMap
+from Map_Files.TiledMap import TiledMapLegacy
 from player import Player, Movement
 from pokemon import Pokemon
 from Poketech.Poketech import Poketech
@@ -33,15 +35,15 @@ pokedex = pd.read_csv("game_data/Pokedex/Local Dex.tsv", delimiter='\t', index_c
 
 
 class Game:
-    def __init__(self, scale, optimize=False, new=False, fromPickle=False, overwrite=False, save_slot=1):
+    def __init__(self, scale, optimize=False, new=False, overwrite=False, save_slot=1):
 
         self.overwrite: bool = overwrite
         self.save_slot: int = save_slot
 
         if new:
-            self.dataPath = "game_data/Save States/Start"
+            self.data_path = "game_data/Save States/Start"
         else:
-            self.dataPath = f"game_data/save_states/save_state_{save_slot}"
+            self.data_path = f"game_data/save_states/save_state_{save_slot}"
 
         self.running = True
 
@@ -62,11 +64,11 @@ class Game:
                                                   (self.displaySize.x, self.displaySize.y / 2)))
         self.bottomSurf.fill(Colours.white.value)
         self.loadDisplay = LoadDisplay(self.topSurf.get_size())
-        self.map = TiledMap("Map_Files/Sinnoh Map.tmx", scale=scale)
+        self.map = TiledMapLegacy("Map_Files/Sinnoh Map.tmx", scale=scale)
 
         self.animations = {}
 
-        with open(os.path.join(self.dataPath, "team.json"), "r") as read_file:
+        with open(os.path.join(self.data_path, "team.json"), "r") as read_file:
             # Convert JSON file to Python Types
             teamData = json.load(read_file)
 
@@ -88,7 +90,7 @@ class Game:
 
         self.team.pokemon = self.team.pokemon
 
-        with open(os.path.join(self.dataPath, "bag.json"), "r") as read_file:
+        with open(os.path.join(self.data_path, "bag.json"), "r") as read_file:
             # Convert JSON file to Python Types
             bagData = json.load(read_file)
 
@@ -97,12 +99,12 @@ class Game:
         spriteDirectory = "Sprites/Pokemon Sprites/Gen IV 2"
         gameData = None
 
-        if fromPickle and not os.path.exists(os.path.join(self.dataPath, "game.pickle")):
+        if not new and not os.path.exists(os.path.join(self.data_path, "game.pickle")):
             print("No pickle data not present / corrupted")
 
-        if fromPickle and os.path.exists(os.path.join(self.dataPath, "game.pickle")):
+        if not new and os.path.exists(os.path.join(self.data_path, "game.pickle")):
             print("loading game")
-            gameFile = open(os.path.join(self.dataPath, "game.pickle"), 'rb')
+            gameFile = open(os.path.join(self.data_path, "game.pickle"), 'rb')
             gameData = pickle.load(gameFile, encoding='bytes')
 
             # update player with the Surfaces
@@ -117,12 +119,7 @@ class Game:
             self.poketech.loadSurfaces(self.time)
 
             # update each of the Pokémon with their surfaces
-
-            if gameData.battle:
-                self.battle = Battle(self, pickleData=gameData.battle)
-            else:
-                self.battle = None
-
+            self.battle = Battle(self, pickleData=gameData.battle) if gameData.battle else None
             self.appearances = gameData.appearances
 
         else:
@@ -186,8 +183,7 @@ class Game:
 
         self.fadeToBlack(500)
 
-    def createPokemon(self, name, friendly=False, level=None, exp=None, moveNames=None, EVs=None, IVs=None, shiny=None,
-                      appearance=True, location=None):
+    def createPokemon(self, name, friendly=False, level=None, exp=None, moveNames=None, EVs=None, IVs=None, shiny=None,):
 
         if not friendly:
             self.pokedex.data.loc[name, "appearances"] += 1
@@ -469,7 +465,7 @@ class Game:
             pg.event.pump()
 
     def save(self):
-        # save_temp = f"game_data/save_states/save_{self.save_slot}"
+        # save_temp = f"game_data/save_states/save_{self.save_slot}_temp"
         save_dir = f"game_data/save_states/save_state_{self.save_slot}"
         if not os.path.exists(save_dir):
             os.mkdir(save_dir)
@@ -503,9 +499,14 @@ class Game:
                 self.battle = None
                 # self.battle.clearSurfaces()
 
-            with open(os.path.join(save_dir, "game.pickle"), 'wb') as f:
+            with open(os.path.join(save_dir, "game_temp.pickle"), 'wb') as f:
                 pickle.dump(self, f)
                 print("Successfully pickled")
+                shutil.copyfile(
+                    os.path.join(save_dir, "game_temp.pickle"),
+                    os.path.join(save_dir, "game.pickle")
+                )
+                os.remove(os.path.join(save_dir, "game_temp.pickle"))
 
             # can
             # for root, dirs, files in os.walk("game_data/Save States/Current Game", topdown=False):
@@ -517,11 +518,5 @@ class Game:
             # os.rename("game_data/Save States/Save Test", "game_data/Save States/Current Game")
 
         except TypeError as e:
+            warnings.warn("Pickle Failed...\nThe data was not overwritten")
             raise e
-            print("Pickle Failed")
-            print("The data was not overwritten")
-            # for root, dirs, files in os.walk("game_data/Save States/Save Test", topdown=False):
-            #     for name in files:
-            #         os.remove(os.path.join(root, name))
-            #     for name in dirs:
-            #         os.rmdir(os.path.join(root, name))

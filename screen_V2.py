@@ -1,10 +1,9 @@
-import math
 from enum import Enum
 
 import pygame as pg
-import pygame.freetype
-import pygame.surface
 from font.font import LevelFont, Font
+
+from general.utils import clean_surfaces
 
 
 class Colours(Enum):
@@ -47,17 +46,6 @@ class BlitPosition(Enum):
     centre = 8
 
 
-# class Fonts:
-#     def __init__(self):
-#         self.large = pg.font.font("font/calibri-regular.ttf", 50)
-#         self.normal = pg.font.font("font/calibri-regular.ttf", 30)
-#         self.small = pg.font.font("font/calibri-regular.ttf", 15)
-#         self.custom = self.normal
-#
-#     def update_custom(self, size):
-#         self.custom = pg.font.font("font/calibri-regular.ttf", size=size)
-
-
 fonts = {"Main": Font(2), "Level": LevelFont(2)}
 
 
@@ -72,25 +60,26 @@ class Screen:
         self.base_surface = pg.Surface(size, pg.SRCALPHA)
         self.surface = pg.Surface(size, pg.SRCALPHA)
         self.sprite_surface = pg.Surface(size, pg.SRCALPHA)
-        if font:
-            self.fonts = FontOption
-            self.font: pg.font.Font = font
-        else:
-            self.fonts = FontOption
-            self.font = self.fonts.main
+
+        self.fonts = FontOption
+        self.font: pg.font.Font = font if font else self.fonts.main
 
         if colour:
-            if not type(colour) == pg.Color:
-                colour = colour.value
+            colour = colour.value if not isinstance(colour, pg.Color) else colour
+            self.base_surface.fill(colour)
 
         self.colour = colour
-        if colour:
-            self.base_surface.fill(colour)
 
         self.power_off = False
 
         self.power_off_surface = pg.Surface((self.size.x, self.size.y), pg.SRCALPHA)
         self.power_off_surface.fill(Colours.white.value)
+
+    def __getstate__(self):
+        self.font, self.fonts = None, None
+        print("[__getstate__] Cleaning surfaces before pickling...")
+        # return clean_surfaces(self)
+        return None
 
     def add_surf(self, surf: pg.Surface, pos=(0, 0), base=False, location=BlitLocation.topLeft, sprite=False):
         surf_rect = pg.Rect(pos, surf.get_size())
@@ -112,7 +101,8 @@ class Screen:
         else:
             self.surface.blit(surf, surf_rect.topleft)
 
-    def load_image(self, path, pos=(0, 0), fill=False, base=False, size=None, scale: int | list[int, int] | tuple[int, int] | pg.Vector2 = None,
+    def load_image(self, path, pos=(0, 0), fill=False, base=False, size=None,
+                   scale: int | list[int, int] | tuple[int, int] | pg.Vector2 = None,
                    location=BlitLocation.topLeft):
 
         if isinstance(scale, float) or isinstance(scale, int):
@@ -170,95 +160,23 @@ class Screen:
         else:
             surf.blit(image, pos)
 
-    def add_text_2(self, text:str, text_box: pg.Rect, font_option: FontOption = FontOption.main,
+    def add_text_2(self, text: str, text_box: pg.Rect, font_option: FontOption = FontOption.main,
                    colour: Colours | pg.Color = None, shadow_colour: Colours | pg.Color = None,
-                   max_chars=None, base=False) -> None | bool:
+                   max_chars=None, sep=1, base=False) -> None | bool:
 
         if len(text) == 0:
             return False
 
         self.font = font_option.value
         text_surf, text_box = self.font.render_text_2(
-            text, text_box, colour=colour, shadow_colour=shadow_colour, max_chars=max_chars
+            text, text_box, colour=colour, shadow_colour=shadow_colour, max_chars=max_chars, sep=sep
         )
 
         blit_surf = self.base_surface if base else self.surface
         blit_surf.blit(text_surf, text_box.topleft)
 
-    def add_multiline_text(self, text, rect, location=BlitLocation.topLeft, center_horizontal=False,
-                           center_vertical=False,
-                           colour=None, bg_colour=None, font_size=None, font_option: FontOption = None, border_width=2,
-                           base=False):
-        rect: pg.Rect
-
-        if font_option:
-            self.font = font_option.value
-
-        if colour is None:
-            colour = Colours.hero_blue
-
-        ids = [0]
-        line_width = 0
-        for idx, word in enumerate(text.split(" ")):
-            if word == "\n":
-                ids.append(idx)
-                line_width = 0
-            else:
-                width = self.font.size(word + " ")[0]
-                if line_width + self.font.size(word)[0] > rect.width - border_width * 2:
-                    ids.append(idx)
-                    line_width = width
-                else:
-                    line_width += width
-        ids.append(len(text.split(" ")))
-
-        height, gap = 0, 10
-        text_surfs = []
-        for line in range(len(ids) - 1):
-            line_words = text.replace("\n ", "").split(" ")[ids[line]:ids[line + 1]]
-            line_text_surf = self.font.render(" ".join(line_words), True, colour.value)
-
-            text_surfs.append(line_text_surf)
-
-            height += line_text_surf.get_height() + gap  # cumulative height with 5px padding
-
-        text_surf = pg.Surface(rect.size, pg.SRCALPHA)
-        if bg_colour:
-            text_surf.fill(bg_colour.value)
-        total_height = sum([surf.get_height() for surf in text_surfs])
-        total_height += gap * (len(text_surfs) - 1)
-        if center_vertical:
-            y_offset = (rect.h - total_height) / 2
-        else:
-            y_offset = border_width
-
-        for idx, surf in enumerate(text_surfs):
-            if center_horizontal:
-                text_surf.blit(surf, ((rect.width - surf.get_width()) / 2, y_offset + idx * (surf.get_height() + gap)))
-            else:
-                text_surf.blit(surf, (border_width, y_offset + idx * (surf.get_height() + gap)))
-
-        blitPos = rect.topleft
-        size = rect.size
-
-        # pg.draw.rect(self.surface, Colours.red.value, rect, width=5)
-
-        if location == BlitLocation.centre:
-            blitPos -= size / 2
-        elif location == BlitLocation.topRight:
-            blitPos -= pg.Vector2(size.x, 0)
-        elif location == BlitLocation.midTop:
-            blitPos -= pg.Vector2(size.x / 2, 0)
-
-        elif base:
-            self.base_surface.blit(text_surf, blitPos)
-        else:
-            self.surface.blit(text_surf, blitPos)
-
-        self.font = self.fonts.normal
-
     def addText(self, text, pos, lines=1, location=BlitLocation.topLeft, base=False, colour=None,
-                shadowColour=None, fontOption: FontOption = FontOption.main, surface=None):
+                shadowColour=None, fontOption: FontOption = FontOption.main, surface=None,):
         if len(text) == 0:
             return False
 
@@ -270,7 +188,7 @@ class Screen:
             else:
                 textSurf = self.font.render_text(text, lineCount=lines, colour=colour)
         else:
-            textSurf = self.font.render_text(text, lineCount=lines)
+            textSurf = self.font.render_text(text, lineCount=lines,)
         blitPos = pos
         size = pg.Vector2(textSurf.get_size())
         if location == BlitLocation.centre:
@@ -313,12 +231,6 @@ class Screen:
         display_surf.blit(self.sprite_surface, (0, 0))
 
         return display_surf
-
-    def scale_surface(self, scale, base=False):
-        self.size = pg.Vector2(self.base_surface.get_size()) * scale
-        self.surface = pg.transform.scale(self.surface, pg.Vector2(self.surface.get_size()) * scale)
-        if base:
-            self.base_surface = pg.transform.scale(self.base_surface, pg.Vector2(self.base_surface.get_size()) * scale)
 
 
 class GameButton(pg.sprite.Sprite):
