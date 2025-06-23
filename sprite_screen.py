@@ -1,6 +1,7 @@
 import pygame as pg
 from screen_V2 import Screen
 
+from player import Player
 from pokemon import Pokemon
 
 
@@ -50,11 +51,11 @@ class GameObjects(pg.sprite.Group):
 
     def draw(self, screen: Screen, bgsurf=None, special_flags: int = 0):
         for obj in self.sprites():
-            if isinstance(obj, Pokemon):
-                if obj.visible:
-                    screen.add_surf(obj.image, pos=obj.rect.topleft, sprite=True)
-            elif (obj.sprite_type == "animation" or
-                    obj.sprite_type == "pokeball"):
+            if isinstance(obj, Player):
+                screen.add_surf(obj.image, pos=obj.blit_rect.topleft, sprite=True)
+            elif isinstance(obj, Pokemon) and obj.visible:
+                screen.add_surf(obj.image, pos=obj.rect.topleft, sprite=True)
+            elif obj.sprite_type == "animation" or obj.sprite_type == "pokeball":
                 screen.add_surf(obj.image, pos=obj.rect.topleft, sprite=True)
             elif obj.sprite_type == "text_box":
                 screen.add_surf(obj.image, pos=obj.rect.topleft, sprite=True)

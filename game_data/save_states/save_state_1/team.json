@@ -2,7 +2,7 @@
     {
         "Name": "Piplup",
         "Level": 5,
-        "XP": 135,
+        "XP": 149,
         "Move_Names": [
             "Pound",
             "Growl",
@@ -11,12 +11,12 @@
         "Move_PPs": [
             35,
             28,
-            30
+            28
         ],
-        "Health": 20,
+        "Health": 16,
         "Status": null,
         "EVs": [
-            0,
+            1,
             0,
             0,
             0,
@@ -32,7 +32,7 @@
             31
         ],
         "Gender": "male",
-        "Nature": "Hasty",
+        "Nature": "Rash",
         "ability_name": "Torrent",
         "KO": false,
         "Stat_Stages": {
@@ -47,7 +47,7 @@
         "Friendly": true,
         "Shiny": true,
         "Visible": true,
-        "Catch_Date": "2025-06-08",
+        "Catch_Date": "2025-06-21",
         "Catch_Location": null,
         "Catch_Level": 5
     },
@@ -81,9 +81,9 @@
             31,
             31
         ],
-        "Gender": "female",
-        "Nature": "Quirky",
-        "ability_name": "Blaze",
+        "Gender": "male",
+        "Nature": "Docile",
+        "ability_name": "Iron Fist",
         "KO": false,
         "Stat_Stages": {
             "attack": 0,
@@ -97,7 +97,7 @@
         "Friendly": true,
         "Shiny": true,
         "Visible": true,
-        "Catch_Date": "2025-06-08",
+        "Catch_Date": "2025-06-21",
         "Catch_Location": null,
         "Catch_Level": 5
     }

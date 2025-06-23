@@ -1,13 +1,8 @@
 import json
-import os
-import pickle
 import random
 import shutil
 import warnings
 from datetime import datetime
-
-import pandas as pd
-import pygame as pg
 
 from bag import BagV2
 from battle import Battle, State
@@ -24,7 +19,6 @@ from general.Time import Time
 from displays.game_display import GameDisplay, GameDisplayStates
 from displays.menu.menu_display_team import MenuTeamDisplay
 
-from Map_Files.TiledMap import TiledMapLegacy
 from player import Player, Movement
 from pokemon import Pokemon
 from Poketech.Poketech import Poketech
@@ -64,7 +58,7 @@ class Game:
                                                   (self.displaySize.x, self.displaySize.y / 2)))
         self.bottomSurf.fill(Colours.white.value)
         self.loadDisplay = LoadDisplay(self.topSurf.get_size())
-        self.map = TiledMapLegacy("Map_Files/Sinnoh Map.tmx", scale=scale)
+        # self.map = TiledMapLegacy("Map_Files/Sinnoh Map.tmx", scale=scale)
 
         self.animations = {}
 
@@ -110,8 +104,8 @@ class Game:
             # update player with the Surfaces
             self.player = gameData.player
             self.player.loadSurfaces("Sprites/Player Sprites")
-            self.player.walkingSpriteSet.scaleSprites(1.4)
-            self.player.runningSpriteSet.scaleSprites(1.4)
+            # self.player.walkingSpriteSet.scaleSprites(1.4)
+            # self.player.runningSpriteSet.scaleSprites(1.4)
             self.player.update()
 
             # update poketech with the Surfaces
@@ -125,9 +119,9 @@ class Game:
         else:
             # create new player instance
             self.player = Player("Sprites/Player Sprites", position=pg.Vector2(10, 9))
-            self.player.walkingSpriteSet.scaleSprites(1.4)
-            self.player.runningSpriteSet.scaleSprites(1.4)
-            self.player.update()
+            # self.player.walkingSpriteSet.scaleSprites(1.4)
+            # self.player.runningSpriteSet.scaleSprites(1.4)
+            # self.player.update()
 
             self.poketech = Poketech(self.time)
 
@@ -162,8 +156,6 @@ class Game:
         self.pokedex.game = self
         self.pokedex.load_surfaces()
         self.pokedex.national_dex = pd.read_csv("game_data/Pokedex/NationalDex/NationalDex.tsv", delimiter='\t', index_col=0)
-
-        print(self.pokedex.data.loc["Starly", "caught"])
 
         self.menu_active = False
 
@@ -208,7 +200,7 @@ class Game:
         blackSurf.set_alpha(0)
         count = 100
         for t in range(0, count):
-            blackSurf.set_alpha(t / count * 255)
+            blackSurf.set_alpha(round(t / count * 255))
             pg.time.delay(int(duration / count))
             self.topSurf.blit(blackSurf, (0, 0))
             self.bottomSurf.blit(blackSurf, (0, 0))
@@ -243,9 +235,6 @@ class Game:
             return Time.night
 
     def updateDisplay(self, flip=True):
-        # self.topSurf.blit(self.player.image, pg.Vector2(self.topSurf.get_rect().center) -
-        #                   pg.Vector2(self.player.image.get_rect().centerx,
-        #                              self.map.data.tilewidth * self.map.scale / 2 + 16))
 
         self.game_display.refresh()
         self.topSurf.blit(self.game_display.get_surface(), (0, 0))
@@ -255,32 +244,24 @@ class Game:
             pg.display.flip()
 
     def movePlayer(self, direction, detectGrass=True):
-        if self.player.movement == Movement.walking:
-            self.player.sprites = self.player.walkingSpriteSet.sprites
-
-        elif self.player.movement == Movement.running:
-            self.player.sprites = self.player.runningSpriteSet.sprites
-
-        self.player.image = self.player.sprites[self.player.spriteIdx]
+        self.player.update()
 
         moved = False
 
-        if self.player.leg:
-            self.player.image = self.player.sprites[self.player.spriteIdx + 1]
-        else:
-            self.player.image = self.player.sprites[self.player.spriteIdx + 2]
+        self.player.image = self.player.sprites[self.player.spriteIdx + (1 if self.player.leg else 2)]
 
         if self.player.facingDirection == direction:
             if not self.checkCollision(direction):
                 moved = True
                 # shift the map
                 if self.player.movement == Movement.walking:
-                    self.moveAnimation(direction, 200)
+                    self.game_display.move_animation(self.topSurf, direction, duration=200)
                 elif self.player.movement == Movement.running:
-                    self.moveAnimation(direction, 125)
+                    self.game_display.move_animation(self.topSurf, direction, duration=125)
 
-        self.player.image = self.player.sprites[self.player.spriteIdx]
+        # self.player.image = self.player.sprites[self.player.spriteIdx]
 
+        self.player.update()
         self.updateDisplay()
         if moved:
             if detectGrass:
@@ -301,45 +282,21 @@ class Game:
     def checkCollision(self, direction):
         playerPos = self.player.position + direction.value
 
-        for obstacle in self.map.obstacles.sprites():
-            if obstacle.rect.collidepoint(playerPos * self.map.data.tilewidth * self.map.scale):
+        for obstacle in self.game_display.map.obstacles.sprites():
+            if obstacle.rect.collidepoint(playerPos * self.game_display.map.tilewidth * self.game_display.map.scale):
                 return True
 
         return False
 
-    def moveAnimation(self, direction, duration):
-        frames = 20
-
-        if self.player.leg:
-            self.player.image = self.player.sprites[self.player.spriteIdx + 1]
-        else:
-            self.player.image = self.player.sprites[self.player.spriteIdx + 2]
-
-        for frame in range(frames):
-            self.player.position += direction.value / frames
-            self.updateDisplay()
-            pg.time.delay(int(duration / frames))
-
-        self.player.image = self.player.sprites[self.player.spriteIdx]
-        self.player.position = pg.Vector2(round(self.player.position.x), round(self.player.position.y))
-
     def detectGrassCollision(self, battle=False):
-        for grass in self.map.grassObjects:
-            coordinate = self.player.position * self.map.data.tilewidth * self.map.scale
-            if grass.rect.collidepoint(coordinate):
-                if coordinate.x != grass.rect.right:
-                    if battle:
-                        location = grass.route
-                        pg.time.delay(100)
-                        self.battleIntro(250)
-                        self.startBattle(route=location)
-                    else:
-                        num = random.randint(0, 255)
-                        if num < grass.encounterNum:
-                            location = grass.route
-                            pg.time.delay(100)
-                            self.battleIntro(250)
-                            self.startBattle(route=location)
+        collide = self.game_display.map.detect_collision()
+        if any(collide):
+            grass = collide[0]
+            num = random.randint(0, (1 if battle else 255))
+            if num < grass.encounterNum:
+                pg.time.delay(100)
+                self.battleIntro(250)
+                self.startBattle(route=grass.route)
 
     def startBattle(self, route="Route 201", name=None, level=None):
         battle = Battle(self, route_name=route, wild_name=name, wildLevel=level)
@@ -367,6 +324,8 @@ class Game:
         else:
             self.updateDisplay(flip=False)
             self.fadeFromBlack(500)
+
+        self.updateDisplay()
 
         while self.running:
             pg.time.delay(25)  # set the debounce-time for keys
@@ -479,8 +438,6 @@ class Game:
             self.game_display = None
             self.animations = None
             self.loadDisplay = None
-            self.game_display = None
-            self.map = None
 
             # the player image is a pygame surface
             self.player.clearSurfaces()
@@ -488,7 +445,7 @@ class Game:
             self.poketech.clearSurfaces()
 
             self.bag = None
-
+            # self.menu_objects = None
             self.team = None
 
             self.window = None

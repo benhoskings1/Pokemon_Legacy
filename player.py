@@ -13,7 +13,7 @@ class Movement(Enum):
 
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, spritePath: os.PathLike, position=pg.Vector2(0, 0)):
+    def __init__(self, sprite_path: os.PathLike | str, position=pg.Vector2(0, 0)):
         # ======== INITIALISATION =======
         pg.sprite.Sprite.__init__(self)
         self.sprite_type = "player"
@@ -23,49 +23,33 @@ class Player(pg.sprite.Sprite):
         self.facingDirection = Direction.down
         self.leg = True
 
-        self.walkingSpriteSet = SpriteSet2(os.path.join(spritePath, "Walking Sprites.png"),
-                                           12, pg.Vector2(34, 50), pg.Vector2(0, 0))
-
-        self.runningSpriteSet = SpriteSet2(os.path.join(spritePath, "Running Sprites.png"),
-                                           12, pg.Vector2(40, 50), pg.Vector2(0, 0))
-
+        self.sprite_sets: dict | None = None
+        self.sprites: list[pg.Surface] | None = None
+        self.image: pg.Surface | None = None
         self.movement = Movement.walking
-        self.sprites = self.walkingSpriteSet.sprites
-
-        self.image = self.sprites[self.spriteIdx]
+        self.loadSurfaces(sprite_path)
         self.position = position
-        self.rect = self.image.get_rect()
+        self.blit_rect = self.image.get_rect()
+        self.rect = pg.Rect((0, 0), (32, 32))
 
         self.steps = 0
 
     def update(self):
-        if self.movement == Movement.walking:
-            self.sprites = self.walkingSpriteSet.sprites
-            self.image = self.sprites[self.spriteIdx]
-
-        elif self.movement == Movement.running:
-            self.sprites = self.walkingSpriteSet.sprites
-            self.image = self.sprites[self.spriteIdx]
-
-    def getOffset(self, surfSize, gameMap):
-        centre = pg.Vector2(surfSize) / 2
-        playerOffset = pg.Vector2(- self.position.x * gameMap.data.tilewidth,
-                                  - self.position.y * gameMap.data.tileheight) * gameMap.scale
-        playerOffset += pg.Vector2(0, self.rect.h - gameMap.data.tileheight * gameMap.scale)
-        return centre / 2 + playerOffset
+        self.sprites = self.sprite_sets[self.movement].sprites
+        self.image = self.sprites[self.spriteIdx]
 
     def clearSurfaces(self):
         self.sprites = None
         self.image = None
-        self.walkingSpriteSet = None
-        self.runningSpriteSet = None
 
-    def loadSurfaces(self, spritePath: str | os.PathLike):
-
-        self.walkingSpriteSet = SpriteSet2(os.path.join(spritePath, "Walking Sprites.png"),
-                                           12, pg.Vector2(34, 50), pg.Vector2(0, 0))
-
-        self.runningSpriteSet = SpriteSet2(os.path.join(spritePath, "Running Sprites.png"),
-                                           12, pg.Vector2(40, 50), pg.Vector2(0, 0))
+    def loadSurfaces(self, sprite_path: str | os.PathLike):
+        self.sprite_sets = {
+            Movement.walking: SpriteSet2(
+                os.path.join(sprite_path, "Walking Sprites.png"), 12, pg.Vector2(34, 50), pg.Vector2(0, 0)
+            ),
+            Movement.running: SpriteSet2(
+                os.path.join(sprite_path, "Running Sprites.png"), 12, pg.Vector2(40, 50), pg.Vector2(0, 0)
+            )
+        }
 
         self.update()

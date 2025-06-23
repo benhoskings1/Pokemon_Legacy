@@ -106,6 +106,8 @@ class Stats:
         self.exp = exp
 
     def __sub__(self, other):
+        # [val2 - val1 for ]
+
         return Stats(
             health=self.health-other.health, attack=self.attack-other.attack, defence=self.defence-other.defence,
             spAttack=self.spAttack - other.spAttack, spDefence=self.spDefence - other.spDefence,
@@ -114,6 +116,13 @@ class Stats:
 
     def __str__(self):
         return f"HP: {self.health}, Atk: {self.attack}, Def: {self.defence}, Sp. Atk: {self.spAttack}, Speed: {self.speed}, Exp: {self.exp}"
+
+    def __iter__(self):
+        for val in self.get_values():
+            yield val
+
+    def __getitem__(self, key):
+        return self.get_values()[key]
 
     def get_values(self):
         return [self.health, self.attack, self.defence, self.spAttack, self.spDefence, self.speed]

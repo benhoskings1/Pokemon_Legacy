@@ -111,8 +111,6 @@ class Battle:
             self.battle_display.intro_animations(self.game.topSurf, 2000)
             self.battle_display.bounce_friendly_stat = True
 
-        print(f"visble:{self.foe.visible}", self.foe.rect, self.foe.sprite.rect)
-
     # ======== GRAPHICS HANDLERS =========
     def update_upper_screen(self):
         self.game.topSurf.blit(self.battle_display.get_surface(show_sprites=True), (0, 0))

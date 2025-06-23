@@ -624,278 +624,6 @@
     "Surface"
   ],
   [
-    "game.map.data.images[1]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[1]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[2]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[2]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[3]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[3]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[4]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[4]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[5]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[5]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[6]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[6]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[7]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[7]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[8]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[8]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[9]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[9]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[10]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[10]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[11]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[11]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[12]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[12]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[13]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[13]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[14]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[14]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[15]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[15]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[16]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[16]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[17]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[17]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[18]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[18]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[19]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[19]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[20]",
-    "Surface"
-  ],
-  [
-    "game.map.data.images[20]",
-    "Surface"
-  ],
-  [
-    "game.map.screen.baseSurface",
-    "Surface"
-  ],
-  [
-    "game.map.screen.baseSurface",
-    "Surface"
-  ],
-  [
-    "game.map.screen.surface",
-    "Surface"
-  ],
-  [
-    "game.map.screen.surface",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[0].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[0].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[1].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[1].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[2].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[2].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[3].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[3].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[4].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[4].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[5].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[5].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[6].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[6].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[7].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[7].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[8].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[8].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[9].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[9].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[10].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[10].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[11].surf",
-    "Surface"
-  ],
-  [
-    "game.map.grassObjects[11].surf",
-    "Surface"
-  ],
-  [
     "game.animations['Piplup'].front[0]",
     "Surface"
   ],
@@ -4320,195 +4048,195 @@
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[0]",
+    "game.player.sprite_sets['Movement.walking'].sprites[0]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[0]",
+    "game.player.sprite_sets['Movement.walking'].sprites[0]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[1]",
+    "game.player.sprite_sets['Movement.walking'].sprites[1]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[1]",
+    "game.player.sprite_sets['Movement.walking'].sprites[1]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[2]",
+    "game.player.sprite_sets['Movement.walking'].sprites[2]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[2]",
+    "game.player.sprite_sets['Movement.walking'].sprites[2]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[3]",
+    "game.player.sprite_sets['Movement.walking'].sprites[3]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[3]",
+    "game.player.sprite_sets['Movement.walking'].sprites[3]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[4]",
+    "game.player.sprite_sets['Movement.walking'].sprites[4]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[4]",
+    "game.player.sprite_sets['Movement.walking'].sprites[4]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[5]",
+    "game.player.sprite_sets['Movement.walking'].sprites[5]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[5]",
+    "game.player.sprite_sets['Movement.walking'].sprites[5]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[6]",
+    "game.player.sprite_sets['Movement.walking'].sprites[6]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[6]",
+    "game.player.sprite_sets['Movement.walking'].sprites[6]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[7]",
+    "game.player.sprite_sets['Movement.walking'].sprites[7]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[7]",
+    "game.player.sprite_sets['Movement.walking'].sprites[7]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[8]",
+    "game.player.sprite_sets['Movement.walking'].sprites[8]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[8]",
+    "game.player.sprite_sets['Movement.walking'].sprites[8]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[9]",
+    "game.player.sprite_sets['Movement.walking'].sprites[9]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[9]",
+    "game.player.sprite_sets['Movement.walking'].sprites[9]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[10]",
+    "game.player.sprite_sets['Movement.walking'].sprites[10]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[10]",
+    "game.player.sprite_sets['Movement.walking'].sprites[10]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[11]",
+    "game.player.sprite_sets['Movement.walking'].sprites[11]",
     "Surface"
   ],
   [
-    "game.player.walkingSpriteSet.sprites[11]",
+    "game.player.sprite_sets['Movement.walking'].sprites[11]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[0]",
+    "game.player.sprite_sets['Movement.running'].sprites[0]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[0]",
+    "game.player.sprite_sets['Movement.running'].sprites[0]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[1]",
+    "game.player.sprite_sets['Movement.running'].sprites[1]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[1]",
+    "game.player.sprite_sets['Movement.running'].sprites[1]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[2]",
+    "game.player.sprite_sets['Movement.running'].sprites[2]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[2]",
+    "game.player.sprite_sets['Movement.running'].sprites[2]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[3]",
+    "game.player.sprite_sets['Movement.running'].sprites[3]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[3]",
+    "game.player.sprite_sets['Movement.running'].sprites[3]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[4]",
+    "game.player.sprite_sets['Movement.running'].sprites[4]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[4]",
+    "game.player.sprite_sets['Movement.running'].sprites[4]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[5]",
+    "game.player.sprite_sets['Movement.running'].sprites[5]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[5]",
+    "game.player.sprite_sets['Movement.running'].sprites[5]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[6]",
+    "game.player.sprite_sets['Movement.running'].sprites[6]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[6]",
+    "game.player.sprite_sets['Movement.running'].sprites[6]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[7]",
+    "game.player.sprite_sets['Movement.running'].sprites[7]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[7]",
+    "game.player.sprite_sets['Movement.running'].sprites[7]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[8]",
+    "game.player.sprite_sets['Movement.running'].sprites[8]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[8]",
+    "game.player.sprite_sets['Movement.running'].sprites[8]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[9]",
+    "game.player.sprite_sets['Movement.running'].sprites[9]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[9]",
+    "game.player.sprite_sets['Movement.running'].sprites[9]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[10]",
+    "game.player.sprite_sets['Movement.running'].sprites[10]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[10]",
+    "game.player.sprite_sets['Movement.running'].sprites[10]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[11]",
+    "game.player.sprite_sets['Movement.running'].sprites[11]",
     "Surface"
   ],
   [
-    "game.player.runningSpriteSet.sprites[11]",
+    "game.player.sprite_sets['Movement.running'].sprites[11]",
     "Surface"
   ],
   [
@@ -5268,275 +4996,195 @@
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[1]",
+    "game.game_display.map.images[1]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[1]",
+    "game.game_display.map.images[1]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[2]",
+    "game.game_display.map.images[2]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[2]",
+    "game.game_display.map.images[2]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[3]",
+    "game.game_display.map.images[3]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[3]",
+    "game.game_display.map.images[3]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[4]",
+    "game.game_display.map.images[4]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[4]",
+    "game.game_display.map.images[4]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[5]",
+    "game.game_display.map.images[5]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[5]",
+    "game.game_display.map.images[5]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[6]",
+    "game.game_display.map.images[6]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[6]",
+    "game.game_display.map.images[6]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[7]",
+    "game.game_display.map.images[7]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[7]",
+    "game.game_display.map.images[7]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[8]",
+    "game.game_display.map.images[8]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[8]",
+    "game.game_display.map.images[8]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[9]",
+    "game.game_display.map.images[9]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[9]",
+    "game.game_display.map.images[9]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[10]",
+    "game.game_display.map.images[10]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[10]",
+    "game.game_display.map.images[10]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[11]",
+    "game.game_display.map.images[11]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[11]",
+    "game.game_display.map.images[11]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[12]",
+    "game.game_display.map.images[12]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[12]",
+    "game.game_display.map.images[12]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[13]",
+    "game.game_display.map.images[13]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[13]",
+    "game.game_display.map.images[13]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[14]",
+    "game.game_display.map.images[14]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[14]",
+    "game.game_display.map.images[14]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[15]",
+    "game.game_display.map.images[15]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[15]",
+    "game.game_display.map.images[15]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[16]",
+    "game.game_display.map.images[16]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[16]",
+    "game.game_display.map.images[16]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[17]",
+    "game.game_display.map.images[17]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[17]",
+    "game.game_display.map.images[17]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[18]",
+    "game.game_display.map.images[18]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[18]",
+    "game.game_display.map.images[18]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[19]",
+    "game.game_display.map.images[19]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[19]",
+    "game.game_display.map.images[19]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[20]",
+    "game.game_display.map.images[20]",
     "Surface"
   ],
   [
-    "game.game_display.map.data.images[20]",
+    "game.game_display.map.images[20]",
     "Surface"
   ],
   [
-    "game.game_display.map.screen.baseSurface",
+    "game.game_display.map.base_surface",
     "Surface"
   ],
   [
-    "game.game_display.map.screen.baseSurface",
+    "game.game_display.map.base_surface",
     "Surface"
   ],
   [
-    "game.game_display.map.screen.surface",
+    "game.game_display.map.surface",
     "Surface"
   ],
   [
-    "game.game_display.map.screen.surface",
+    "game.game_display.map.surface",
     "Surface"
   ],
   [
-    "game.game_display.map.grassObjects[0].surf",
+    "game.game_display.map.sprite_surface",
     "Surface"
   ],
   [
-    "game.game_display.map.grassObjects[0].surf",
+    "game.game_display.map.sprite_surface",
     "Surface"
   ],
   [
-    "game.game_display.map.grassObjects[1].surf",
+    "game.game_display.map.power_off_surface",
     "Surface"
   ],
   [
-    "game.game_display.map.grassObjects[1].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[2].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[2].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[3].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[3].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[4].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[4].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[5].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[5].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[6].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[6].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[7].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[7].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[8].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[8].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[9].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[9].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[10].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[10].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[11].surf",
-    "Surface"
-  ],
-  [
-    "game.game_display.map.grassObjects[11].surf",
+    "game.game_display.map.power_off_surface",
     "Surface"
   ],
   [
@@ -5793,6 +5441,126 @@
   ],
   [
     "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.info'].power_off_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.memo'].image",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.memo'].image",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.memo'].base_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.memo'].base_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.memo'].surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.memo'].surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.memo'].sprite_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.memo'].sprite_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.memo'].power_off_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.memo'].power_off_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.skills'].image",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.skills'].image",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.skills'].base_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.skills'].base_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.skills'].surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.skills'].surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.skills'].sprite_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.skills'].sprite_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.skills'].power_off_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.skills'].power_off_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.moves'].image",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.moves'].image",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.moves'].base_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.moves'].base_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.moves'].surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.moves'].surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.moves'].sprite_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.moves'].sprite_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.moves'].power_off_surface",
+    "Surface"
+  ],
+  [
+    "game.menu_objects['GameDisplayStates.team'].displays['MenuTeamDisplayStates.summary'].containers['PokemonSummaryStates.moves'].power_off_surface",
     "Surface"
   ]
 ]

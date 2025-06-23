@@ -16,6 +16,9 @@ class TallGrass(pg.sprite.Sprite):
         self.route = route
         self.encounterNum = randint(15, 25)
 
+    def __repr__(self):
+        return f"Tall Grass at {self.rect}"
+
 
 class Obstacle(pg.sprite.Sprite):
     def __init__(self, rect, scale):
