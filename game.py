@@ -1,6 +1,7 @@
 import json
 import random
 import shutil
+import time
 import warnings
 from datetime import datetime
 
@@ -18,6 +19,7 @@ from general.Time import Time
 # ======= Load displays =====
 from displays.game_display import GameDisplay, GameDisplayStates
 from displays.menu.menu_display_team import MenuTeamDisplay
+from displays.menu.menu_display_bag import MenuBagDisplay
 
 from player import Player, Movement
 from pokemon import Pokemon
@@ -34,10 +36,7 @@ class Game:
         self.overwrite: bool = overwrite
         self.save_slot: int = save_slot
 
-        if new:
-            self.data_path = "game_data/Save States/Start"
-        else:
-            self.data_path = f"game_data/save_states/save_state_{save_slot}"
+        self.data_path = f"game_data/save_states/{'save_state_' + save_slot if not new else 'start'}"
 
         self.running = True
 
@@ -75,7 +74,7 @@ class Game:
                 self.topSurf.blit(top, (0, 0))
                 self.bottomSurf.blit(bottom, (0, 0))
                 pg.display.flip()
-                print("Creating ", repr(pk))
+                # print("Creating ", repr(pk))
                 self.animations[pk.name] = createAnimation(pk.name)
                 animations = self.animations[pk.name]
                 pk.loadImages(animations)
@@ -97,7 +96,6 @@ class Game:
             print("No pickle data not present / corrupted")
 
         if not new and os.path.exists(os.path.join(self.data_path, "game.pickle")):
-            print("loading game")
             gameFile = open(os.path.join(self.data_path, "game.pickle"), 'rb')
             gameData = pickle.load(gameFile, encoding='bytes')
 
@@ -162,6 +160,7 @@ class Game:
         self.menu_objects = {
             GameDisplayStates.pokedex: self.pokedex,
             GameDisplayStates.team: MenuTeamDisplay(self.displaySize, self.graphics_scale, self),
+            GameDisplayStates.bag: MenuBagDisplay(self.displaySize, self.graphics_scale, self),
         }
 
         # ========== POST INITIALISATION =========
@@ -301,7 +300,7 @@ class Game:
     def startBattle(self, route="Route 201", name=None, level=None):
         battle = Battle(self, route_name=route, wild_name=name, wildLevel=level)
         self.battle = battle
-        battle.loop()
+        battle.run()
         self.battle = None
         # print(self.animations[name])
 
@@ -313,6 +312,23 @@ class Game:
             pg.display.flip()
             pg.time.delay(time)
             self.updateDisplay()
+
+    def wait_for_key(self, key=None):
+        key = key if key is not None else self.controller.a
+
+        t0 = time.monotonic()
+        pg.event.clear()
+        while True:
+            event = pg.event.wait()
+            if event.type == pg.QUIT:
+                ...
+            elif event.type == pg.KEYDOWN:
+                if event.key == key:
+                    return True
+
+            if time.monotonic() - t0 > 10:
+                # timeout at 10s
+                return True
 
     def loop(self):
         if self.battle:
@@ -456,6 +472,8 @@ class Game:
                 self.battle = None
                 # self.battle.clearSurfaces()
 
+            self.menu_objects = None
+
             with open(os.path.join(save_dir, "game_temp.pickle"), 'wb') as f:
                 pickle.dump(self, f)
                 print("Successfully pickled")
@@ -476,4 +494,4 @@ class Game:
 
         except TypeError as e:
             warnings.warn("Pickle Failed...\nThe data was not overwritten")
-            raise e
+            # raise e

@@ -19,12 +19,13 @@ item_data = item_data.set_index("item_id")
 
 class ItemType(Enum):
     item = "Items"
-    pokeball = "Pokeballs"
     medicine = "Medicine"
+    pokeball = "Pokeballs"
     tm = "TMs"
     berries = "Berries"
-    key_item = "Key_Items"
+    mail = "Mail"
     battle_item = "Battle_Items"
+    key_item = "Key_Items"
 
 
 class BattleItemType(Enum):
@@ -36,6 +37,7 @@ class BattleItemType(Enum):
 
 class Item:
     def __init__(self, data, type, description=""):
+        self.item_id = data.name
         self.name = data["name"]
         self.type = type
         self.image = pg.image.load(str.format("Sprites/Items/{}/{}.png", self.type, data["name"]))
@@ -47,6 +49,9 @@ class Item:
 
         self.item_type = None if pd.isna(data.name_item_type) else ItemType(data.name_item_type)
         self.battle_item_type = None if pd.isna(data.name_battle_item_type) else BattleItemType(data.name_battle_item_type)
+
+    def __repr__(self):
+        return f"Item({self.item_id}, {self.name})"
 
     def display(self):
         print(vars(self))
@@ -67,6 +72,9 @@ class Pokeball(Item):
         else:
             self.conditions = data.Conditions
 
+    def __repr__(self):
+        return f"Pokeball({self.name}, {self.modifier}, {self.conditions})"
+
 
 class MedicineItem(Item):
     def __init__(self, name):
@@ -79,4 +87,7 @@ class MedicineItem(Item):
         self.heal = False if pd.isna(data.heal_amount) else int(data.heal_amount)
         self.status = None if pd.isna(data.status) else StatusEffect(data.status)
         self.battle_type = None if pd.isna(data.battle_type) else data.battle_type
+
+    def __repr__(self):
+        return f"Medicine({self.name}, {self.heal if self.heal else 0}, {self.status})"
 

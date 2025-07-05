@@ -7,10 +7,12 @@ import pygame as pg
 
 from general.utils import Colours
 
+
 class CharacterType(Enum):
     baseline = 0
     descender = 1
     ascender = 2
+
 
 class Baseline(Enum):
     centre = 0
@@ -149,7 +151,7 @@ class Font:
             lowerBase = False
             for letter in lineText:
                 if letter == " ":
-                    width += 3 * self.space
+                    width += 3 * self.scale
                 else:
 
                     width += self.sizes[letter][0]
@@ -210,7 +212,7 @@ class Font:
         return textSurf
 
     def render_text_2(self, text: str, text_box: pg.Rect | pg.Vector2 | tuple[int, int],
-                      sep=1, colour: Colours | pg.Color = None, shadow_colour=None, max_chars=None) -> pg.Surface:
+                      sep=1, vsep=1.5, colour: Colours | pg.Color = None, shadow_colour=None, max_chars=None) -> pg.Surface:
         """
         Renders the given text in the given colour or shadow colour. The max_chars should be used over
         indexing directly into text, since this will maintain the correct line formatting as each
@@ -218,6 +220,7 @@ class Font:
 
         :param text: the text to be rendered
         :param text_box: the bounding box of the text to be rendered
+        :param sep: the pixels to space each word by
         :param colour: the primary colour of the font
         :param shadow_colour: the secondary colour of the font
         :param max_chars: the maximum number of characters to be rendered.
@@ -264,7 +267,7 @@ class Font:
                 x_pos += self.space * 3
 
             else:
-                y_pos += base_line * 1.5
+                y_pos += base_line * vsep
                 x_pos = blit_word(word, 0, y_pos)
                 x_pos += self.space * 3
 

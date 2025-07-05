@@ -41,6 +41,7 @@ class Player(pg.sprite.Sprite):
     def clearSurfaces(self):
         self.sprites = None
         self.image = None
+        self.sprite_sets = None
 
     def loadSurfaces(self, sprite_path: str | os.PathLike):
         self.sprite_sets = {

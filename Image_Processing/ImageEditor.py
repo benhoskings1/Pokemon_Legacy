@@ -13,7 +13,10 @@ class ImageEditor:
                 print("NO such file")
             head, self.fileName = os.path.split(file)
             self.image = cv2.imread(file, cv2.IMREAD_UNCHANGED)
+            self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2BGRA)
             self.pixelData = self.image
+
+            print(self.pixelData[0, 0, :])
 
         elif type(pixelData) is not None:
             self.image = pixelData
@@ -61,6 +64,7 @@ class ImageEditor:
         return pixelDataCopy
 
     def saveImage(self, directory: os.PathLike = None, name=None):
+        print(self.fileName)
         if directory:
             if not os.path.exists(directory):
                 print("Making directory")
@@ -73,7 +77,7 @@ class ImageEditor:
                 cv2.imwrite(name, self.pixelData)
         else:
             if directory:
-                cv2.imwrite(self.fileName, self.pixelData)
+                cv2.imwrite(os.path.join(directory, self.fileName), self.pixelData)
 
         print("Image Saved")
 
@@ -170,22 +174,21 @@ class ImageEditor:
 
 
 if __name__ == "__main__":
-
-    ...
-    IMAGE_REGEX = r"\d{8}"
+    IMAGE_REGEX = r""
     move = "bubble"
     target = "foe"
-    base_dir = '/Users/benhoskings/Library/Mobile Documents/com~apple~CloudDocs/Desktop/pokemon_sprites/animations'
+    base_dir = '../assets/menu/bag/pocket_buttons/key_items'
     # base_dir = f"/Users/benhoskings/Desktop/pokemon_sprites/animations/"
-    save_dir = f"../assets/battle/move_animations"
+    save_dir = '../assets/menu/bag/pocket_buttons/key_items'
 
     move_dir = os.path.join(base_dir, move, target)
-    files = os.listdir(move_dir)
+    files = os.listdir(base_dir)
     files = sorted([file_name for file_name in files if re.match(IMAGE_REGEX, file_name)])
     print(files)
 
     for idx, file in enumerate(files):
 
-        editor = ImageEditor(file=os.path.join(move_dir, file))
-        editor.eraseColour([0, 0, 0], overwrite=True)
-        editor.saveImage(directory=os.path.join(save_dir, move, target), name=f"{move}_{idx}.png")
+        editor = ImageEditor(file=os.path.join(base_dir, file))
+        editor.eraseColour([248, 232, 208], overwrite=True)
+        # editor.eraseColour([123, 206, 239], overwrite=True)
+        editor.saveImage(directory=base_dir)

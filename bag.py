@@ -7,7 +7,6 @@ import pygame as pg
 from general.Item import Item, Pokeball, MedicineItem, BattleItemType, ItemType
 
 
-
 pokeballs = pd.read_csv("game_data/Items/pokeballs.tsv", delimiter="\t", index_col=0)
 
 # def unpack_dict(d):
@@ -49,31 +48,6 @@ class BagV2:
         if self.data[item.item_type][item] == 0:
             self.data[item.item_type].pop(item)
 
-    # def get_json_data(self):
-    #     itemData = {}
-    #     for item in self.items:
-    #         itemData[item.name] = self.items[item]
-    #
-    #     pokeballData = {}
-    #     for pokeball in self.pokeballs:
-    #         pokeballData[pokeball.name] = self.pokeballs[pokeball]
-    #
-    #     medicineData = {}
-    #     for medicine in self.medicine:
-    #         medicineData[medicine.name] = self.medicine[medicine]
-    #
-    #     TMData = {}
-    #     berryData = {}
-    #     battleItemData = {}
-    #     keyItemData = {}
-    #
-    #     data = {"Items": itemData, "Pokeballs": pokeballData,
-    #             "Medicine": medicineData, "TMs": TMData,
-    #             "Berries": berryData, "Battle_Items": battleItemData,
-    #             "Key_Items": keyItemData}
-    #
-    #     return data
-
 
 if __name__ == "__main__":
     # pygame setup
@@ -83,7 +57,7 @@ if __name__ == "__main__":
     with open("test_data/bag/test_bag.json", "r") as read_file:
         bag_data = json.load(read_file)
 
-
     demo_bag = BagV2(bag_data)
-    # print(demo_bag.get_items(item_type=ItemType.pokeball))
-    print(demo_bag.get_items(battle_item_type=BattleItemType.pokeball))
+    item_list = list(demo_bag.get_items(item_type=ItemType.pokeball).items())
+    print(item_list)
+    print(sorted(item_list, key=lambda item: item[0].item_id))

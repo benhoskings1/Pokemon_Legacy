@@ -2,7 +2,7 @@ import pygame as pg
 
 
 class Controller:
-    def __init__(self, a=pg.K_d, b=pg.K_s, x=pg.K_w, y=pg.K_a,
+    def __init__(self, a=pg.K_x, b=pg.K_z, x=pg.K_s, y=pg.K_a,
                  up=pg.K_UP, down=pg.K_DOWN, left=pg.K_LEFT, right=pg.K_RIGHT):
         self.a = a
         self.b = b

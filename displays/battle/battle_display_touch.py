@@ -112,7 +112,7 @@ class MoveContainer(DisplayContainer):
                              colour=pg.Color(63, 48, 41), shadowColour=pg.Color(153, 158, 136), base=True,
                              location=BlitLocation.midTop)
 
-        self.image = self.get_surface()
+        # self.image = self.get_surface()
 
         self.scale = scale
 
@@ -121,7 +121,7 @@ class MoveContainer(DisplayContainer):
         self.addText(f"{move.PP}/{move.maxPP}", pg.Vector2((int(108 * self.scale), int(34 * self.scale))),
                              fontOption=FontOption.level, location=BlitLocation.topRight)
 
-        self.image = self.get_surface()
+        # self.image = self.get_surface()
 
 
 class ItemContainer(DisplayContainer):

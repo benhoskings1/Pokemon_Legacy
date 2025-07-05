@@ -67,8 +67,9 @@ if __name__ == "__main__":
     pg.init()
     pg.event.pump()
 
-    game = Game(1.5, overwrite=True, save_slot=1, new=True)
-    object_map = map_properties(game, filter_types=[pg.Surface], path="game")
+    game = Game(1.5, overwrite=False, new=True)
+    game.loop()
+    object_map = map_properties(game, filter_types=[pg.Surface])
     with open("matched_properties.json", "w") as f:
         json.dump(object_map, f, indent=2)
-    game.loop()
+

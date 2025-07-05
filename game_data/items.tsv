@@ -6,7 +6,7 @@ item_id	item_type_id	battle_item_type_id	name	description	buy_price	sell_price
 5	3	1	Potion	A Spray-type medicine for wounds. It restores the HP of one Pokemon by just 20 Points
 6	3	1	Super Potion	A Spray-type medicine for wounds. It restores the HP of one Pokemon by 50 Points
 7	3	1	Hyper Potion	A Spray-type medicine for wounds. It restores the HP of one Pokemon by 200 Points
-8	3	3	Antidote
+8	3	3	Antidote	A Spray-type medicine. It lifts the effect of poison from one Pokemon.
 9	3	3	Awakening
 10	3	3	Burn Heal
 11	3	3	Full Heal

@@ -35,7 +35,7 @@ class NameContainer2(DisplayContainer):
         img_path = "assets/containers/menu/pokedex/name_container_2.png"
         DisplayContainer.__init__(self, img_path, "name_container", pos, scale)
 
-        self.add_text_2(pk_name.upper(), text_box=pg.Rect(pg.Vector2(49, 4)*scale, (200, 100)))
+        self.add_text_2(pk_name.upper(), text_box=pg.Rect(pg.Vector2(49, 4)*scale, (300, 100)))
         self.add_text_2(f"{pk_id:03}", text_box=pg.Rect(pg.Vector2(22, 4) * scale, (200, 100)))
         self.add_text_2(species, text_box=pg.Rect(pg.Vector2(30, 24) * scale, (200, 100)))
 

@@ -22,6 +22,7 @@ attributes = pd.read_csv("game_data/Pokedex/AttributeDex.tsv", delimiter='\t', i
 effectiveness = pd.read_csv("game_data/Effectiveness.csv", index_col=0)
 level_up_values = pd.read_csv("game_data/level_up_exp.tsv", delimiter='\t', index_col=6)
 natures = pd.read_csv("game_data/Natures.tsv", delimiter='\t', index_col=0)
+national_dex = pd.read_csv("game_data/Pokedex/NationalDex/NationalDex.tsv", delimiter='\t', index_col=0)
 
 capWildMoves = True
 
@@ -213,6 +214,7 @@ class Pokemon(pg.sprite.Sprite):
 
         self.name = Name
         self.ID = data.Local_Num
+        self.species = national_dex.loc[Name, "Species"]
         self.growthRate = data.Growth_Rate
         self.catchRate = data.Catch_Rate
         self.EVYield = data.EV_Yield

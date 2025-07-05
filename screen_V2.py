@@ -162,14 +162,14 @@ class Screen:
 
     def add_text_2(self, text: str, text_box: pg.Rect, font_option: FontOption = FontOption.main,
                    colour: Colours | pg.Color = None, shadow_colour: Colours | pg.Color = None,
-                   max_chars=None, sep=1, base=False) -> None | bool:
+                   max_chars=None, sep=1, vsep=1.5, base=False) -> None | bool:
 
         if len(text) == 0:
             return False
 
         self.font = font_option.value
         text_surf, text_box = self.font.render_text_2(
-            text, text_box, colour=colour, shadow_colour=shadow_colour, max_chars=max_chars, sep=sep
+            text, text_box, colour=colour, shadow_colour=shadow_colour, max_chars=max_chars, sep=sep, vsep=vsep
         )
 
         blit_surf = self.base_surface if base else self.surface
@@ -177,6 +177,7 @@ class Screen:
 
     def addText(self, text, pos, lines=1, location=BlitLocation.topLeft, base=False, colour=None,
                 shadowColour=None, fontOption: FontOption = FontOption.main, surface=None,):
+
         if len(text) == 0:
             return False
 

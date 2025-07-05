@@ -4,6 +4,7 @@ from enum import Enum
 import pygame as pg
 
 import team
+from general.Move import Move2
 from pokemon import Pokemon, getImages
 from general.utils import Colours, create_display_bar
 from screen_V2 import FontOption, BlitLocation
@@ -16,11 +17,9 @@ CONTAINER_POSITIONS = [(1, 3), (129, 12), (1, 52), (129, 60), (1, 100), (129, 10
 class MenuTeamDisplayStates(Enum):
     home = 0
     summary = 1
-    pokemon_info = 1
-    trainer_memo = 2
-    pokemon_skills = 3
-    battle_moves = 4
-    exit = 6
+    switch = 2
+    item = 3
+    exit = 4
 
 
 class PokemonSummaryStates(Enum):
@@ -49,18 +48,22 @@ class PokemonContainer(DisplayContainer):
         self.sprite_type = "pokemon_container"
         self.small_sprite = None
 
-        if pokemon:
-            self.small_sprite = PokemonSpriteSmall(pokemon.small_animation)
-            self.small_sprite.rect.center = pg.Vector2(28, 19) * self.scale
-            self.addText(pokemon.name, pg.Vector2(47, 9) * self.scale, base=True, colour=Colours.white.value,
-                         shadowColour=Colours.darkGrey.value, )
-            self.addText(f"{pokemon.health}/{pokemon.stats.health}", pg.Vector2(72, 32) * self.scale,
-                         colour=Colours.white.value, shadowColour=Colours.white.value, fontOption=FontOption.level)
-            self.addText(f"Lv{pokemon.level}", pg.Vector2(12, 32) * self.scale,
-                         colour=Colours.white.value, shadowColour=Colours.white.value, fontOption=FontOption.level,
-                         base=True, )
 
-            self.sprites.add(self.small_sprite)
+        self.small_sprite = PokemonSpriteSmall(pokemon.small_animation)
+        self.small_sprite.rect.center = pg.Vector2(28, 19) * self.scale
+        self.addText(pokemon.name, pg.Vector2(47, 9) * self.scale, base=True, colour=Colours.white.value,
+                     shadowColour=Colours.darkGrey.value, )
+        self.addText(f"{pokemon.health}/{pokemon.stats.health}", pg.Vector2(72, 32) * self.scale,
+                     colour=Colours.white.value, shadowColour=Colours.white.value, fontOption=FontOption.level)
+        self.addText(f"Lv{pokemon.level}", pg.Vector2(12, 32) * self.scale,
+                     colour=Colours.white.value, shadowColour=Colours.white.value, fontOption=FontOption.level,
+                     base=True, )
+
+        self.sprites.add(self.small_sprite)
+
+        health_bar = create_display_bar(pokemon.health, pokemon.stats.health, "HP")
+        self.add_image(health_bar, pos=pg.Vector2(64 if selected and not primary else 63, 26 if selected else 23) * self.scale,
+                       scale=pg.Vector2(self.scale, self.scale))
 
         self.img_update = time.monotonic()
         self.image_idx = 0
@@ -183,7 +186,47 @@ class PokemonMovesContainer(DisplayContainer):
         )
 
     def load_pokemon_details(self, pokemon: Pokemon):
-        ...
+        for idx, move in enumerate(pokemon.moves):
+            move: Move2
+            # move type
+            self.load_image(
+                f"Images/Type Labels/{move.type} Label.png", pg.Vector2(31, 5 + 32*idx)*self.scale,
+                scale=self.scale
+            )
+
+            # move name
+            self.addText(
+                move.name, pg.Vector2(65, 7 + 32*idx)*self.scale,
+                colour=Colours.white.value, shadowColour=Colours.darkGrey.value,
+            )
+
+            # add pp values
+            self.addText("PP", pg.Vector2(81, 21 + 32*idx)*self.scale,)
+            self.addText(
+                f"{move.PP}/{move.maxPP}", pg.Vector2(124, 11 + 32*idx)*self.scale, location=BlitLocation.midTop,
+            )
+
+
+
+
+class PokemonSelectorContainer(DisplayContainer):
+    def __init__(self, scale=1):
+        DisplayContainer.__init__(
+            self, "assets/containers/menu/team/action_popup.png", "selector", scale=scale
+        )
+
+        self.rect.bottomright = pg.Vector2(254, 190) * self.scale
+
+        self.select_arrow = pg.sprite.Sprite()
+        self.select_arrow.image = pg.image.load("assets/containers/menu/team/popup_arrow.png")
+        self.select_arrow.image = pg.transform.scale(
+            self.select_arrow.image, pg.Vector2(self.select_arrow.image.get_size()) * self.scale
+        )
+        self.select_arrow.rect = self.select_arrow.image.get_rect()
+        self.select_arrow.rect.topleft = pg.Vector2(6, 9) * self.scale
+        self.select_arrow.sprite_type = "arrow"
+
+        self.sprites.add(self.select_arrow)
 
 
 class MenuTeamDisplayHome(SpriteScreen):
@@ -199,9 +242,11 @@ class MenuTeamDisplayHome(SpriteScreen):
             for idx, pk in enumerate(team.pokemon)
         ]
 
+        self.selector_popup = PokemonSelectorContainer(scale)
         self.sprites.add(self.pk_containers)
 
         self.selected_idx = None
+        self.popup_active = False
 
     def update_containers(self, selected_idx: int):
         """
@@ -217,7 +262,7 @@ class MenuTeamDisplayHome(SpriteScreen):
             self.get_object(self.pk_containers[self.selected_idx].pokemon).kill()
             # self.pk_containers[self.selected_idx].kill()
             deselected_container = PokemonContainer(
-                self.team.pokemon[self.selected_idx], CONTAINER_POSITIONS[self.selected_idx], primary=selected_idx == 0,
+                self.team.pokemon[self.selected_idx], CONTAINER_POSITIONS[self.selected_idx], primary=self.selected_idx == 0,
                 scale=self.scale
             )
             self.sprites.add(deselected_container)
@@ -243,19 +288,40 @@ class MenuTeamDisplayHome(SpriteScreen):
         """
         # ======= Processing Functions ========
         if key == controller.a:
-            # print(repr(self.pk_containers[self.selected_idx].pokemon))
-            return self.pk_containers[self.selected_idx].pokemon
+            if not self.popup_active:
+                self.sprites.add(self.selector_popup)
+                self.popup_active = True
+            else:
+                print(repr(self.pk_containers[self.selected_idx].pokemon))
+                return self.pk_containers[self.selected_idx].pokemon
+
         elif key == controller.b:
-            return MenuTeamDisplayStates.exit
+            if self.popup_active:
+                self.sprites.remove(self.selector_popup)
+                self.popup_active = False
+                self.refresh()
+            else:
+                return MenuTeamDisplayStates.exit
+
+            return None
 
         # ======= Move Selector ========
         elif self.selected_idx is None:
             self.update_containers(selected_idx=0)
 
         elif key == controller.down:
-            self.update_containers(min([self.selected_idx + 1, len(self.sprites) - 1]))
+            if not self.popup_active:
+                self.update_containers(min([self.selected_idx + 1, len(self.sprites) - 1]))
+            else:
+                self.selector_popup.refresh()
+                self.selector_popup.select_arrow.rect.topleft += pg.Vector2(0, 16) * self.scale
+
         elif key == controller.up:
-            self.update_containers(max([self.selected_idx - 1, 0]))
+            if not self.popup_active:
+                self.update_containers(max([self.selected_idx - 1, 0]))
+            else:
+                self.selector_popup.refresh()
+                self.selector_popup.select_arrow.rect.topleft -= pg.Vector2(0, 16) * self.scale
 
         return None
 

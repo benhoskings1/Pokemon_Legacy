@@ -18,6 +18,8 @@ class Pokedex:
         if "caught" not in self.data.columns:
             self.data["caught"] = False
 
+            # print(self.data.head())
+
         self.main_display = None
         self.touch_display = None
 
@@ -44,9 +46,11 @@ class Pokedex:
 
                 elif event.type == pg.KEYDOWN:
                     if event.key == self.controller.a and self.main_display.display_state == PokedexDisplayStates.home:
-                        self.main_display.display_state = PokedexDisplayStates.info
-                        self.main_display.update()
-                        self.update_display()
+                        # print(self.data.loc[self.data["Local_Num"] == self.main_display.pokemon_idx, "caught"])
+                        if self.data.loc[self.data["Local_Num"] == self.main_display.pokemon_idx, "appearances"].iloc[0] > 0:
+                            self.main_display.display_state = PokedexDisplayStates.info
+                            self.main_display.update()
+                            self.update_display()
 
                     elif event.key == self.controller.b:
                         if self.main_display.display_state == PokedexDisplayStates.home:
@@ -67,7 +71,6 @@ class Pokedex:
                             self.main_display.pokemon_idx += 1
                             self.main_display.update()
                             self.update_display()
-                            print("down")
 
     def clear_surfaces(self):
         self.main_display = None

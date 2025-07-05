@@ -10,6 +10,7 @@ from battle_action import BattleAction, BattleActionType, BattleAttack, BattleTa
 from displays.battle.battle_display_main import BattleDisplayMain, LevelUpBox
 from displays.battle.battle_display_touch import *
 from displays.battle.learn_move_display import LearnMoveDisplay
+from displays.battle.battle_catch_display import BattleCatchDisplay
 
 from general.utils import *
 from general.Animations import createAnimation
@@ -774,6 +775,14 @@ class Battle:
 
         self.update_upper_screen()
 
+    def wild_catch_display(self):
+        self.display_message(f"{self.foe.name}'s data was added to the pokedex", duration=2000)
+        catch_display = BattleCatchDisplay(self.screenSize, self.foe, scale=2)
+        self.game.topSurf.blit(catch_display.get_surface(), (0, 0))
+        pg.display.flip()
+        # wait for key
+        self.game.wait_for_key()
+
     def loop(self):
         while self.running:
             # get speed of wild Pokémon
@@ -798,8 +807,9 @@ class Battle:
                 if not end:
                     if pokemon.health > 0:
                         res = self.take_turn(pokemon, friendlyAction if pokemon.friendly else foeAction)
-                        if res == BattleOutcome.catch:
-                            end = True
+                        if isinstance(res, BattleOutcome):
+                            return res
+
                     # check if both Pokémon are still alive
                     if self.checkKOs():
                         end = True
@@ -822,13 +832,28 @@ class Battle:
             self.active_touch_display = self.touch_displays[TouchDisplayStates.home]
             self.update_screen()
 
-        # anything here happens after all the Pokémon have fainted
+    def entry_sequence(self):
+        ...
+
+    def exit_sequence(self, outcome: BattleOutcome):
+        if outcome == BattleOutcome.catch:
+            # add pokemon to the pokedex
+            self.wild_catch_display()
+
+        # clear up pk stats
         for pk in self.pokemon_team.pokemon:
             pk.resetStatStages()
 
         self.game.bottomSurf.blit(self.lowerScreenBase, (0, 0))
         pg.display.flip()
         self.fadeOut(1000)
+
+    def run(self):
+        self.entry_sequence()
+
+        outcome = self.loop()
+
+        self.exit_sequence(outcome)
 
     def clearSurfaces(self):
         self.pokemon_team = None
@@ -861,11 +886,11 @@ if __name__ == '__main__':
     with open("test_data/bag/test_bag.json", "r") as read_file:
         bag_data = json.load(read_file)
 
-    demo_game = Game(scale=1, from_pickle=False, overwrite=False, optimize=False)
+    demo_game = Game(scale=1, overwrite=False, save_slot=1)
     print("game loaded")
 
     demo_game.bag = BagV2(bag_data)
 
     battle = Battle(demo_game, route_name="Route 201", wild_name="Abra", wildLevel=5)
 
-    battle.loop()
+    battle.run()

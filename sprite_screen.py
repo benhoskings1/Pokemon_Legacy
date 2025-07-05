@@ -1,5 +1,5 @@
 import pygame as pg
-from screen_V2 import Screen
+from screen_V2 import Screen, BlitLocation
 
 from player import Player
 from pokemon import Pokemon
@@ -54,10 +54,6 @@ class GameObjects(pg.sprite.Group):
             if isinstance(obj, Player):
                 screen.add_surf(obj.image, pos=obj.blit_rect.topleft, sprite=True)
             elif isinstance(obj, Pokemon) and obj.visible:
-                screen.add_surf(obj.image, pos=obj.rect.topleft, sprite=True)
-            elif obj.sprite_type == "animation" or obj.sprite_type == "pokeball":
-                screen.add_surf(obj.image, pos=obj.rect.topleft, sprite=True)
-            elif obj.sprite_type == "text_box":
                 screen.add_surf(obj.image, pos=obj.rect.topleft, sprite=True)
             elif isinstance(obj, DisplayContainer):
                 screen.add_surf(obj.get_surface(), pos=obj.rect.topleft, sprite=True)

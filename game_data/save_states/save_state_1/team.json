@@ -2,7 +2,7 @@
     {
         "Name": "Piplup",
         "Level": 5,
-        "XP": 149,
+        "XP": 178,
         "Move_Names": [
             "Pound",
             "Growl",
@@ -10,13 +10,13 @@
         ],
         "Move_PPs": [
             35,
-            28,
-            28
+            40,
+            30
         ],
-        "Health": 16,
+        "Health": 20,
         "Status": null,
         "EVs": [
-            1,
+            2,
             0,
             0,
             0,
@@ -32,8 +32,8 @@
             31
         ],
         "Gender": "male",
-        "Nature": "Rash",
-        "ability_name": "Torrent",
+        "Nature": "Serious",
+        "ability_name": "Defiant",
         "KO": false,
         "Stat_Stages": {
             "attack": 0,
@@ -47,7 +47,7 @@
         "Friendly": true,
         "Shiny": true,
         "Visible": true,
-        "Catch_Date": "2025-06-21",
+        "Catch_Date": "2025-06-28",
         "Catch_Location": null,
         "Catch_Level": 5
     },
@@ -61,7 +61,7 @@
         ],
         "Move_PPs": [
             35,
-            28
+            30
         ],
         "Health": 19,
         "Status": null,
@@ -82,8 +82,8 @@
             31
         ],
         "Gender": "male",
-        "Nature": "Docile",
-        "ability_name": "Iron Fist",
+        "Nature": "Rash",
+        "ability_name": "Blaze",
         "KO": false,
         "Stat_Stages": {
             "attack": 0,
@@ -97,8 +97,56 @@
         "Friendly": true,
         "Shiny": true,
         "Visible": true,
-        "Catch_Date": "2025-06-21",
+        "Catch_Date": "2025-06-28",
         "Catch_Location": null,
         "Catch_Level": 5
+    },
+    {
+        "Name": "Bidoof",
+        "Level": 2,
+        "XP": 8,
+        "Move_Names": [
+            "Tackle"
+        ],
+        "Move_PPs": [
+            35
+        ],
+        "Health": 14,
+        "Status": null,
+        "EVs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "IVs": [
+            21,
+            25,
+            1,
+            24,
+            6,
+            3
+        ],
+        "Gender": "female",
+        "Nature": "Bold",
+        "ability_name": "Unaware",
+        "KO": false,
+        "Stat_Stages": {
+            "attack": 0,
+            "defence": 0,
+            "spAttack": 0,
+            "spDefence": 0,
+            "speed": 0,
+            "accuracy": 0,
+            "evasion": 0
+        },
+        "Friendly": true,
+        "Shiny": false,
+        "Visible": true,
+        "Catch_Date": "2025-06-28",
+        "Catch_Location": "Route 202",
+        "Catch_Level": 2
     }
 ]
