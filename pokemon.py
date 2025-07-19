@@ -1,8 +1,12 @@
+import os
+import importlib.resources as resources
+
 import datetime
 import pickle
 from enum import Enum
 from math import floor
-from random import randint, choice, random
+# from random import randint, choice, random
+import random
 
 import cv2
 import pandas as pd
@@ -13,6 +17,7 @@ from general.Animations import Animations, createAnimation
 from general.Move import getMove
 from general.ability import Ability
 from Image_Processing.ImageEditor import ImageEditor
+
 
 with open("game_data/Pokedex/LocalDex/LocalDex.pickle", 'rb') as file:
     pokedex: pd.DataFrame = pickle.load(file)
@@ -229,7 +234,7 @@ class Pokemon(pg.sprite.Sprite):
             self.type2 = data.Type[1]
 
         XP = int(level_up_values.loc[Level, self.growthRate]) if XP is None else XP
-        Level = randint(1, 10) if Level is None else Level
+        Level = random.randint(1, 10) if Level is None else Level
 
         self.level, self.exp = Level, XP
         self.level_exp = int(level_up_values.loc[Level, self.growthRate])
@@ -237,31 +242,14 @@ class Pokemon(pg.sprite.Sprite):
         self.evolveLevel = oldData.Evolve_Level
 
         if Move_Names is None:
-            Move_Names = []
-            possibleMoves = []
-            for name, level in self.moveData:
-                if capWildMoves:
-                    if level <= self.level:
-                        possibleMoves.append(name)
-
-                else:
-                    possibleMoves.append(name)
-
-                if len(possibleMoves) < 4:
-                    moveCount = len(possibleMoves)
-                else:
-                    moveCount = 4
-
-                for _ in range(moveCount):
-                    move = choice(possibleMoves)
-                    Move_Names.append(move)
-                    possibleMoves.remove(move)
+            possible_moves = [name for name, level in self.moveData if level <= self.level]
+            Move_Names = random.choices(possible_moves, k=min([4, len(possible_moves)]))
 
         self.moveNames = Move_Names
         self.moves = [getMove(move_name) for move_name in Move_Names]
 
         self.EVs = EVs if EVs is not None else [0 for _ in range(6)]
-        self.IVs = IVs if IVs is not None else [randint(0, 31) for _ in range(6)]
+        self.IVs = IVs if IVs is not None else [random.randint(0, 31) for _ in range(6)]
 
         self.stats = Stats(exp=data.Base_Exp)
         self.updateStats()
@@ -273,21 +261,13 @@ class Pokemon(pg.sprite.Sprite):
             self.gender = Gender.lower()
         else:
             genders = data.Gender
-            if genders:
-                num = random() * 100
-                self.gender = "male" if num < genders[0] else "female"
-            else:
-                self.gender = None
+            self.gender = ("male" if random.random() * 100 < genders[0] else "female") if genders else None
 
-        ability_name = ability_name if ability_name else choice(data.Abilities[:len(data.Abilities)])
+        ability_name = ability_name if ability_name else random.choice(data.Abilities[:len(data.Abilities)])
         self.ability = Ability(name=ability_name)
-        self.nature = Nature if Nature else natures.loc[randint(0, 24)].Name
+        self.nature = Nature if Nature else natures.loc[random.randint(0, 24)].Name
 
-        if Shiny:
-            self.shiny = Shiny
-        else:
-            # one in 4096 chance for a pokemon to be shiny
-            self.shiny = True if randint(0, 4095) == 0 else False
+        self.shiny = Shiny if Shiny else (True if random.randint(0, 4095) == 0 else False)
 
         self.sprite = PokemonSprite(self.ID, self.shiny, friendly=self.friendly)
 
@@ -407,13 +387,8 @@ class Pokemon(pg.sprite.Sprite):
             hits = 1
             heal = 0
 
-        num = randint(0, 99) / 100
-        if num < critChance[critStage]:
-            crit = True
-            critical = 2
-        else:
-            crit = False
-            critical = 1
+        num = random.randint(0, 99) / 100
+        crit, critical = (True, 2) if num < critChance[critStage] else (False, 1)
 
         baseDamage = self.getMoveDamage(move, target, crit)
 
@@ -428,12 +403,9 @@ class Pokemon(pg.sprite.Sprite):
 
         item, first = 1, 1
 
-        rand = randint(85, 100) / 100
+        rand = random.randint(85, 100) / 100
 
-        if move.type == self.type1 or move.type == self.type2:
-            STAB = 1.5
-        else:
-            STAB = 1
+        STAB = 1.5 if (move.type == self.type1 or move.type == self.type2) else 1
 
         type1 = effectiveness.loc[str.upper(move.type), target.type1]
 
@@ -545,13 +517,8 @@ class Pokemon(pg.sprite.Sprite):
     # ========== DISPLAY FUNCTIONS BELOW  =============
     def get_json_data(self):
         movePPs = [move.PP for move in self.moves]
-        if self.status:
-            status = self.status.value
-        else:
-            status = None
-
-        if self.friendly:
-            self.visible = True
+        status = self.status.value if self.status else None
+        self.visible = True if self.friendly else self.visible
 
         data = {
             "Name": self.name, "Level": self.level, "XP": self.exp,

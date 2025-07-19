@@ -24,6 +24,7 @@ class MenuTeamDisplayStates(Enum):
     mail = 5
     battle_items = 6
     key_items = 7
+    exit = 8
 
 
 class PocketButton(pg.sprite.Sprite):
@@ -63,6 +64,22 @@ class ItemSelector(pg.sprite.Sprite):
 
         self.sprite_type = "selector"
         self.id = None
+
+
+class SelectedContainer(DisplayContainer):
+    def __init__(self, item, scale=1):
+        DisplayContainer.__init__(
+            self, "assets/containers/menu/bag/item_selected.png", item, pg.Vector2(35, 146)*scale, scale=scale
+        )
+
+        self.add_text_2(f"{item.name} was selected", pg.Rect(pg.Vector2(13, 9)*scale, pg.Vector2(100, 28)*scale))
+
+        self.rect.topleft = pg.Vector2(35, 146)*scale
+
+
+class SelectorPopup(DisplayContainer):
+    def __init__(self, item, scale=1):
+        ...
 
 
 class ItemSetContainer(DisplayContainer):
@@ -119,7 +136,8 @@ class MenuBagDisplay(SpriteScreen):
                  re.match(r"frame_\d", file_name)]
         self.pokeball_frame_count = len(files)
 
-        self.pocket_buttons = [PocketButton(item_type, scale=self.scale) for item_type in MenuTeamDisplayStates]
+        self.pocket_buttons = [PocketButton(item_type, scale=self.scale) for item_type in MenuTeamDisplayStates
+                               if item_type != MenuTeamDisplayStates.items.exit]
 
         self.touch_display.sprites.add(self.pocket_buttons)
         self.update_display()
@@ -193,7 +211,17 @@ class MenuBagDisplay(SpriteScreen):
                 self.pokeball_frame_idx = (self.pokeball_frame_idx - 1) % (self.pokeball_frame_count - 1)
 
         elif key == controller.a:
-            return self.selected_item
+            if self.selected_item:
+                selected_container = SelectedContainer(self.selected_item, scale=self.scale)
+                popup_container = ...
+                self.sprites.add(selected_container)
+                self.update_display()
+                # item loop here!
+
+                return self.selected_item
+
+        elif key == controller.b:
+            return MenuTeamDisplayStates.exit
 
         self.selector.rect.top = (15 + 16 * min([4, self.item_ids[self.active_display_state.value]])) * self.scale
 
@@ -211,6 +239,10 @@ class MenuBagDisplay(SpriteScreen):
                         action = self.process_input(event.key, controller)
                         if isinstance(action, Item):
                             print(action)
+
+                        elif isinstance(action, MenuTeamDisplayStates):
+                            if action == MenuTeamDisplayStates.exit:
+                                return MenuTeamDisplayStates.exit
 
                 elif event.type == pg.MOUSEBUTTONDOWN:
                     pos = pg.Vector2(pg.mouse.get_pos()) - pg.Vector2(0, self.size.y)

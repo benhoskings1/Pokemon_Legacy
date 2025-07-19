@@ -437,7 +437,8 @@ class BattleDisplayBagItem(SpriteScreen):
 
         self.sprites.add([return_container])
 
-        item_containers = [ItemContainer(item, count, self.parent_display_type, pos=ITEM_CONTAINER_POSITIONS[idx], scale=scale) for idx, (item, count) in enumerate(items.items())]
+        item_containers = [ItemContainer(item, count, self.parent_display_type, pos=ITEM_CONTAINER_POSITIONS[idx], scale=scale)
+                           for idx, (item, count) in enumerate(items.items()) if idx < 4]
         self.sprites.add(item_containers)
 
     def update_container(self, item, count):

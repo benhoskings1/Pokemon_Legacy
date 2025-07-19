@@ -36,7 +36,7 @@ class Game:
         self.overwrite: bool = overwrite
         self.save_slot: int = save_slot
 
-        self.data_path = f"game_data/save_states/{'save_state_' + save_slot if not new else 'start'}"
+        self.data_path = f"game_data/save_states/{'save_state_' + str(save_slot) if not new else 'start'}"
 
         self.running = True
 
@@ -102,8 +102,6 @@ class Game:
             # update player with the Surfaces
             self.player = gameData.player
             self.player.loadSurfaces("Sprites/Player Sprites")
-            # self.player.walkingSpriteSet.scaleSprites(1.4)
-            # self.player.runningSpriteSet.scaleSprites(1.4)
             self.player.update()
 
             # update poketech with the Surfaces
@@ -117,9 +115,6 @@ class Game:
         else:
             # create new player instance
             self.player = Player("Sprites/Player Sprites", position=pg.Vector2(10, 9))
-            # self.player.walkingSpriteSet.scaleSprites(1.4)
-            # self.player.runningSpriteSet.scaleSprites(1.4)
-            # self.player.update()
 
             self.poketech = Poketech(self.time)
 

@@ -1,4 +1,6 @@
 import os
+import importlib.resources as resources
+
 from enum import Enum
 from math import floor, ceil
 
@@ -6,6 +8,8 @@ import numpy as np
 import pygame as pg
 
 from general.utils import Colours
+
+MODULE_PATH = resources.files(__package__)
 
 
 class CharacterType(Enum):
@@ -64,7 +68,7 @@ class Font:
         self.letters = {}
         self.sizes = {}
 
-        names = sorted(os.listdir("font/Letter Images"))
+        names = sorted(os.listdir(os.path.join(MODULE_PATH, "Letter Images")))
 
         for name in names:
             letter = name[0]
@@ -74,7 +78,7 @@ class Font:
                 letter = "/"
 
             if name.endswith(".png"):
-                image = pg.image.load(str.format("font/Letter Images/{}", name))
+                image = pg.image.load(str.format(os.path.join(MODULE_PATH, "Letter Images/{}"), name))
                 newImage = pg.transform.scale(image, pg.Vector2(image.get_size()) * scale)
                 self.sizes[letter] = newImage.get_size()
                 self.letters[letter] = newImage
@@ -294,7 +298,7 @@ class LevelFont:
         self.letters = {}
         self.sizes = {}
 
-        names = sorted(os.listdir("font/Level"))
+        names = sorted(os.listdir(os.path.join(MODULE_PATH, "Level")))
 
         for name in names:
 
@@ -302,7 +306,7 @@ class LevelFont:
             if "slash" in name:
                 letter = "/"
 
-            image = pg.image.load(str.format("font/Level/{}", name))
+            image = pg.image.load(str.format(os.path.join(MODULE_PATH, "Level/{}"), name))
             newImage = pg.transform.scale(image, pg.Vector2(image.get_size()) * scale)
             self.sizes[letter] = newImage.get_size()
             self.letters[letter] = newImage
@@ -383,3 +387,7 @@ class ClockFont:
             offset.x += self.sizes[letter][0]
 
         return textSurf
+
+
+if __name__ == "__main__":
+    test_font = Font(2)

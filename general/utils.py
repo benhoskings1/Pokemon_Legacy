@@ -43,8 +43,8 @@ def clean_surfaces(obj, _path='root'):
         return obj
 
 
-with open("game_data/Pokedex/LocalDex/LocalDex.pickle", 'rb') as file:
-    pokedex: pd.DataFrame = pickle.load(file)
+# with open("game_data/Pokedex/LocalDex/LocalDex.pickle", 'rb') as file:
+#     pokedex: pd.DataFrame = pickle.load(file)
 
 editor = ImageEditor()
 

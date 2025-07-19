@@ -207,8 +207,6 @@ class PokemonMovesContainer(DisplayContainer):
             )
 
 
-
-
 class PokemonSelectorContainer(DisplayContainer):
     def __init__(self, scale=1):
         DisplayContainer.__init__(
